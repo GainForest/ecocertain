@@ -818,7 +818,7 @@ const HypercertForm = () => {
 													{field.value && (
 														<div className="mt-4 aspect-video w-full rounded-lg border border-border">
 															<iframe
-																src={`https://trace.gainforest.app/?geojsonUrl=${encodeURIComponent(
+																src={`https://gainforest.app/?geojsonURL=${encodeURIComponent(
 																	field.value,
 																)}`}
 																className="h-full w-full rounded-lg"

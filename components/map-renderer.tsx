@@ -62,7 +62,7 @@ export default function MapRenderer({ uri }: MapRendererProps) {
 				}
 
 				const cid = match[1];
-				const _baseUrl = `https://www.trace.gainforest.app/?geojsonUrl=https://gateway.pinata.cloud/ipfs/${cid}`;
+				const _baseUrl = `https://www.gainforest.app/?geojsonURL=https://gateway.pinata.cloud/ipfs/${cid}`;
 
 				setMapData({
 					baseUrl: _baseUrl,
