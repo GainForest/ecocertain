@@ -62,10 +62,32 @@ export default function MapRenderer({ uri }: MapRendererProps) {
 				}
 
 				const cid = match[1];
-				const _baseUrl = `https://www.trace.gainforest.app/?geojsonUrl=https://gateway.pinata.cloud/ipfs/${cid}`;
+				const TRACE_ENDPOINT = "https://www.trace.gainforest.app/?geojsonUrl=";
+				const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${cid}`;
+				const gcpUrl = `https://storage.googleapis.com/ecocertain-public/geojson/${cid}.geojson`;
+
+				// Try IPFS gateway first, fallback to GCP
+				let finalUrl: string;
+				try {
+					const response = await fetch(ipfsUrl);
+					if (response.ok) {
+						finalUrl = ipfsUrl;
+					} else {
+						// Try GCP fallback
+						const gcpResponse = await fetch(gcpUrl);
+						if (gcpResponse.ok) {
+							finalUrl = gcpUrl;
+						} else {
+							throw new Error("Failed to fetch the shapefile.");
+						}
+					}
+				} catch (error) {
+					console.error("Error fetching GeoJSON:", error);
+					throw new Error("Failed to fetch the shapefile.");
+				}
 
 				setMapData({
-					baseUrl: _baseUrl,
+					baseUrl: TRACE_ENDPOINT + finalUrl,
 					metadata: validationResult.data as HypercertMetadata,
 				});
 			} catch (error) {
