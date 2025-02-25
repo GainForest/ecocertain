@@ -5,6 +5,8 @@ import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import useCopy from "@/hooks/use-copy";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
+import checkMultisigWallet from "@/lib/checkMultisigWallet";
+import generateSafeAppLink from "@/lib/generateSafeAppLink";
 import { cn } from "@/lib/utils";
 import {
 	ChainId,
@@ -16,6 +18,8 @@ import type {
 } from "ethers";
 import { motion } from "framer-motion";
 import {
+	ArrowRight,
+	ArrowUpRight,
 	Check,
 	ChevronLeft,
 	Circle,
@@ -25,7 +29,9 @@ import {
 	Loader2,
 	RotateCw,
 } from "lucide-react";
-import React, {
+import Link from "next/link";
+import type React from "react";
+import {
 	type Dispatch,
 	type SetStateAction,
 	useEffect,
@@ -142,11 +148,13 @@ const TransactionProgress = ({
 		useState<TransactionProgressStatusKey>("COMPLETED");
 	const [error, setError] = useState(true);
 	const [transactionReceipt, setTransactionReceipt] = transactionReceiptState;
+	const [customDescription, setCustomDescription] =
+		useState<React.ReactNode | null>(null);
 	const { copy: copyTxnHash, isCopied: isTxnHashCopied } = useCopy();
 
 	const ordersInfo = useOrdersInfo(hypercert);
 	const { orderId, units: unitsToBuy } = orderPreferences;
-	const { address, chainId } = useAccount();
+	const { address, chainId, chain: currentChain } = useAccount();
 
 	const provider = useEthersProvider({ chainId: Number(chainId) });
 	const signer = useEthersSigner({ chainId: Number(chainId) });
@@ -154,6 +162,16 @@ const TransactionProgress = ({
 	const startTransaction = async () => {
 		setError(false);
 		setStatus("PREPARING");
+		setCustomDescription(null);
+		if (!currentChain) {
+			setError(true);
+			return;
+		}
+		const isMultisigWallet = await checkMultisigWallet(
+			currentChain,
+			address as `0x${string}`,
+		);
+
 		const hcExchangeClient = new HypercertExchangeClient(
 			Number(chainId) ?? SUPPORTED_CHAINS[0].id,
 			// @ts-ignore
@@ -164,8 +182,8 @@ const TransactionProgress = ({
 		const ordersResponse = await hcExchangeClient.api.fetchOrdersByHypercertId({
 			hypercertId: hypercert.hypercertId,
 		});
-		const orders = ordersResponse.data;
-		if (orders === null || orderId === undefined) {
+		const orders = ordersResponse?.data;
+		if (!Array.isArray(orders) || orderId === undefined) {
 			setError(true);
 			return;
 		}
@@ -186,12 +204,30 @@ const TransactionProgress = ({
 		let approveTx: ContractTransactionResponse;
 		try {
 			setStatus("SPEND_APPROVING");
-
+			if (isMultisigWallet) {
+				setCustomDescription(
+					<>
+						Please approve the spending cap limit for the transaction.
+						<br />
+						<Link
+							href={generateSafeAppLink(currentChain, address as `0x${string}`)}
+							target="_blank"
+						>
+							<Button size={"sm"} className="h-6 gap-1 rounded-sm p-2">
+								<span>View in Safe</span>
+								<ArrowUpRight size={16} />
+							</Button>
+						</Link>
+					</>,
+				);
+			}
 			approveTx = await hcExchangeClient.approveErc20(
 				order.currency,
 				totalPrice,
 			);
+			setCustomDescription(null);
 		} catch (error) {
+			setCustomDescription(null);
 			setError(true);
 			return;
 		}
@@ -202,7 +238,6 @@ const TransactionProgress = ({
 			if (!receipt || receipt.status === 0) {
 				throw new Error();
 			}
-			setTransactionReceipt(receipt);
 		} catch (error) {
 			setError(true);
 			return;
@@ -220,16 +255,37 @@ const TransactionProgress = ({
 
 		try {
 			setStatus("SIGNING");
+			if (isMultisigWallet) {
+				setCustomDescription(
+					<>
+						Waiting for you to sign the transaction...
+						<br />
+						<Link
+							href={generateSafeAppLink(currentChain, address as `0x${string}`)}
+							target="_blank"
+						>
+							<Button size={"sm"} className="h-6 gap-1 rounded-sm p-2">
+								<span>View in Safe</span>
+								<ArrowUpRight size={16} />
+							</Button>
+						</Link>
+					</>,
+				);
+			}
 			transaction = await hcExchangeClient
 				.executeOrder(order, takerOrder, order.signature, undefined, overrides)
 				.call();
+			// Wait for transaction to be mined to get receipt
+			setCustomDescription(null);
 		} catch (e) {
 			setError(true);
+			setCustomDescription(null);
 			return;
 		}
 		try {
 			setStatus("TXN_PENDING");
-			await transaction.wait();
+			const receipt = await transaction.wait();
+			setTransactionReceipt(receipt);
 		} catch (error) {
 			setError(true);
 			return;
@@ -241,6 +297,8 @@ const TransactionProgress = ({
 	useEffect(() => {
 		if (!provider || !signer) {
 			setStatus("INITIALIZING");
+			setCustomDescription(null);
+			setError(false);
 			return;
 		}
 		startTransaction();
@@ -312,6 +370,7 @@ const TransactionProgress = ({
 						transactionProgressStatusKeys.indexOf(status);
 					const isOlderStep = i < currentStatusKeyIndex;
 					const isUpcomingStep = i > currentStatusKeyIndex;
+					const isCurrentStep = i === currentStatusKeyIndex;
 
 					const showErrorVariant =
 						error && key === status && "errorState" in txnStatus;
@@ -347,12 +406,11 @@ const TransactionProgress = ({
 							<div
 								className="flex flex-col gap-1 px-2 transition-opacity"
 								style={{
-									opacity:
-										i === currentStatusKeyIndex
-											? 1
-											: Math.abs(i - currentStatusKeyIndex) === 1
-											  ? 0.8
-											  : 0.5,
+									opacity: isCurrentStep
+										? 1
+										: Math.abs(i - currentStatusKeyIndex) === 1
+										  ? 0.8
+										  : 0.5,
 								}}
 							>
 								<span
@@ -368,7 +426,11 @@ const TransactionProgress = ({
 								<span className="font-sans text-sm">
 									{showErrorVariant
 										? transactionProgressStatus[key].errorState?.description
-										: txnStatus.description}
+										: isCurrentStep
+										  ? customDescription !== null
+												? customDescription
+												: txnStatus.description
+										  : txnStatus.description}
 								</span>
 								{showErrorVariant && (
 									<div className="flex items-center gap-2">
@@ -396,18 +458,34 @@ const TransactionProgress = ({
 											<span className="inline-block w-[150px] truncate rounded-full border border-border px-2 text-sm">
 												{transactionReceipt.hash}
 											</span>
-											<Button
-												size={"sm"}
-												variant={"outline"}
-												className="h-6 w-fit gap-1 rounded-sm p-2"
-												onClick={() => copyTxnHash(transactionReceipt.hash)}
-											>
-												{isTxnHashCopied ? (
-													<Check size={16} />
-												) : (
-													<Copy size={16} />
-												)}
-											</Button>
+											{currentChain?.blockExplorers?.default.url ? (
+												<Link
+													href={`${currentChain?.blockExplorers?.default.url}/tx/${transactionReceipt.hash}`}
+													target="_blank"
+												>
+													<Button
+														size={"sm"}
+														variant={"outline"}
+														className="h-6 w-fit gap-1 rounded-sm p-2"
+													>
+														<span>View on Block Explorer</span>
+														<ArrowUpRight size={16} />
+													</Button>
+												</Link>
+											) : (
+												<Button
+													size={"sm"}
+													variant={"outline"}
+													className="h-6 w-fit gap-1 rounded-sm p-2"
+													onClick={() => copyTxnHash(transactionReceipt.hash)}
+												>
+													{isTxnHashCopied ? (
+														<Check size={16} />
+													) : (
+														<Copy size={16} />
+													)}
+												</Button>
+											)}
 										</div>
 									)}
 							</div>

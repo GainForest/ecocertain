@@ -29,6 +29,7 @@ export const getUSDByCurrencyAddress = async (
   throw new Error("Failed to fetch USD price");
 };
 
+// The following function normalizes the tokens config to ensure that the address is always lowercase and the usdPriceFetcher is always defined
 const normalizeTokensConfig = (
   config: TokensConfig<"raw">
 ): TokensConfig<"normalized"> => {

@@ -11,13 +11,17 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/modern-dialog-extended";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import type React from "react";
+import { useAccount } from "wagmi";
 import useFullHypercert from "../../contexts/full-hypercert";
 import usePaymentFlowDialog from "./hooks/usePaymentFlowDialog";
 
 const PaymentFlowDialog = ({ children }: { children: React.ReactNode }) => {
 	const hypercert = useFullHypercert();
+	const { address } = useAccount();
 
 	const {
 		title,
@@ -71,7 +75,7 @@ const PaymentFlowDialog = ({ children }: { children: React.ReactNode }) => {
 									setVariant?.("amount-options");
 								}}
 							>
-								Finish
+								Close
 							</Button>
 						) : (
 							<Button
@@ -85,6 +89,14 @@ const PaymentFlowDialog = ({ children }: { children: React.ReactNode }) => {
 						)}
 					</DialogCancel>
 					{nextButton}
+					{transactionReceipt && transactionReceipt.status === 1 && address && (
+						<Link href={`/profile/${address}`}>
+							<Button>
+								<span>View supported hypercerts</span>
+								<ArrowRight size={16} />
+							</Button>
+						</Link>
+					)}
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

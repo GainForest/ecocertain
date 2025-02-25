@@ -18,21 +18,17 @@ const useMyHypercertsLink = (): {
 } => {
 	const { address, isConnected } = useAccount();
 	const pathname = usePathname();
-	const params = useSearchParams();
 
 	const hrefPath = `/profile/${address}`;
-	const hrefSuffix = "?view=created";
 	const config = {
 		type: "static" as const,
 		id: "my-hypercerts",
-		href: isConnected ? hrefPath + hrefSuffix : "#",
+		href: isConnected ? hrefPath : "#",
 		text: "My Hypercerts",
 		Icon: Sparkle,
 	};
 
-	const isActive = isConnected
-		? pathname === hrefPath && hrefSuffix === `?view=${params.get("view")}`
-		: false;
+	const isActive = isConnected ? pathname === hrefPath : false;
 
 	return { config, isActive };
 };
@@ -67,12 +63,16 @@ export const MyHypercerts: ClientLink = {
 		const data = useMyHypercertsLink();
 		return (
 			<div className="flex items-center justify-between gap-2">
-				<PhoneNavLink link={data.config} isActive={data.isActive} />
-				<QuickTooltip content="Please connect your wallet." openOnClick>
-					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive/20">
-						<CircleAlert className="text-destructive" size={16} />
-					</span>
-				</QuickTooltip>
+				<div className="flex flex-1 flex-col justify-center">
+					<PhoneNavLink link={data.config} isActive={data.isActive} />
+				</div>
+				{data.config.href === "#" && (
+					<QuickTooltip content="Please connect your wallet." openOnClick>
+						<span className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive/20">
+							<CircleAlert className="text-destructive" size={16} />
+						</span>
+					</QuickTooltip>
+				)}
 			</div>
 		);
 	},
