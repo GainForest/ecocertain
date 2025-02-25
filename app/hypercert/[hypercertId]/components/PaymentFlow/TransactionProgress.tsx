@@ -460,7 +460,7 @@ const TransactionProgress = ({
 											</span>
 											{currentChain?.blockExplorers?.default.url ? (
 												<Link
-													href={`${currentChain?.blockExplorers?.default.url}/tx/${transactionReceipt.hash}`}
+													href={`${currentChain.blockExplorers.default.url}/tx/${transactionReceipt.hash}`}
 													target="_blank"
 												>
 													<Button
