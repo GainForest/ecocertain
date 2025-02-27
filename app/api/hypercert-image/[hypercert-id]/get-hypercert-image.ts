@@ -62,12 +62,18 @@ export async function getHypercertImage(
 	hypercertId: string,
 ): Promise<{ contentType: string; buffer: Buffer }> {
 	try {
-		const res = await graphQlrequest(graphqlEndpoint, IMAGE_QUERY, {
-			hypercert_id: hypercertId,
-		});
+		const headers = {
+			"Cache-Control": "public, max-age=1800", // 30 minutes in seconds
+		};
+		const res = await graphQlrequest(
+			graphqlEndpoint,
+			IMAGE_QUERY,
+			{
+				hypercert_id: hypercertId,
+			},
+			headers,
+		);
 		const imageOrUrl = res.hypercerts.data?.[0]?.metadata?.image;
-
-		console.log("imageOrUrl", res);
 
 		// Use placeholder image if no image URL or data is found
 		if (!imageOrUrl || imageOrUrl === "https://hypercerts.org/logo.png") {
