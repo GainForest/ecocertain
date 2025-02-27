@@ -4,7 +4,6 @@ import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import Progress from "../shared/progress";
 
 // * REFACTORED from hypercerts-app hypercert-window
 const Card = ({ hypercert }: { hypercert: Hypercert }) => {
@@ -12,7 +11,6 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 		hypercertId,
 		name,
 		description,
-		image,
 		totalUnits,
 		unitsForSale,
 		pricePerPercentInUSD,
@@ -29,7 +27,7 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 			<article className="group relative overflow-hidden rounded-2xl border border-border bg-muted">
 				<div className="h-[320px] w-full overflow-hidden p-4">
 					<Image
-						src={image ?? ""}
+						src={`/api/hypercerts/${hypercertId}/image`}
 						alt={name ?? "Untitled"}
 						height={500}
 						width={500}

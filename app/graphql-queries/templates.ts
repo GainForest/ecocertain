@@ -5,7 +5,6 @@ export const hypercert = `
           chain_id
         }
         metadata {
-          image
           name
           description
         }

@@ -157,7 +157,6 @@ const fullHypercertByHypercertIdQuery = graphql(`
           chain_id
         }
         metadata {
-          image
           name
           description
           work_scope
