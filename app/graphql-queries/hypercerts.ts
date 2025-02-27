@@ -363,7 +363,6 @@ export const fetchFullHypercertById = async (
 		chainId:
 			(hypercert.contract?.chain_id as string).toLowerCase() ?? undefined,
 		metadata: {
-			image: metadata?.image ?? undefined,
 			name: metadata?.name ?? undefined,
 			description: metadata?.description ?? undefined,
 			work: {

@@ -66,7 +66,6 @@ export const fetchHypercertsByUserId = async (
 			chainId: (hypercert.contract?.chain_id as string) ?? undefined,
 			name: hypercert.metadata?.name ?? undefined,
 			description: hypercert.metadata?.description ?? undefined,
-			image: hypercert.metadata?.image ?? undefined,
 			totalUnits: typeCastApiResponseToBigInt(hypercert.units) ?? 0n,
 			unitsForSale: typeCastApiResponseToBigInt(
 				hypercert.orders?.totalUnitsForSale as string,
