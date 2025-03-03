@@ -84,7 +84,7 @@ export default async function HypercertPage({
 								</Link>
 							</div>
 						</div>
-						<FundingView hypercert={hypercert} />
+						<FundingView />
 					</div>
 					<div className="hidden w-full md:mt-1 md:block">
 						<Separator className="bg-beige-muted-foreground/20" />

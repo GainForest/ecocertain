@@ -3,11 +3,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as turf from "@turf/turf";
 import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	ArrowRight,
 	CalendarIcon,
 	Check,
+	ChevronDown,
+	Eye,
+	EyeOff,
+	FileText,
+	Info,
+	Settings,
 	Share2,
+	Sparkles,
 	TriangleAlert,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -37,13 +45,37 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 
+import { Dialog } from "@/components/ui/dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { BASE_URL } from "@/config/endpoint";
+import useMintHypercert from "@/hooks/use-mint-hypercert";
 import { toPng } from "html-to-image";
+import { CollapsibleDeploymentInfo } from "./collapsible-deployment-info";
+import { DeploymentInfoBox } from "./deployment-info-box";
 import HypercertCard from "./hypercert-card";
 import MintingProgressDialog from "./minting-progress-dialog";
 
+const INITIAL_BANNER_URL = `${BASE_URL}/ecocert-card/banner.webp`;
+const INITIAL_LOGO_URL = `${BASE_URL}/ecocert-card/logo.webp`;
 const telegramHandleRegex = /^@([a-zA-Z0-9_]{4,31})$/;
 const emailRegex =
 	/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+const AREA_ACTIVITIES = [
+	{ value: "Restoration", label: "Restoration - Bringing nature back" },
+	{
+		value: "Conservation",
+		label: "Conservation - Letting nature do its own thing",
+	},
+	{ value: "Landscape", label: "Landscape - Managing diverse activities" },
+	{ value: "Community", label: "Community - Empowering local community" },
+	{ value: "Science", label: "Science - Researching and monitoring" },
+] as const;
 
 const HypercertMintSchema = z
 	.object({
@@ -146,15 +178,15 @@ const HypercertForm = () => {
 		useState(false);
 	const [mintingFormValues, setMintingFormValues] =
 		useState<MintingFormValues>();
+	const [isMobileInfoExpanded, setIsMobileInfoExpanded] = useState(false);
 
 	const form = useForm<MintingFormValues>({
 		resolver: zodResolver(HypercertMintSchema),
 		defaultValues: {
 			title: "",
-			banner:
-				"https://pub-c2c1d9230f0b4abb9b0d2d95e06fd4ef.r2.dev/sites/93/2019/05/My-Post-9-1600x900.png",
+			banner: INITIAL_BANNER_URL,
 			description: "",
-			logo: "https://pbs.twimg.com/profile_images/1674865118914437130/9HjAHrYf_400x400.jpg",
+			logo: INITIAL_LOGO_URL,
 			link: "",
 			tags: "",
 			projectDates: [undefined, undefined],
@@ -483,10 +515,7 @@ const HypercertForm = () => {
 												<FormItem>
 													<FormLabel>Logo Image</FormLabel>
 													<FormControl>
-														<Input
-															placeholder="https://i.imgur.com/hypercert-logo.png"
-															{...field}
-														/>
+														<Input placeholder={INITIAL_LOGO_URL} {...field} />
 													</FormControl>
 													<FormMessage />
 												</FormItem>
@@ -500,7 +529,7 @@ const HypercertForm = () => {
 													<FormLabel>Background Banner Image</FormLabel>
 													<FormControl>
 														<Input
-															placeholder="https://i.imgur.com/hypercert-banner.png"
+															placeholder={INITIAL_BANNER_URL}
 															{...field}
 														/>
 													</FormControl>
@@ -558,30 +587,35 @@ const HypercertForm = () => {
 														What are you doing with this area?
 													</FormLabel>
 													<FormControl>
-														<select
-															className="w-full rounded-md border border-input bg-background px-3 py-2"
-															{...field}
-															value={field.value || ""}
-														>
-															<option value="" disabled>
-																Select an activity...
-															</option>
-															<option value="Restoration">
-																Restoration - Bringing nature back
-															</option>
-															<option value="Conservation">
-																Conservation - Letting nature do its own thing
-															</option>
-															<option value="Landscape">
-																Landscape - Managing diverse activities
-															</option>
-															<option value="Community">
-																Community - Empowering local community
-															</option>
-															<option value="Science">
-																Science - Researching and monitoring
-															</option>
-														</select>
+														<DropdownMenu>
+															<DropdownMenuTrigger asChild>
+																<Button
+																	variant="outline"
+																	className="w-full justify-between font-normal"
+																>
+																	{field.value
+																		? AREA_ACTIVITIES.find(
+																				(activity) =>
+																					activity.value === field.value,
+																		  )?.label
+																		: "Select an activity..."}
+																	<ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+																</Button>
+															</DropdownMenuTrigger>
+															<DropdownMenuContent className="w-[400px]">
+																{AREA_ACTIVITIES.map((activity) => (
+																	<DropdownMenuItem
+																		key={activity.value}
+																		onClick={() =>
+																			field.onChange(activity.value)
+																		}
+																		className="cursor-pointer"
+																	>
+																		{activity.label}
+																	</DropdownMenuItem>
+																))}
+															</DropdownMenuContent>
+														</DropdownMenu>
 													</FormControl>
 													<FormMessage />
 												</FormItem>
@@ -803,7 +837,7 @@ const HypercertForm = () => {
 								<div className="flex items-center justify-center">
 									<div className="relative mt-2 inline-flex flex-col items-center gap-2 self-start rounded-lg border border-orange-500/50 bg-orange-100/50 px-4 py-2 md:flex-row dark:bg-orange-950/50">
 										<TriangleAlert
-											className="mr-2 hidden text-orange-600 md:block dark:text-orange-300"
+											className="mr-2 hidden shrink-0 text-orange-600 md:block dark:text-orange-300"
 											size={16}
 										/>
 										<div className="-top-2 -right-2 absolute flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background md:hidden">
@@ -819,9 +853,6 @@ const HypercertForm = () => {
 									</div>
 								</div>
 								<div className="flex w-full items-center justify-end gap-2">
-									<Button type="submit" className="gap-2">
-										Submit <ArrowRight size={16} />
-									</Button>
 									<Button
 										type="button"
 										onClick={copyCurrentUrl}
@@ -835,27 +866,48 @@ const HypercertForm = () => {
 											</>
 										) : (
 											<>
-												Share Form <Share2 size={16} />
+												<Share2 size={16} />
+												Share Form
 											</>
 										)}
+									</Button>
+									<Button type="submit" className="gap-2">
+										Submit <ArrowRight size={16} />
 									</Button>
 								</div>
 							</CardContent>
 						</Card>
-						<div className="flex w-full justify-center rounded-3xl bg-beige-muted p-8 md:block md:w-auto md:justify-start md:bg-transparent md:p-0">
-							<HypercertCard
-								title={form.watch("title") || undefined}
-								banner={form.watch("banner") || undefined}
-								logo={form.watch("logo") || undefined}
-								workStartDate={form.watch("projectDates.0")}
-								workEndDate={form.watch("projectDates.1")}
-								badges={badges}
-								displayOnly={true}
-								contributors={
-									form.watch("contributors")?.split(", ").filter(Boolean) || []
-								}
-								ref={imageRef}
+						<div className="flex w-full flex-col justify-center md:sticky md:top-24 md:h-fit md:w-[336px]">
+							<div className="rounded-3xl rounded-b-none bg-beige-muted p-8 md:block md:bg-transparent md:p-0">
+								<div className="flex w-full items-center justify-center">
+									<HypercertCard
+										title={form.watch("title") || undefined}
+										banner={form.watch("banner") || undefined}
+										logo={form.watch("logo") || undefined}
+										workStartDate={form.watch("projectDates.0")}
+										workEndDate={form.watch("projectDates.1")}
+										badges={badges}
+										displayOnly={true}
+										contributors={
+											form.watch("contributors")?.split(", ").filter(Boolean) ||
+											[]
+										}
+										ref={imageRef}
+									/>
+								</div>
+							</div>
+
+							{/* Mobile Collapsible Info Box */}
+							<CollapsibleDeploymentInfo
+								isExpanded={isMobileInfoExpanded}
+								onToggle={() => setIsMobileInfoExpanded(!isMobileInfoExpanded)}
+								className="md:hidden"
 							/>
+
+							{/* Desktop Info Box */}
+							<div className="hidden md:mt-6 md:block">
+								<DeploymentInfoBox className="w-full" />
+							</div>
 						</div>
 					</div>
 				</form>

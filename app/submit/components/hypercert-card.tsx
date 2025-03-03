@@ -71,7 +71,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
 				<header className="relative flex h-[173px] w-full items-center justify-center overflow-clip rounded-b-xl">
 					{banner ? (
 						<Image
-							src={`https://cors-proxy.hypercerts.workers.dev/?url=${banner}`}
+							src={`${banner}`}
 							alt={`${title} banner`}
 							className="object-cover object-center"
 							fill
@@ -87,7 +87,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
 					<div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-300">
 						{logo ? (
 							<Image
-								src={`https://cors-proxy.hypercerts.workers.dev/?url=${logo}`}
+								src={`${logo}`}
 								alt={`${title} logo`}
 								fill
 								unoptimized

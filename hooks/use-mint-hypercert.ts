@@ -9,8 +9,8 @@ import {
 } from "@hypercerts-org/sdk";
 import { useEffect, useState } from "react";
 import { type TransactionReceipt, parseEther } from "viem";
+import type { WaitForTransactionReceiptData } from "wagmi/query";
 import { useSendEmailAndUpdateGoogle } from "./use-send-email-and-update-google";
-import { WaitForTransactionReceiptData } from "wagmi/query";
 
 type Payload = {
 	metaData: HypercertMetadata;
@@ -19,8 +19,8 @@ type Payload = {
 };
 
 export type HypercertMintReceiptData = {
-  hypercertId: string;
-  // biome-ignore lint/suspicious/noExplicitAny: any types need to be used here.
+	hypercertId: string;
+	// biome-ignore lint/suspicious/noExplicitAny: any types need to be used here.
 } & WaitForTransactionReceiptData<any, any>;
 
 const useMintHypercert = () => {
@@ -37,28 +37,28 @@ const useMintHypercert = () => {
 		throw new Error("Public client is not initialized");
 	}
 
-  const {
-    mutate: mintHypercert,
-    data: mintData,
-    status: mintStatus,
-    isIdle: isMintIdle,
-    isPending: isMintPending,
-    isSuccess: isMintSuccess,
-    isError: isMintError,
-    error: mintError,
-  } = useMutation({
-    mutationFn: (payload: Payload) => {
-      const { metaData, contactInfo, amount } = payload;
-      console.log("contactInfo", contactInfo);
-      console.log("amount", amount);
-      setContactInfo(contactInfo);
-      return client.mintClaim(
-        metaData,
-        100_000_000n,
-        TransferRestrictions.FromCreatorOnly
-      );
-    },
-  });
+	const {
+		mutate: mintHypercert,
+		data: mintData,
+		status: mintStatus,
+		isIdle: isMintIdle,
+		isPending: isMintPending,
+		isSuccess: isMintSuccess,
+		isError: isMintError,
+		error: mintError,
+	} = useMutation({
+		mutationFn: (payload: Payload) => {
+			const { metaData, contactInfo, amount } = payload;
+			console.log("contactInfo", contactInfo);
+			console.log("amount", amount);
+			setContactInfo(contactInfo);
+			return client.mintClaim(
+				metaData,
+				100_000_000n,
+				TransferRestrictions.FromCreatorOnly,
+			);
+		},
+	});
 
 	console.log("mintData", mintData);
 
@@ -104,27 +104,27 @@ const useMintHypercert = () => {
 		}
 	}, [receiptData?.hypercertId, contactInfo, sendEmailAndUpdateGoogle]);
 
-  return {
-    mintHypercert,
-    mintStatus,
-    isMintIdle,
-    isMintPending,
-    isMintSuccess,
-    isMintError,
-    mintData,
-    mintError,
-    receiptData: receiptData as HypercertMintReceiptData | undefined,
-    receiptError,
-    isReceiptPending,
-    isReceiptLoading,
-    isReceiptSuccess,
-    isReceiptError,
-    googleSheetsData,
-    googleSheetsStatus,
-    googleSheetsError,
-    metaData,
-    setMetaData,
-  };
+	return {
+		mintHypercert,
+		mintStatus,
+		isMintIdle,
+		isMintPending,
+		isMintSuccess,
+		isMintError,
+		mintData,
+		mintError,
+		receiptData: receiptData as HypercertMintReceiptData | undefined,
+		receiptError,
+		isReceiptPending,
+		isReceiptLoading,
+		isReceiptSuccess,
+		isReceiptError,
+		googleSheetsData,
+		googleSheetsStatus,
+		googleSheetsError,
+		metaData,
+		setMetaData,
+	};
 };
 
 export default useMintHypercert;

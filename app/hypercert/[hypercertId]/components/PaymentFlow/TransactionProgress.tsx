@@ -164,7 +164,7 @@ const TransactionProgress = ({
 		const ordersResponse = await hcExchangeClient.api.fetchOrdersByHypercertId({
 			hypercertId: hypercert.hypercertId,
 		});
-		const orders = ordersResponse.data;
+		const orders = ordersResponse?.data ?? [];
 		if (orders === null || orderId === undefined) {
 			setError(true);
 			return;
