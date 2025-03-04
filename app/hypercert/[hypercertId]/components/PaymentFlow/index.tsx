@@ -1,4 +1,5 @@
 "use client";
+import useFullHypercert from "@/app/contexts/full-hypercert";
 import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/modern-dialog-extended";
 import Image from "next/image";
 import type React from "react";
-import useFullHypercert from "../../contexts/full-hypercert";
 import usePaymentFlowDialog from "./hooks/usePaymentFlowDialog";
 
 const PaymentFlowDialog = ({ children }: { children: React.ReactNode }) => {

@@ -8,9 +8,11 @@ import { useEffect, useState } from "react";
 export const EvervaultCard = ({
 	children,
 	className,
+	gradientClassName = "bg-gradient-to-r from-lime-300 to-green-300",
 }: {
 	children?: React.ReactNode;
 	className?: string;
+	gradientClassName?: string;
 }) => {
 	const mouseX = useMotionValue(0);
 	const mouseY = useMotionValue(0);
@@ -54,6 +56,7 @@ export const EvervaultCard = ({
 					mouseX={mouseX}
 					mouseY={mouseY}
 					randomString={randomString}
+					gradientClassName={gradientClassName}
 				/>
 				<div className="relative z-10 flex items-center justify-center p-2 py-4">
 					<span className="z-20 text-black dark:text-white">{children}</span>
@@ -67,10 +70,12 @@ export function CardPattern({
 	mouseX,
 	mouseY,
 	randomString,
+	gradientClassName,
 }: {
 	mouseX: MotionValue<number>;
 	mouseY: MotionValue<number>;
 	randomString: string;
+	gradientClassName: string;
 }) {
 	const maskImage = useMotionTemplate`radial-gradient(250px at ${mouseX}px ${mouseY}px, white, transparent)`;
 	const style = { maskImage, WebkitMaskImage: maskImage };
@@ -79,7 +84,10 @@ export function CardPattern({
 		<div className="pointer-events-none">
 			<div className="absolute inset-0 rounded-2xl [mask-image:linear-gradient(white,transparent)] group-hover/card:opacity-50" />
 			<motion.div
-				className="absolute inset-0 rounded-2xl bg-gradient-to-r from-lime-300 to-green-300 opacity-0 backdrop-blur-xl transition duration-500 group-hover/card:opacity-100"
+				className={cn(
+					"absolute inset-0 rounded-2xl opacity-0 backdrop-blur-xl transition duration-500 group-hover/card:opacity-100",
+					gradientClassName,
+				)}
 				style={style}
 			/>
 			<motion.div

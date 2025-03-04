@@ -5,6 +5,7 @@ import EthAvatar from "@/components/ui/eth-avatar";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import { Separator } from "@/components/ui/separator";
 import UserChip from "@/components/user-chip";
+import { verifiedAttestors } from "@/config/gainforest";
 import { cn } from "@/lib/utils";
 import { Info, ShieldCheck } from "lucide-react";
 import React, { useState } from "react";
@@ -16,10 +17,8 @@ const EvaluationDetails = ({ hypercert }: { hypercert: FullHypercert }) => {
 	);
 	const [viewingAll, setViewingAll] = useState(false);
 
-	const hasGainforestAttestation = [...attesters].some(
-		(attester) =>
-			attester === "0xEf48752C933b1050187e89A9F909De2b9e0BDCE6" ||
-			attester === "0x40713Ca5223eFb79E861E282495092D2563c1eCE",
+	const hasGainforestAttestation = [...attesters].some((attester) =>
+		verifiedAttestors.has(attester),
 	);
 
 	return (

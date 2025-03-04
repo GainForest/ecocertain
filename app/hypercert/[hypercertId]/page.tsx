@@ -1,5 +1,6 @@
 import PageError from "@/app/components/shared/PageError";
 import Progress from "@/app/components/shared/progress";
+import { FullHypercertProvider } from "@/app/contexts/full-hypercert";
 import {
 	type FullHypercert,
 	fetchFullHypercertById,
@@ -17,7 +18,6 @@ import FundingView from "./components/FundingView";
 import CopyButton from "./components/copy-button";
 import LeftContent from "./components/left-content";
 import RightContent from "./components/right-content";
-import { FullHypercertProvider } from "./contexts/full-hypercert";
 
 export const dynamic = "force-dynamic";
 
@@ -84,7 +84,7 @@ export default async function HypercertPage({
 								</Link>
 							</div>
 						</div>
-						<FundingView hypercert={hypercert} />
+						<FundingView />
 					</div>
 					<div className="hidden w-full md:mt-1 md:block">
 						<Separator className="bg-beige-muted-foreground/20" />

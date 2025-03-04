@@ -68,6 +68,7 @@ type HypercertByHypercertIdQueryResponse = ResultOf<
 
 export type Hypercert = {
 	hypercertId: string;
+	creatorAddress: string;
 	chainId?: string;
 	name?: string;
 	description?: string;
@@ -113,6 +114,7 @@ const fetchHypercertById = async (hypercertId: string): Promise<Hypercert> => {
 
 	return {
 		hypercertId,
+		creatorAddress: hypercert.creator_address as string,
 		chainId: (hypercert.contract?.chain_id as string) ?? undefined,
 		name: hypercert.metadata?.name ?? undefined,
 		description: hypercert.metadata?.description ?? undefined,

@@ -391,7 +391,7 @@ const MintingProgress = ({
 							className="flex items-start gap-1"
 							data-status-key={key}
 						>
-							<div className="relative flex aspect-square h-[36px] scale-100 items-center justify-center overflow-hidden rounded-full border border-border bg-white dark:bg-black">
+							<div className="relative flex aspect-square h-[36px] shrink-0 scale-100 items-center justify-center overflow-hidden rounded-full border border-border bg-white dark:bg-black">
 								{showErrorVariant ? (
 									<CircleAlert size={20} className="text-destructive" />
 								) : key === configKey ? (
@@ -435,7 +435,7 @@ const MintingProgress = ({
 										? mintingProgressConfigs[key].errorState?.title
 										: mintingProgressConfig.title}
 								</span>
-								<span className="font-sans">
+								<span className="text-balance font-sans">
 									{showErrorVariant
 										? mintingProgressConfigs[key].errorState?.description
 										: mintingProgressConfig.description}
