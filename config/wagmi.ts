@@ -1,11 +1,11 @@
-import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import getPriceFeed from "@/lib/pricefeed";
+import { walletConnect } from "wagmi/connectors";
 
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createConfig, createStorage } from "wagmi";
 import { BASE_URL } from "./endpoint";
 import { sepolia, celo, mainnet } from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
-
+import { HttpTransport, fallback, http } from "viem";
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
 
@@ -84,13 +84,36 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/46801808"],
 };
 
+// TODO: Add alchemy key to .env and import it here
+const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY || "<placeholder>";
+
+export const getRpcUrlForChain = (chainId: number) => {
+  switch (chainId) {
+    case mainnet.id:
+      return `https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+    case sepolia.id:
+      return `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+    default:
+      throw new Error(`Unsupported chainId: ${chainId}`);
+  }
+};
+
 // Create wagmiConfig
-export const config = defaultWagmiConfig({
-  chains: SUPPORTED_CHAINS, // required
-  projectId, // required
-  metadata, // required
+// Create wagmiConfig
+export const config = createConfig({
+  chains: SUPPORTED_CHAINS,
+  connectors: [
+    walletConnect({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID! }),
+  ],
+  pollingInterval: 2_000,
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
+  transports: SUPPORTED_CHAINS.reduce((acc, chain) => {
+    const urls = [getRpcUrlForChain(chain.id)];
+    // @ts-expect-error
+    acc[chain.id] = fallback([...urls.map((url) => http(url)), http()]);
+    return acc;
+  }, {} as Record<number, HttpTransport>),
 });
