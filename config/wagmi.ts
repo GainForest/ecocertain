@@ -84,15 +84,15 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/46801808"],
 };
 
-// TODO: Add alchemy key to .env and import it here
-const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY || "<placeholder>";
+const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY || "";
+const infuraRPCEndpoint = `https://mainnet.infura.io/v3/${infuraKey}`;
 
 export const getRpcUrlForChain = (chainId: number) => {
   switch (chainId) {
     case mainnet.id:
-      return `https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`;
+      return infuraRPCEndpoint
     case sepolia.id:
-      return `https://eth-sepolia.g.alchemy.com/v2/${alchemyKey}`;
+      return infuraRPCEndpoint
     default:
       throw new Error(`Unsupported chainId: ${chainId}`);
   }
