@@ -2,29 +2,20 @@
 import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
-import { sendEmailAndUpdateGoogle } from "@/lib/sendEmailAndUpdateGoogle";
 import { cn } from "@/lib/utils";
-import { constructHypercertIdFromReceipt } from "@/utils/constructHypercertIdFromReceipt";
-import {
-	type ChainId,
-	type HypercertExchangeClient,
-	type SUPPORTED_CURRENCIES,
-	currenciesByNetwork,
+
+import type {
+	Currency,
+	HypercertExchangeClient,
 } from "@hypercerts-org/marketplace-sdk";
-import {
-	type HypercertMetadata,
-	TransferRestrictions,
-	formatHypercertData,
-	parseClaimOrFractionId,
-} from "@hypercerts-org/sdk";
+import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import { motion } from "framer-motion";
 import {
+	ArrowRight,
 	Check,
-	ChevronLeft,
 	Circle,
 	CircleAlert,
-	Copy,
-	Dot,
+	Info,
 	Loader2,
 	RotateCw,
 } from "lucide-react";
@@ -157,7 +148,7 @@ const ListingProgress = ({
 	hypercert: FullHypercert;
 	values: {
 		price: number;
-		currency: (typeof SUPPORTED_CURRENCIES)[number];
+		currency: Currency;
 	};
 	visible?: boolean;
 	setVisible: (visible: boolean) => void;
@@ -178,12 +169,6 @@ const ListingProgress = ({
 			setError(true);
 			return;
 		}
-		console.log("currency", currenciesByNetwork[chainId as ChainId]);
-		const currency = currenciesByNetwork[chainId as ChainId][values.currency];
-		if (!currency) {
-			setError(true);
-			return;
-		}
 
 		setConfigKey("CREATING_LISTING");
 		const [createMakerAskOutput, createMakerAskError] = await catchError(
@@ -195,13 +180,15 @@ const ListingProgress = ({
 				return await hypercertExchangeClient.createFractionalSaleMakerAsk({
 					startTime: Math.floor(new Date().getTime() / 1000), // Order start time (in seconds)
 					endTime: Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24 * 365, // [1 Year] Order end time (in seconds)
-					price: BigInt(values.price * 10 ** currency.decimals), // price multiplied by decimals
+					price:
+						BigInt(values.price * 10 ** values.currency.decimals) /
+						hypercert.totalUnits, // price multiplied by decimals
 					itemIds: [fractionId + 1n], // fraction id being sold
 					minUnitAmount: 1n, // minimum amount of units to sell per sale
 					maxUnitAmount: 1_000_000n, // Maximum amount of units to sell per sale
 					minUnitsToKeep: 0n, // Minimum amount of units to keep after the sale
 					sellLeftoverFraction: true, // If you want to sell the leftover fraction
-					currency: currency.address,
+					currency: values.currency.address,
 				});
 			},
 		);
@@ -335,9 +322,6 @@ const ListingProgress = ({
 		);
 	}, [configKey, error]);
 
-	useEffect(() => {
-		console.log("re-render");
-	});
 	return (
 		<div
 			className="relative w-full overflow-hidden"
@@ -439,12 +423,16 @@ const ListingProgress = ({
 									</div>
 								)}
 								{listingProgressConfig.isFinalState && (
-									<div className="flex flex-col gap-1">
-										{address && (
-											<Link href={`/profile/${address}?view=created`}>
-												<Button size={"sm"}>View my hypercerts</Button>
-											</Link>
-										)}
+									<div className="flex flex-col gap-2">
+										<Link href={`/hypercert/${hypercert.hypercertId}`}>
+											<Button size={"sm"} className="gap-2">
+												View hypercert <ArrowRight size={16} />
+											</Button>
+										</Link>
+										<span className="flex items-center gap-1 text-muted-foreground text-xs">
+											<Info size={16} />
+											It might take a few seconds to show up.
+										</span>
 									</div>
 								)}
 							</div>

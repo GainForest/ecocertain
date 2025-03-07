@@ -1,13 +1,12 @@
 "use client";
+import GetVerifiedDialog from "@/app/components/get-verified-dialog";
 import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
-import EthAvatar from "@/components/ui/eth-avatar";
 import { EvervaultCard } from "@/components/ui/evervault-card";
-import { Separator } from "@/components/ui/separator";
 import UserChip from "@/components/user-chip";
 import { verifiedAttestors } from "@/config/gainforest";
 import { cn } from "@/lib/utils";
-import { Info, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import React, { useState } from "react";
 
 const EvaluationDetails = ({ hypercert }: { hypercert: FullHypercert }) => {
@@ -32,10 +31,19 @@ const EvaluationDetails = ({ hypercert }: { hypercert: FullHypercert }) => {
 				</EvervaultCard>
 			)}
 			{attesters.size === 0 ? (
-				<div className="flex w-full flex-col items-center gap-1 px-8 py-4">
+				<div className="flex w-full flex-col items-center gap-4 px-8 py-4">
 					<span className="text-center text-muted-foreground leading-none">
 						This hypercert and the work has not been verified yet.
 					</span>
+					<GetVerifiedDialog
+						hypercertId={hypercert.hypercertId}
+						trigger={
+							<Button size={"sm"} className="gap-2">
+								<ShieldCheck size={16} />
+								Get Verified
+							</Button>
+						}
+					/>
 				</div>
 			) : (
 				// Display subtitle if there are no attesters other than gainforest.

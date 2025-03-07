@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,7 +8,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { SUPPORTED_CURRENCIES } from "@hypercerts-org/marketplace-sdk";
+import {
+	type Currency,
+	SUPPORTED_CURRENCIES,
+} from "@hypercerts-org/marketplace-sdk";
 import { ChevronDown } from "lucide-react";
 import React, {
 	type Dispatch,
@@ -18,6 +22,7 @@ import React, {
 const PriceForm = ({
 	priceState,
 	priceValidityErrorState,
+	currencyOptions,
 	currencyState,
 }: {
 	priceState: [number, Dispatch<SetStateAction<number>>];
@@ -25,9 +30,10 @@ const PriceForm = ({
 		string | null,
 		Dispatch<SetStateAction<string | null>>,
 	];
+	currencyOptions: Array<Currency>;
 	currencyState: [
-		(typeof SUPPORTED_CURRENCIES)[number],
-		Dispatch<SetStateAction<(typeof SUPPORTED_CURRENCIES)[number]>>,
+		Currency | undefined,
+		Dispatch<SetStateAction<Currency | undefined>>,
 	];
 }) => {
 	const [price, setPrice] = priceState;
@@ -68,31 +74,23 @@ const PriceForm = ({
 					value={priceInputValue}
 					onChange={(e) => {
 						setPriceInputValue(e.target.value);
-						const value = e.target.value;
 					}}
 				/>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							className="w-[100px] justify-between font-normal"
-						>
-							{selectedCurrency}
-							<ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-[100px]">
-						{SUPPORTED_CURRENCIES.map((currency) => (
-							<DropdownMenuItem
-								key={currency}
-								onClick={() => setSelectedCurrency(currency)}
-								className="cursor-pointer"
-							>
-								{currency}
-							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<Combobox
+					options={currencyOptions.map((currency) => ({
+						label: currency.symbol,
+						value: currency.symbol,
+					}))}
+					value={selectedCurrency?.symbol}
+					onChange={(value) => {
+						setSelectedCurrency(
+							currencyOptions.find((currency) => currency.symbol === value),
+						);
+					}}
+					placeholder="Select a currency"
+					emptyLabel="No currencies supported"
+					searchPlaceholder="Search for a currency"
+				/>
 			</div>
 			{priceValidityError && (
 				<p className="text-destructive text-sm">{priceValidityError}</p>

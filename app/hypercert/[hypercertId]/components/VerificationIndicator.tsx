@@ -1,4 +1,5 @@
 "use client";
+import GetVerifiedDialog from "@/app/components/get-verified-dialog";
 import useFullHypercert from "@/app/contexts/full-hypercert";
 import { verifiedAttestors } from "@/config/gainforest";
 import { cn } from "@/lib/utils";
@@ -39,12 +40,17 @@ const VerificationIndicator = () => {
 						<ShieldAlert size={16} className="opacity-50" />
 						<span>This ecocert is not verified.</span>
 					</span>
-					<button
-						className="flex items-center justify-center gap-1 focus:underline hover:underline"
-						type="button"
-					>
-						Apply Now <ArrowRight size={16} />
-					</button>
+					<GetVerifiedDialog
+						hypercertId={hypercert.hypercertId}
+						trigger={
+							<button
+								className="flex items-center justify-center gap-1 focus:underline hover:underline"
+								type="button"
+							>
+								Apply Now <ArrowRight size={16} />
+							</button>
+						}
+					/>
 				</div>
 			) : (
 				<div className="flex w-full items-center justify-center gap-1 text-center">

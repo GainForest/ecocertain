@@ -21,11 +21,59 @@ import type { ApiError } from "@/app/utils/graphql";
 import ListingProgress from "./listing-progress";
 
 import { Button } from "@/components/ui/button";
+import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
-import type { SUPPORTED_CURRENCIES } from "@hypercerts-org/marketplace-sdk";
-import { CircleAlert, Loader2, RefreshCcw, RefreshCw } from "lucide-react";
+import {
+	type ChainId,
+	type Currency,
+	type SUPPORTED_CURRENCIES,
+	currenciesByNetwork,
+} from "@hypercerts-org/marketplace-sdk";
+import { useQuery } from "@tanstack/react-query";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import {
+	ArrowRightLeft,
+	CircleAlert,
+	Loader2,
+	RefreshCcw,
+	RefreshCw,
+} from "lucide-react";
+import { useAccount } from "wagmi";
 import PriceForm from "./price-form";
 import Sidebar from "./sidebar";
+
+const ErrorSection = ({
+	title,
+	description,
+	cta,
+}: {
+	title: string;
+	description: string;
+	cta: React.ReactNode;
+}) => {
+	return (
+		<div className="flex flex-col items-center justify-center rounded-lg bg-destructive/5 p-4">
+			<CircleAlert size={36} className="text-destructive opacity-50" />
+			<span className="font-bold font-sans text-lg">{title}</span>
+			<p className="mt-1 text-balance text-center text-muted-foreground text-sm">
+				{description}
+			</p>
+			{cta}
+		</div>
+	);
+};
+
+const getCurrenciesSupportedOnChainByHypercerts = (
+	chainId: number | undefined,
+): Array<Currency> => {
+	if (!chainId) return [];
+	const hypercertChainId = chainId as ChainId;
+	if (hypercertChainId in currenciesByNetwork) {
+		const symbolToCurrencyMap = currenciesByNetwork[hypercertChainId];
+		return Object.values(symbolToCurrencyMap);
+	}
+	return [];
+};
 
 const CreateListingDialog = ({
 	hypercertId,
@@ -36,35 +84,40 @@ const CreateListingDialog = ({
 }) => {
 	const { client: hcExchangeClient } = useHypercertExchangeClient();
 
-	const [hypercert, setHypercert] = useState<FullHypercert>();
-	const [hypercertFetchError, setHypercertFetchError] = useState<ApiError>();
-	const [retry, setRetry] = useState(0);
+	const { chain: currentChain } = useAccount();
+	const isCurrentChainSupported = SUPPORTED_CHAINS.find(
+		(chain) => chain.id === currentChain?.id,
+	);
+	const { open } = useWeb3Modal();
+
+	const {
+		data: hypercert,
+		isLoading: hypercertLoading,
+		error: hypercertError,
+		refetch: refetchHypercert,
+	} = useQuery({
+		queryKey: ["hypercert", hypercertId],
+		queryFn: () => fetchFullHypercertById(hypercertId),
+	});
+
 	const [isProgressVisible, setIsProgressVisible] = useState(false);
 
 	const [price, setPrice] = useState(1);
 	const [priceValidityError, setPriceValidityError] = useState<string | null>(
 		null,
 	);
-	const [selectedCurrency, setSelectedCurrency] =
-		useState<(typeof SUPPORTED_CURRENCIES)[number]>("ETH");
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies(hypercertId): retry should be the only trigger for the side effect
-	// biome-ignore lint/correctness/useExhaustiveDependencies(retry): retry should be the only trigger for the side effect
-	useEffect(() => {
-		setHypercert(undefined);
-		setHypercertFetchError(undefined);
-		fetchFullHypercertById(hypercertId)
-			.then((hypercert) => {
-				setHypercert(hypercert);
-			})
-			.catch((error) => {
-				setHypercertFetchError(error);
-			});
-	}, [retry]);
+	const currencyOptions = getCurrenciesSupportedOnChainByHypercerts(
+		currentChain?.id,
+	);
+	const [selectedCurrency, setSelectedCurrency] = useState<
+		Currency | undefined
+	>(currencyOptions.length > 0 ? currencyOptions[0] : undefined);
 
 	const shouldDisplayForm =
+		isCurrentChainSupported &&
 		hypercert &&
-		!hypercertFetchError &&
+		!hypercertError &&
 		hypercert.orders.length === 0 &&
 		!isProgressVisible;
 
@@ -81,39 +134,53 @@ const CreateListingDialog = ({
 					</DialogDescription>
 				</DialogHeader>
 				<div className="flex min-h-80 w-full flex-1 flex-col">
-					{hypercertFetchError ? (
-						<div className="flex flex-col items-center justify-center">
-							<CircleAlert size={36} className="text-destructive opacity-50" />
-							<span className="font-bold font-sans text-lg">
-								Unable to load information
-							</span>
-							<p className="mt-1 text-balance text-center text-muted-foreground text-sm">
-								We could not load information about this ecocert.
-							</p>
-							<Button
-								onClick={() => setRetry(retry + 1)}
-								size={"sm"}
-								className="mt-3 gap-2"
-							>
-								<RefreshCw size={16} />
-								Retry
-							</Button>
-						</div>
+					{!isCurrentChainSupported ? (
+						<ErrorSection
+							title="This chain is not supported"
+							description="Please switch to a supported chain to list your ecocert."
+							cta={
+								<Button
+									onClick={() => open({ view: "Networks" })}
+									size={"sm"}
+									className="mt-3 gap-2"
+								>
+									<ArrowRightLeft size={16} />
+									Switch Chain
+								</Button>
+							}
+						/>
+					) : hypercertError ? (
+						<ErrorSection
+							title="Unable to load information"
+							description="We could not load information about this ecocert."
+							cta={
+								<Button
+									onClick={() => refetchHypercert()}
+									size={"sm"}
+									className="mt-3 gap-2"
+								>
+									<RefreshCw size={16} />
+									Retry
+								</Button>
+							}
+						/>
 					) : hypercert ? (
 						hypercert.orders.length > 0 ? (
-							<div className="flex flex-col gap-2">
-								<p className="text-destructive">Already listed</p>
-								<p className="text-destructive">
-									This ecocert is already listed.
-								</p>
-							</div>
-						) : !isProgressVisible ? (
+							<ErrorSection
+								title="This ecocert is already listed"
+								description="Please switch to a supported chain to list your ecocert."
+								cta={null}
+							/>
+						) : !isProgressVisible ||
+						  priceValidityError ||
+						  !selectedCurrency ? (
 							<PriceForm
 								priceState={[price, setPrice]}
 								priceValidityErrorState={[
 									priceValidityError,
 									setPriceValidityError,
 								]}
+								currencyOptions={currencyOptions}
 								currencyState={[selectedCurrency, setSelectedCurrency]}
 							/>
 						) : (

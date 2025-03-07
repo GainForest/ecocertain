@@ -11,8 +11,8 @@ export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
 
 if (!projectId) throw new Error("Project ID is not defined");
 
-const DEV_CHAINS = [sepolia, mainnet] as const;
-const PROD_CHAINS = [celo, mainnet] as const;
+const DEV_CHAINS = [sepolia] as const;
+const PROD_CHAINS = [celo] as const;
 export const SUPPORTED_CHAINS =
   process.env.NEXT_PUBLIC_DEPLOY_ENV === "production"
     ? PROD_CHAINS
