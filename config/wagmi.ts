@@ -89,9 +89,9 @@ const infuraRPCEndpoint = `https://mainnet.infura.io/v3/${infuraKey}`;
 
 export const getRpcUrlForChain = (chainId: number) => {
   switch (chainId) {
-    case mainnet.id:
-      return infuraRPCEndpoint
     case sepolia.id:
+      return infuraRPCEndpoint
+    case celo.id:
       return infuraRPCEndpoint
     default:
       throw new Error(`Unsupported chainId: ${chainId}`);
