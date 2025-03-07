@@ -12,7 +12,6 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 		hypercertId,
 		name,
 		description,
-		image,
 		totalUnits,
 		unitsForSale,
 		pricePerPercentInUSD,
@@ -29,7 +28,7 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 			<article className="group relative overflow-hidden rounded-2xl border border-border bg-muted">
 				<div className="h-[320px] w-full overflow-hidden p-4">
 					<Image
-						src={image ?? ""}
+						src={`/api/hypercert-image/${hypercertId}`}
 						alt={name ?? "Untitled"}
 						height={500}
 						width={500}

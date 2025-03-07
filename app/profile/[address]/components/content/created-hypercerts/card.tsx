@@ -7,7 +7,7 @@ import Link from "next/link";
 import CardOptions from "./card-options";
 
 export default function Card({ hypercert }: { hypercert: Hypercert }) {
-	const { hypercertId, name, description, image } = hypercert;
+	const { hypercertId, name, description } = hypercert;
 
 	return (
 		<HypercertProvider value={hypercert}>

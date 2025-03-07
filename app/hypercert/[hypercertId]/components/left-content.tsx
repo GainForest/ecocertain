@@ -79,27 +79,22 @@ const Metadata = ({ hypercert }: { hypercert: FullHypercert }) => {
 const LeftContent = ({ hypercert }: { hypercert: FullHypercert }) => {
 	return (
 		<div className="flex w-full flex-initial flex-col gap-6 md:w-auto md:flex-[3]">
-			{hypercert.metadata.image && (
-				<div className="overflow-hidden rounded-2xl border border-border bg-beige-muted/80">
-					<VerificationIndicator />
-					<div className="flex w-full flex-col items-center justify-center p-2">
-						<div className="w-full max-w-sm">
-							<NFT3D src={hypercert.metadata.image} />
-						</div>
-						<section className="mt-2 flex w-full flex-col gap-2 rounded-xl bg-background p-3 shadow-[0px_-10px_20px_rgba(0,0,0,0.1)]">
-							<Metadata hypercert={hypercert} />
-							<div className="flex flex-col gap-2 p-0 md:p-2">
-								<h2 className="font-baskerville font-bold text-muted-foreground text-xl">
-									Description
-								</h2>
-								<p className="text-justify leading-tight">
-									{hypercert.metadata.description}
-								</p>
-							</div>
-						</section>
-					</div>
+			<div className="flex w-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-border bg-beige-muted/80 p-2">
+				<div className="w-full max-w-sm">
+					<NFT3D src={`/api/hypercert-image/${hypercert.hypercertId}`} />
 				</div>
-			)}
+				<section className="mt-2 flex w-full flex-col gap-2 rounded-xl bg-background p-3 shadow-[0px_-10px_20px_rgba(0,0,0,0.1)]">
+					<Metadata hypercert={hypercert} />
+					<div className="flex flex-col gap-2 p-0 md:p-2">
+						<h2 className="font-baskerville font-bold text-muted-foreground text-xl">
+							Description
+						</h2>
+						<p className="text-justify leading-tight">
+							{hypercert.metadata.description}
+						</p>
+					</div>
+				</section>
+			</div>
 
 			<Support hypercert={hypercert} />
 		</div>
