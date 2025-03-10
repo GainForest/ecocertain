@@ -1,0 +1,73 @@
+/* Custom styles for the markdown preview */
+.markdown-preview {
+  @apply text-xl;
+}
+
+.markdown-preview h1 {
+  @apply text-4xl font-bold mb-4;
+}
+
+.markdown-preview h2 {
+  @apply text-3xl font-bold mb-3;
+}
+
+.markdown-preview h3 {
+  @apply text-2xl font-bold mb-2;
+}
+
+.markdown-preview h4 {
+  @apply text-xl font-bold mb-2;
+}
+
+.markdown-preview h5 {
+  @apply text-lg font-bold mb-2;
+}
+
+.markdown-preview h6 {
+  @apply text-base font-bold mb-2;
+}
+
+.markdown-preview p {
+  @apply mb-4;
+}
+
+.markdown-preview ul {
+  @apply list-disc pl-5 mb-4;
+}
+
+.markdown-preview ol {
+  @apply list-decimal pl-5 mb-4;
+}
+
+.markdown-preview blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic mb-4;
+}
+
+.markdown-preview pre {
+  @apply bg-gray-100 dark:bg-gray-700 p-4 rounded-xl mb-4 overflow-x-auto;
+}
+
+.markdown-preview code {
+  @apply font-mono text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded-xl;
+}
+
+.markdown-preview pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-preview a {
+  @apply text-blue-600 hover:underline;
+}
+
+.markdown-preview table {
+  @apply w-full border-collapse mb-4;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  @apply border border-gray-300 dark:border-gray-600 p-2;
+}
+
+.markdown-preview th {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
