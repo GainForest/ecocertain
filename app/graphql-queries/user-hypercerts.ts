@@ -60,6 +60,7 @@ export const fetchHypercertsByUserId = async (
 		const uniqueBuyers = new Set(
 			hypercert.sales?.data?.map((sale) => sale.buyer as string) ?? [],
 		);
+		const orderNonce = hypercert.orders?.data?.[0]?.orderNonce;
 
 		return {
 			hypercertId: hypercert.hypercert_id as string,
@@ -75,6 +76,8 @@ export const fetchHypercertsByUserId = async (
 			buyerCount: uniqueBuyers.size,
 			creationBlockTimestamp:
 				typeCastApiResponseToBigInt(hypercert.creation_block_timestamp) ?? 0n,
+			orderNonce: orderNonce ? Number(orderNonce) : undefined,
+			orderId: hypercert.orders?.data?.[0]?.id,
 		} satisfies Hypercert;
 	});
 

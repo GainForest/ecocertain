@@ -5,8 +5,12 @@ import type React from "react";
 
 const Progress = ({
 	percentage,
+	innerClassName,
 	...props
-}: { percentage: number } & React.HTMLAttributes<HTMLDivElement>) => {
+}: {
+	percentage: number;
+	innerClassName?: string;
+} & React.HTMLAttributes<HTMLDivElement>) => {
 	return (
 		<div
 			{...props}
@@ -16,7 +20,7 @@ const Progress = ({
 			)}
 		>
 			<motion.div
-				className="h-full bg-primary"
+				className={cn("h-full bg-primary", innerClassName)}
 				initial={{ width: "0%" }}
 				animate={{ width: `${2 + (percentage / 100) * 99}%` }}
 				transition={{ duration: 0.5 }}

@@ -96,7 +96,7 @@ const CreateListingDialog = ({
 		error: hypercertError,
 		refetch: refetchHypercert,
 	} = useQuery({
-		queryKey: ["hypercert", hypercertId],
+		queryKey: [`create-listing-dialog-hypercert-${hypercertId}`, hypercertId],
 		queryFn: () => fetchFullHypercertById(hypercertId),
 	});
 
