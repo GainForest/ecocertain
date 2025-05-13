@@ -133,7 +133,7 @@ const SupportGitcoinDonorsDialog = ({
 						gitcoinApplicationId={gitcoinApplicationId ?? ecocertId}
 						ecocertId={ecocertId}
 						values={donations.map((donation) => ({
-							amountInUsd: Number(donation.amount),
+							amountInUsd: Number(donation.amountInUsd),
 							donorAddress: donation.donorAddress,
 						}))}
 						walletClient={walletClient}

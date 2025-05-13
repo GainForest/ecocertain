@@ -240,7 +240,9 @@ const Progress = ({
 
 		// Calculate the amount of units to transfer / split to each donor.
 		const unitsToTransfer = values.map((value) => {
-			return BigInt(value.amountInUsd) * unitsPerUSD;
+			return (
+				(BigInt(Math.floor(value.amountInUsd * 1000)) * unitsPerUSD) / 1000n
+			);
 		});
 
 		// Check if the fractions are already split.
@@ -370,6 +372,7 @@ const Progress = ({
 			}
 
 			const [splitData, splitDataError] = await tryCatch(async () => {
+				console.log(parsedLog);
 				const splitTokenIds = parsedLog.args.getValue("tokenIds") as string[];
 				const splitTokenAmounts = parsedLog.args.getValue("values") as string[];
 
