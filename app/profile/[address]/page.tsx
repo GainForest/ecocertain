@@ -156,7 +156,6 @@ export default async function ProfilePage({
 				view={view}
 				createdHypercerts={hypercerts}
 				combinedSales={combinedSales}
-				userHypercertIds={Array.from(hypercertIdSet)}
 			/>
 		</MotionWrapper>
 	);

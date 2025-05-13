@@ -1,10 +1,10 @@
 /**
  * @description This function checks if the hypercert is already split by comparing the units in the fractions to the units to donate.
- * @param unitsInFractions - The units in the fractions.
- * @param unitsToDonate - The units to donate.
+ * @param ownerFractions - The units in the fractions.
+ * @param donorFractions - The units to donate.
  * @returns true if the hypercert is already split, false otherwise.
  */
-const getSplitStatusAndDataByUnitsComparision = (
+export const getSplitStatusAndDataByUnitsComparision = (
 	ownerFractions: {
 		tokenId: string;
 		units: string;

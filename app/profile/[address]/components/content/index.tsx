@@ -10,12 +10,10 @@ const Content = ({
 	view,
 	combinedSales,
 	createdHypercerts,
-	userHypercertIds,
 }: {
 	view: "created" | "supported" | "transfer";
 	combinedSales: CombinedSale[];
 	createdHypercerts: Hypercert[];
-	userHypercertIds: string[];
 }) => {
 	return (
 		<section className="mt-2 flex w-full flex-1 flex-col gap-6">

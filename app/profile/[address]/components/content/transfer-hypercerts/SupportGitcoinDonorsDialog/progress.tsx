@@ -28,6 +28,7 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import type { WalletClient } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
+import { getSplitStatusAndDataByUnitsComparision } from "./utils";
 
 type TransferProgressConfig = {
 	title: string;
@@ -168,6 +169,7 @@ const Progress = ({
 		setError(false);
 		setConfigKey("INITIALIZING");
 		if (!walletClient || !isConnected || chainId !== 42220) {
+			console.error("Wallet not connected or wrong chain");
 			setError(true);
 			return;
 		}
@@ -189,11 +191,13 @@ const Progress = ({
 			async () => await fetchHypercertById(ecocertId),
 		);
 		if (hypercertFetchError) {
+			console.error("Failed to fetch hypercert:", hypercertFetchError);
 			setError(true);
 			return;
 		}
 		const hypercertOwner = hypercert.creatorAddress;
 		if (hypercertOwner.toLowerCase() !== address?.toLowerCase()) {
+			console.error("User is not the owner of the hypercert");
 			setError(true);
 			return;
 		}
@@ -204,6 +208,7 @@ const Progress = ({
 			async () => await fetchFractionsByHypercert(ecocertId),
 		);
 		if (fractionsFetchError || fractions === null) {
+			console.error("Failed to fetch fractions:", fractionsFetchError);
 			setError(true);
 			return;
 		}
@@ -211,6 +216,7 @@ const Progress = ({
 			(fraction) => fraction.ownerAddress === address,
 		);
 		if (ownerFractions.length === 0) {
+			console.error("No fractions found for owner");
 			setError(true);
 			return;
 		}
@@ -295,6 +301,7 @@ const Progress = ({
 			BigInt(0),
 		);
 		if (totalUnitsToTransfer > BigInt(ownerFractionWithHighestUnits.units)) {
+			console.error("Total units to transfer exceeds owner's fraction");
 			setError(true);
 			return;
 		}
@@ -321,6 +328,7 @@ const Progress = ({
 						),
 				);
 			if (splitTxError) {
+				console.error("Split transaction failed:", splitTxError);
 				setError(true);
 				console.error(splitTxError);
 				console.log(unitsToTransfer, ownerFractionWithHighestUnits);
@@ -333,6 +341,10 @@ const Progress = ({
 				async () => await splitTx.wait(),
 			);
 			if (splitTxReceiptError || !splitTxReceipt) {
+				console.error(
+					"Split transaction confirmation failed:",
+					splitTxReceiptError,
+				);
 				setError(true);
 				return;
 			}
@@ -345,12 +357,14 @@ const Progress = ({
 					"0x088515a3c7b4e71520602d818f4dec002fadefde30c55e13f390c8d96046990a",
 			);
 			if (!batchValueTransferLog) {
+				console.error("No batch value transfer log found");
 				setError(true);
 				return;
 			}
 			const logParser = new Interface(HypercertMinterAbi);
 			const parsedLog = logParser.parseLog(batchValueTransferLog);
 			if (!parsedLog) {
+				console.error("Failed to parse log");
 				setError(true);
 				return;
 			}
@@ -377,6 +391,7 @@ const Progress = ({
 			});
 
 			if (splitDataError) {
+				console.error("Failed to process split data:", splitDataError);
 				setError(true);
 				return;
 			}
@@ -395,6 +410,11 @@ const Progress = ({
 						units: u.toString(),
 					})),
 				);
+			if (!computedDonorFractionsToTransfer) {
+				console.error("Failed to compute donor fractions to transfer");
+				setError(true);
+				return;
+			}
 			donorFractionsToTransfer = computedDonorFractionsToTransfer;
 			window.localStorage.setItem(
 				`gitcoin-round-35-application-${gitcoinApplicationId}-donor-fractions-to-transfer`,
@@ -407,11 +427,12 @@ const Progress = ({
 		const [approveTx, approveTxError] = await tryCatch(
 			async () =>
 				await hypercertMinterContract.setApprovalForAll(
-					"0x16ba53b74c234c870c61efc04cd418b8f2865959", // Hypercert owner address ==> should be same as signer
-					true, // Fraction ID of the fraction to split
+					"0x16ba53b74c234c870c61efc04cd418b8f2865959",
+					true,
 				),
 		);
 		if (approveTxError) {
+			console.error("Approval transaction failed:", approveTxError);
 			setError(true);
 			return;
 		}
@@ -423,6 +444,7 @@ const Progress = ({
 		);
 
 		if (approveTxReceiptError || !approveTxReceipt) {
+			console.error("Approval confirmation failed:", approveTxReceiptError);
 			setError(true);
 			return;
 		}
@@ -446,6 +468,7 @@ const Progress = ({
 			async () => await batchTransferContract.batchTransfer(encodedData),
 		);
 		if (transferTxError) {
+			console.error("Transfer transaction failed:", transferTxError);
 			setError(true);
 			return;
 		}
@@ -457,6 +480,7 @@ const Progress = ({
 		);
 
 		if (transferTxReceiptError || !transferTxReceipt) {
+			console.error("Transfer confirmation failed:", transferTxReceiptError);
 			setError(true);
 			return;
 		}
@@ -474,6 +498,7 @@ const Progress = ({
 		if (!walletClient) {
 			setConfigKey("INITIALIZING");
 			const showInitializationError = setTimeout(() => {
+				console.error("Wallet client not available after timeout");
 				setError(true);
 			}, 5000);
 			return () => {

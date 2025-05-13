@@ -164,7 +164,7 @@ const ProfileCard = ({
 						</Button>
 					</Link>
 				</li>
-				{true && (
+				{isUserAddress && (
 					<li>
 						<Link href={"?view=transfer"}>
 							<Button

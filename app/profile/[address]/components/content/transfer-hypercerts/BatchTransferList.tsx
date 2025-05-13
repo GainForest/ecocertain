@@ -145,9 +145,12 @@ const GitcoinEcocertAccordionItem = ({
 										key={donation.transactionHash}
 										className="border-border border-t"
 									>
-										<td className="max-w-[40px] truncate py-2 md:max-w-[80px]">
+										<td className="py-2">
 											<span className="text-muted-foreground text-sm">
-												{donation.donorAddress}
+												{`${donation.donorAddress.slice(
+													0,
+													6,
+												)}...${donation.donorAddress.slice(-4)}`}
 											</span>
 										</td>
 										<td className="py-2 text-right text-muted-foreground text-sm">
@@ -163,41 +166,14 @@ const GitcoinEcocertAccordionItem = ({
 											</Link>
 										</td>
 										<td className="py-2 text-center">
-											<div className="flex justify-center">
-												<CircularProgressbar
-													value={
-														pricePerPercentInUSD
-															? Number(donation.amountInUsd) /
-															  pricePerPercentInUSD
-															: 0
-													}
-													text={
-														pricePerPercentInUSD
-															? `${(
-																	Number(donation.amountInUsd) /
-																	pricePerPercentInUSD
-															  ).toFixed(1)}%`
-															: ""
-													}
-													className="h-8 w-8"
-													styles={{
-														path: {
-															stroke: "#22c55e",
-															strokeLinecap: "round",
-														},
-														trail: {
-															stroke: "#e5e7eb",
-														},
-														text: {
-															fill: "#22c55e",
-															fontSize: "28px",
-															fontWeight: "bold",
-															dominantBaseline: "central",
-															textAnchor: "middle",
-														},
-													}}
-												/>
-											</div>
+											<span className="text-muted-foreground text-sm">
+												{pricePerPercentInUSD
+													? `${(
+															Number(donation.amountInUsd) /
+															pricePerPercentInUSD
+													  ).toFixed(2)}%`
+													: "-"}
+											</span>
 										</td>
 										<td className="py-2 text-right text-muted-foreground text-sm">
 											${Number(donation.amountInUsd).toFixed(2)}
