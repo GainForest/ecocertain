@@ -129,7 +129,7 @@ const ProfileCard = ({
 			</div>
 			<ul className="mt-2 flex w-full flex-col gap-0.5 border-t border-t-border p-2">
 				<li>
-					<Link href={`?view=${view}`}>
+					<Link href={`?view=${"created"}`}>
 						<Button
 							variant={view === "created" ? "secondary" : "ghost"}
 							className="w-full justify-between"
@@ -147,7 +147,7 @@ const ProfileCard = ({
 					</Link>
 				</li>
 				<li>
-					<Link href={`?view=${view}`}>
+					<Link href={`?view=${"supported"}`}>
 						<Button
 							variant={view === "supported" ? "secondary" : "ghost"}
 							className="w-full justify-between"
@@ -166,7 +166,7 @@ const ProfileCard = ({
 				</li>
 				{isUserAddress && (
 					<li>
-						<Link href={`?view=${view}`}>
+						<Link href={`?view=${"gitcoin-donations"}`}>
 							<Button
 								variant={view === "gitcoin-donations" ? "secondary" : "ghost"}
 								className="w-full justify-between"
