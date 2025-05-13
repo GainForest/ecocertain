@@ -3,15 +3,15 @@ import { HeartHandshake, Send, Sparkle } from "lucide-react";
 import React from "react";
 import type { CombinedSale } from "../../page";
 import CreatedHypercerts from "./created-hypercerts";
+import GitcoinDonations from "./gitcoin-donations";
 import SupportedHypercerts from "./supported-hypercerts";
-import TransferHypercerts from "./transfer-hypercerts";
 
 const Content = ({
 	view,
 	combinedSales,
 	createdHypercerts,
 }: {
-	view: "created" | "supported" | "transfer";
+	view: "created" | "supported" | "gitcoin-donations";
 	combinedSales: CombinedSale[];
 	createdHypercerts: Hypercert[];
 }) => {
@@ -38,7 +38,7 @@ const Content = ({
 			) : view === "supported" ? (
 				<SupportedHypercerts combinedSales={combinedSales} />
 			) : (
-				<TransferHypercerts
+				<GitcoinDonations
 					userHypercertIds={createdHypercerts.map((h) => h.hypercertId)}
 				/>
 			)}

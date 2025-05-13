@@ -3,7 +3,7 @@ import useGitcoinEcocerts from "@/app/profile/[address]/hooks/use-gitcoin-ecocer
 import { ClipboardCheck, HandHeart, TreePalm } from "lucide-react";
 import React from "react";
 import BatchTransferList from "./BatchTransferList";
-const TransferHypercerts = ({
+const GitcoinDonations = ({
 	userHypercertIds,
 }: {
 	userHypercertIds: string[];
@@ -87,4 +87,4 @@ const TransferHypercerts = ({
 	);
 };
 
-export default TransferHypercerts;
+export default GitcoinDonations;

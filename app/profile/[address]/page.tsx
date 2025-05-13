@@ -92,7 +92,7 @@ export default async function ProfilePage({
 	const view = getValueFromSearchParams(searchParams, "view", "supported", [
 		"created",
 		"supported",
-		"transfer",
+		"gitcoin-donations",
 	]);
 	// const DUMMY_ADDRESS = "0x223c656ed35bfb7a8e358140ca1e2077be090b2e";
 

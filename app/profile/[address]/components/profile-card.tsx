@@ -44,7 +44,7 @@ const ProfileCard = ({
 		hypercertsSupported: number;
 		salesMadeCount: number;
 	};
-	view: "created" | "supported" | "transfer";
+	view: "created" | "supported" | "gitcoin-donations";
 	userHypercertIds: string[];
 }) => {
 	const { data: ensName, isFetching: isEnsNameLoading } = useEnsName({
@@ -129,7 +129,7 @@ const ProfileCard = ({
 			</div>
 			<ul className="mt-2 flex w-full flex-col gap-0.5 border-t border-t-border p-2">
 				<li>
-					<Link href={"?view=created"}>
+					<Link href={`?view=${view}`}>
 						<Button
 							variant={view === "created" ? "secondary" : "ghost"}
 							className="w-full justify-between"
@@ -147,7 +147,7 @@ const ProfileCard = ({
 					</Link>
 				</li>
 				<li>
-					<Link href={"?view=supported"}>
+					<Link href={`?view=${view}`}>
 						<Button
 							variant={view === "supported" ? "secondary" : "ghost"}
 							className="w-full justify-between"
@@ -166,9 +166,9 @@ const ProfileCard = ({
 				</li>
 				{isUserAddress && (
 					<li>
-						<Link href={"?view=transfer"}>
+						<Link href={`?view=${view}`}>
 							<Button
-								variant={view === "transfer" ? "secondary" : "ghost"}
+								variant={view === "gitcoin-donations" ? "secondary" : "ghost"}
 								className="w-full justify-between"
 								size={"sm"}
 							>
