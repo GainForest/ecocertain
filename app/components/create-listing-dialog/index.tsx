@@ -13,11 +13,11 @@ import {
 import type React from "react";
 import { useEffect, useState } from "react";
 
+import type { ApiError } from "@/graphql";
 import {
 	type FullHypercert,
 	fetchFullHypercertById,
-} from "@/app/graphql-queries/hypercerts";
-import type { ApiError } from "@/app/utils/graphql";
+} from "@/graphql/hypercerts/queries/hypercerts";
 import ListingProgress from "./listing-progress";
 
 import { Button } from "@/components/ui/button";

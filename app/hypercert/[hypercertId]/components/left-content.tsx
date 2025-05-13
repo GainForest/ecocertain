@@ -1,7 +1,7 @@
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import MarkdownEditor from "@/components/ui/mdx-editor";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import UserChip from "@/components/user-chip";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { bigintToFormattedDate } from "@/lib/utils";
 import { CalendarCheck, CalendarDays, User2 } from "lucide-react";
 import type React from "react";

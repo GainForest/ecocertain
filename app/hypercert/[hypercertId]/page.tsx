@@ -1,14 +1,14 @@
 import PageError from "@/app/components/shared/PageError";
 import Progress from "@/app/components/shared/progress";
 import { FullHypercertProvider } from "@/app/contexts/full-hypercert";
-import {
-	type FullHypercert,
-	fetchFullHypercertById,
-} from "@/app/graphql-queries/hypercerts";
 import { catchError } from "@/app/utils";
 import { Button } from "@/components/ui/button";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
 import { Separator } from "@/components/ui/separator";
+import {
+	type FullHypercert,
+	fetchFullHypercertById,
+} from "@/graphql/hypercerts/queries/hypercerts";
 import type { ApiError } from "@/types/api";
 import { ArrowUpRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";

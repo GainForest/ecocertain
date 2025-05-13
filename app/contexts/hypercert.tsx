@@ -1,5 +1,5 @@
 "use client";
-import type { Hypercert } from "@/app/graphql-queries/hypercerts";
+import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { createContext, useContext } from "react";
 
 const HypercertContext = createContext<Hypercert | null>(null);

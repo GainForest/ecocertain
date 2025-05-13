@@ -2,15 +2,15 @@ import { type Address, getAddress } from "viem";
 
 import PageError from "@/app/components/shared/PageError";
 
-import { fetchHypercertsByUserId } from "@/app/graphql-queries/user-hypercerts";
 import { catchError } from "@/app/utils";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
+import { fetchHypercertsByUserId } from "@/graphql/hypercerts/queries/user-hypercerts";
 
 import {
 	type SaleByUser,
 	type SaleByUserHypercert,
 	fetchSalesByUser,
-} from "@/app/graphql-queries/sales";
+} from "@/graphql/hypercerts/queries/sales";
 import {
 	convertCurrencyPriceToUSD,
 	getValueFromSearchParams,
@@ -92,6 +92,7 @@ export default async function ProfilePage({
 	const view = getValueFromSearchParams(searchParams, "view", "supported", [
 		"created",
 		"supported",
+		"transfer",
 	]);
 	// const DUMMY_ADDRESS = "0x223c656ed35bfb7a8e358140ca1e2077be090b2e";
 
@@ -130,6 +131,7 @@ export default async function ProfilePage({
 				<ProfileCard
 					view={view}
 					address={formattedAddress}
+					userHypercertIds={Array.from(hypercertIdSet)}
 					stats={{
 						hypercertsCreated: validHypercertsCount,
 						hypercertsSupported: combinedSales.length,
@@ -154,6 +156,7 @@ export default async function ProfilePage({
 				view={view}
 				createdHypercerts={hypercerts}
 				combinedSales={combinedSales}
+				userHypercertIds={Array.from(hypercertIdSet)}
 			/>
 		</MotionWrapper>
 	);

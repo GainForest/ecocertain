@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { Hypercert } from "@/app/graphql-queries/hypercerts";
+import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { CircleAlert } from "lucide-react";
 import Card from "./card";
 

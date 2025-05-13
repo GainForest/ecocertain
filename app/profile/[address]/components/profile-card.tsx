@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 import useCopy from "@/hooks/use-copy";
 import { cn, getUrl } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { blo } from "blo";
 import {
 	Check,
@@ -17,7 +18,9 @@ import {
 	Copy,
 	CopyCheck,
 	HeartHandshake,
+	Loader2,
 	Pencil,
+	Send,
 	Settings2,
 	Share2,
 	Sparkle,
@@ -26,12 +29,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { useEnsName } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
+import useGitcoinEcocerts from "../hooks/use-gitcoin-ecocerts";
 
 const ProfileCard = ({
 	address,
 	stats,
 	view,
+	userHypercertIds,
 }: {
 	address: `0x${string}`;
 	stats: {
@@ -39,12 +44,19 @@ const ProfileCard = ({
 		hypercertsSupported: number;
 		salesMadeCount: number;
 	};
-	view: "created" | "supported";
+	view: "created" | "supported" | "transfer";
+	userHypercertIds: string[];
 }) => {
 	const { data: ensName, isFetching: isEnsNameLoading } = useEnsName({
 		address,
 		chainId: 1,
 	});
+
+	const { gitcoinEcocerts, isGitcoinEcocertsLoading } =
+		useGitcoinEcocerts(userHypercertIds);
+
+	const { address: connectedWalletAddress } = useAccount();
+	const isUserAddress = address === connectedWalletAddress;
 
 	const { copy: copyAddress, isCopied: isAddressCopied } = useCopy();
 	const { copy: copyProfileLink, isCopied: isProfileLinkCopied } = useCopy();
@@ -152,6 +164,34 @@ const ProfileCard = ({
 						</Button>
 					</Link>
 				</li>
+				{true && (
+					<li>
+						<Link href={"?view=transfer"}>
+							<Button
+								variant={view === "transfer" ? "secondary" : "ghost"}
+								className="w-full justify-between"
+								size={"sm"}
+							>
+								<span className="flex items-center justify-start gap-2 text-left">
+									<Send size={16} className="text-primary" />
+									Gitcoin Donations
+								</span>
+								<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
+									<span>
+										{isGitcoinEcocertsLoading ? (
+											<Loader2 size={14} className="animate-spin" />
+										) : (
+											gitcoinEcocerts?.filter(
+												(gitcoinEcocert) => gitcoinEcocert !== null,
+											).length
+										)}
+									</span>
+									<ChevronRight size={16} />
+								</span>
+							</Button>
+						</Link>
+					</li>
+				)}
 			</ul>
 		</div>
 	);

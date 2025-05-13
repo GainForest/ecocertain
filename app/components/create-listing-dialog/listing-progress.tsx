@@ -1,6 +1,6 @@
 "use client";
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { cn } from "@/lib/utils";
 

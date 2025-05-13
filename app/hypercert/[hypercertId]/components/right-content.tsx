@@ -1,4 +1,4 @@
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import React from "react";
 import Attestations from "./Attestations";
 import Contributors from "./Contributors";

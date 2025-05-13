@@ -1,8 +1,8 @@
 "use client";
 import GetVerifiedDialog from "@/app/components/get-verified-dialog";
 import useFullHypercert from "@/app/contexts/full-hypercert";
-import { fetchHypercertIDs } from "@/app/graphql-queries/hypercerts";
 import { verifiedAttestors } from "@/config/gainforest";
+import { fetchHypercertIDs } from "@/graphql/hypercerts/queries/hypercerts";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
