@@ -2,12 +2,12 @@
 
 import AddAttestationDialog from "@/app/components/add-attestation-dialog";
 import useFullHypercert from "@/app/contexts/full-hypercert";
-import type { EcocertAttestation } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
 import QuickTooltip from "@/components/ui/quicktooltip";
 import UserChip from "@/components/user-chip";
 import { EAS_CONFIGS, getEASConfig } from "@/config/eas";
+import type { EcocertAttestation } from "@/graphql/hypercerts/queries/hypercerts";
 import autoAnimate from "@formkit/auto-animate";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

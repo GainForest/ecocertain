@@ -1,11 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import type {
 	FullHypercert,
 	FullHypercertWithOrder,
-} from "@/app/graphql-queries/hypercerts";
-import { Button } from "@/components/ui/button";
-import { SUPPORTED_CHAINS } from "@/config/wagmi";
+} from "@/graphql/hypercerts/queries/hypercerts";
 import type { ContractTransactionReceipt } from "ethers";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useAccount } from "wagmi";

@@ -1,7 +1,3 @@
-import {
-	FullHypercert,
-	type FullHypercertWithOrder,
-} from "@/app/graphql-queries/hypercerts";
 import BigintSlider from "@/components/ui/bigint-slider";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
@@ -16,6 +12,10 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TOKENS_CONFIG } from "@/config/wagmi";
+import {
+	FullHypercert,
+	type FullHypercertWithOrder,
+} from "@/graphql/hypercerts/queries/hypercerts";
 import { cn, formatDecimals } from "@/lib/utils";
 import {
 	ArrowRight,
