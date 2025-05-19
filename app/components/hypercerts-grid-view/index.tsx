@@ -1,9 +1,9 @@
+import { catchError } from "@/app/utils";
+import { Button } from "@/components/ui/button";
 import {
 	type Hypercert,
 	fetchHypercerts,
-} from "@/app/graphql-queries/hypercerts";
-import { catchError } from "@/app/utils";
-import { Button } from "@/components/ui/button";
+} from "@/graphql/hypercerts/queries/hypercerts";
 import type { ApiError } from "@/types/api";
 import { CircleAlert, RotateCw } from "lucide-react";
 import Link from "next/link";

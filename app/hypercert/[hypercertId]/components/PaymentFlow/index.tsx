@@ -1,6 +1,5 @@
 "use client";
 import useFullHypercert from "@/app/contexts/full-hypercert";
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -12,6 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/modern-dialog-extended";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import Image from "next/image";
 import type React from "react";
 import usePaymentFlowDialog from "./hooks/usePaymentFlowDialog";

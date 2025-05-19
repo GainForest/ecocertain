@@ -1,6 +1,6 @@
 import { HypercertProvider } from "@/app/contexts/hypercert";
-import type { Hypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
+import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

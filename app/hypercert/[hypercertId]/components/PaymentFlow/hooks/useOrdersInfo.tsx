@@ -2,7 +2,7 @@
 import type {
 	FullHypercert,
 	FullHypercertOrders,
-} from "@/app/graphql-queries/hypercerts";
+} from "@/graphql/hypercerts/queries/hypercerts";
 
 const DECIMALS = 18;
 const BIGINT_MULTIPLIER = 10n ** BigInt(DECIMALS);
