@@ -1,4 +1,5 @@
 "use client";
+import SelfXYZVerificationDialog from "@/app/components/self-xyz-verification-dialog";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
@@ -26,7 +27,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { useEnsName } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 
 const ProfileCard = ({
 	address,
@@ -41,6 +42,7 @@ const ProfileCard = ({
 	};
 	view: "created" | "supported";
 }) => {
+	const { address: connectedAddress } = useAccount();
 	const { data: ensName, isFetching: isEnsNameLoading } = useEnsName({
 		address,
 		chainId: 1,
@@ -50,6 +52,8 @@ const ProfileCard = ({
 	const { copy: copyProfileLink, isCopied: isProfileLinkCopied } = useCopy();
 	const profileLink = getUrl(`/profile/${address}`);
 	const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+	const isUserAddress = address === connectedAddress;
 
 	return (
 		<div className="flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-background">
@@ -112,6 +116,16 @@ const ProfileCard = ({
 						<span className="flex h-6 items-center justify-center rounded-full bg-beige-muted px-2 text-center text-beige-muted-foreground text-sm">
 							{stats.hypercertsCreated > 0 ? "Community Member" : "Contributor"}
 						</span>
+					)}
+					{isUserAddress && (
+						<div className="mt-3 flex w-full flex-col items-center justify-center gap-1 rounded-xl bg-muted p-2 font-sans text-sm">
+							<span>
+								Get verified using <b>self.xyz</b>.
+							</span>
+							<SelfXYZVerificationDialog
+								trigger={<Button size={"sm"}>Verify Now</Button>}
+							/>
+						</div>
 					)}
 				</div>
 			</div>
