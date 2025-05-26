@@ -1,9 +1,9 @@
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import EthAddress from "@/components/eth-address";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
 import { TOKENS_CONFIG } from "@/config/wagmi";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import {
 	bigintToFormattedDate,

@@ -19,9 +19,19 @@
         "name": "next"
       },
       {
-        "name": "@0no-co/graphqlsp",
-        "schema": "https://staging-api.hypercerts.org/v1/graphql",
-        "tadaOutputLocation": "./graphql-hypercerts-env.d.ts"
+        "name": "gql.tada/ts-plugin",
+        "schemas": [
+          {
+            "name": "hypercerts",
+            "schema": "https://api.hypercerts.org/v1/graphql",
+            "tadaOutputLocation": "./graphql/hypercerts/env.d.ts"
+          },
+          {
+            "name": "gitcoin",
+            "schema": "https://beta.indexer.gitcoin.co/v1/graphql",
+            "tadaOutputLocation": "./graphql/gitcoin/env.d.ts"
+          }
+        ]
       }
     ],
     "paths": {

@@ -9,7 +9,7 @@ const NoSupportedHypercerts = () => {
 		<div className="flex flex-col items-center gap-4 pt-6 text-center md:px-20">
 			<CircleAlert className="text-beige-muted-foreground/50" size={40} />
 			<p className="px-8 text-beige-muted-foreground">
-				Hypercerts that you contribute to, will appear here.
+				Hypercerts contributed by the user, will appear here.
 			</p>
 		</div>
 	);

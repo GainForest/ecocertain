@@ -1,13 +1,13 @@
 "use client";
 import GetVerifiedDialog from "@/app/components/get-verified-dialog";
-import {
-	type FullHypercert,
-	fetchHypercertIDs,
-} from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import { EvervaultCard } from "@/components/ui/evervault-card";
 import UserChip from "@/components/user-chip";
 import { verifiedAttestors } from "@/config/gainforest";
+import {
+	type FullHypercert,
+	fetchHypercertIDs,
+} from "@/graphql/hypercerts/queries/hypercerts";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldCheck } from "lucide-react";
