@@ -5,6 +5,7 @@ import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { bigintToFormattedDate } from "@/lib/utils";
 import { CalendarCheck, CalendarDays, User2 } from "lucide-react";
 import type React from "react";
+import Reviews from "./Reviews";
 import VerificationIndicator from "./VerificationIndicator";
 import NFT3D from "./nft-3d";
 import Support from "./support";
@@ -86,7 +87,7 @@ const LeftContent = ({ hypercert }: { hypercert: FullHypercert }) => {
 					<div className="w-full max-w-sm">
 						<NFT3D src={`/api/hypercert-image/${hypercert.hypercertId}`} />
 					</div>
-					<section className="mt-2 flex w-full flex-col gap-2 rounded-xl bg-background p-3 shadow-[0px_-10px_20px_rgba(0,0,0,0.1)]">
+					<section className="my-2 flex w-full flex-col gap-2 rounded-xl bg-background p-3 shadow-[0px_-10px_20px_rgba(0,0,0,0.1)]">
 						<Metadata hypercert={hypercert} />
 						<div className="flex flex-col gap-2 p-0 md:p-2">
 							<h2 className="font-baskerville font-bold text-muted-foreground text-xl">
@@ -102,6 +103,7 @@ const LeftContent = ({ hypercert }: { hypercert: FullHypercert }) => {
 							</div>
 						</div>
 					</section>
+					<Reviews />
 				</div>
 			</div>
 

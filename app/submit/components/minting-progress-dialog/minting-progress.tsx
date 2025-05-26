@@ -1,9 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
+import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { sendEmailAndUpdateGoogle } from "@/lib/sendEmailAndUpdateGoogle";
 import { cn } from "@/lib/utils";
 import { constructHypercertIdFromReceipt } from "@/utils/constructHypercertIdFromReceipt";
+import { submitReferral } from "@divvi/referral-sdk";
 import {
 	type HypercertMetadata,
 	TransferRestrictions,
@@ -22,6 +25,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
+import { createWalletClient, custom, formatEther } from "viem";
+import { celo } from "viem/chains";
 import { useAccount, usePublicClient } from "wagmi";
 import type { MintingFormValues } from "../hypercert-form";
 
@@ -43,6 +48,7 @@ const mintingProgressConfigKeys = [
 	"GENERATING_METADATA",
 	"MINTING",
 	"WAITING_TO_MINT",
+	"TIP_SIGNING",
 	"COMPLETED",
 ] as const;
 type MintingProgressConfigKey = (typeof mintingProgressConfigKeys)[number];
@@ -110,9 +116,15 @@ const mintingProgressConfigs: Record<
 			description: "The transaction could not be completed. Please try again.",
 		},
 	},
+	TIP_SIGNING: {
+		title: "Sign the transaction for the Platform Fee",
+		description: `Please confirm the platform fee transaction of ${formatEther(
+			GAINFOREST_TIP_AMOUNT,
+		)} Celo.`,
+	},
 	COMPLETED: {
 		title: "Hypercert Minted",
-		description: "The hypercert was successfully minted.",
+		description: "placeholder", // Will be overridden in JSX
 		isFinalState: true,
 	},
 };
@@ -148,6 +160,7 @@ const MintingProgress = ({
 	const [configKey, setConfigKey] =
 		useState<MintingProgressConfigKey>("INITIALIZING");
 	const [error, setError] = useState(false);
+	const [userDidTip, setUserDidTip] = useState(false);
 	const [mintedHypercertId, setMintedHypercertId] = useState<string>();
 
 	const { isConnected, address } = useAccount();
@@ -156,6 +169,7 @@ const MintingProgress = ({
 
 	const startTransaction = async () => {
 		setError(false);
+		setUserDidTip(false);
 		setConfigKey("INITIALIZING");
 		const values = mintingFormValues;
 		if (!client || !publicClient || !isConnected) {
@@ -290,7 +304,41 @@ const MintingProgress = ({
 			return;
 		}
 
-		setConfigKey("COMPLETED");
+		setConfigKey("TIP_SIGNING");
+		try {
+			const walletClient = createWalletClient({
+				chain: celo,
+				transport: custom(
+					// biome-ignore lint/suspicious/noExplicitAny: window.ethereum has to be any
+					"ethereum" in window ? (window.ethereum as any) : null,
+				),
+			});
+			const [account] = await walletClient.getAddresses();
+			const txhash = await walletClient.sendTransaction({
+				account,
+				to: GAINFOREST_TIP_ADDRESS,
+				value: GAINFOREST_TIP_AMOUNT,
+				data: `0x${DIVVI_DATA_SUFFIX}`,
+			});
+
+			if (txhash) {
+				setUserDidTip(true);
+				// We don't wait for confirmation as per requirements
+				submitReferral({
+					txHash: txhash as `0x${string}`,
+					chainId: celo.id,
+				});
+				setConfigKey("COMPLETED");
+			}
+		} catch (error) {
+			// If platform fee transaction is rejected, continue to complete
+			console.error(
+				"Unable to process platform fee, and report to Divvi:",
+				error,
+			);
+			setConfigKey("COMPLETED");
+		}
+
 		setMintedHypercertId(hypercertId);
 		if (mintingFormValues.contact) {
 			try {
@@ -438,7 +486,14 @@ const MintingProgress = ({
 								<span className="text-balance font-sans">
 									{showErrorVariant
 										? mintingProgressConfigs[key].errorState?.description
-										: mintingProgressConfig.description}
+										: mintingProgressConfig.isFinalState
+										  ? mintingProgressConfigKeys[currentConfigKeyIndex] ===
+											  "COMPLETED"
+												? userDidTip
+													? "Your hypercert was minted successfully. Thank you for supporting GainForest!"
+													: "The tip was rejected, but your hypercert was minted successfully!"
+												: "The hypercert was minted successfully!"
+										  : mintingProgressConfig.description}
 								</span>
 								{showErrorVariant && (
 									<div className="flex items-center gap-2">

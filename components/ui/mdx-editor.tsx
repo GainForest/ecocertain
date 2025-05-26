@@ -28,9 +28,11 @@ import React, { useEffect, useState, type ForwardedRef } from "react";
 function MarkdownEditor({
 	editorRef,
 	showToolbar = true,
+	toolbarSize = "md",
 	...props
 }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps & {
 		showToolbar?: boolean;
+		toolbarSize?: "sm" | "md";
 	}) {
 	const [isMounted, setMounted] = useState(false);
 
@@ -40,38 +42,48 @@ function MarkdownEditor({
 
 	if (!isMounted) return null;
 
-	const toolbar = toolbarPlugin({
-		toolbarContents: () => {
-			return (
-				<div className="flex flex-col">
-					<div className="flex items-center">
-						<UndoRedo />
+	const customizedToolbarPlugin = () =>
+		toolbarPlugin({
+			toolbarContents: () => {
+				return (
+					<div className="flex flex-col">
+						<div className="flex items-center">
+							<UndoRedo />
 
-						<Separator />
+							<Separator />
 
-						<BoldItalicUnderlineToggles />
+							<BoldItalicUnderlineToggles />
 
-						<Separator />
+							{toolbarSize === "md" && (
+								<>
+									<Separator />
 
-						<BlockTypeSelect />
+									<BlockTypeSelect />
+								</>
+							)}
 
-						<Separator />
+							<Separator />
 
-						<ListsToggle />
+							<ListsToggle />
 
-						<Separator />
+							<Separator />
 
-						<CreateLink />
-						<InsertTable />
+							<CreateLink />
 
-						<Separator />
+							{toolbarSize === "md" && (
+								<>
+									<InsertTable />
 
-						<InsertThematicBreak />
+									<Separator />
+
+									<InsertThematicBreak />
+								</>
+							)}
+						</div>
 					</div>
-				</div>
-			);
-		},
-	});
+				);
+			},
+		});
 
 	return (
 		<MDXEditor
@@ -85,7 +97,7 @@ function MarkdownEditor({
 				tablePlugin(),
 				thematicBreakPlugin(),
 				markdownShortcutPlugin(),
-				...(showToolbar ? [toolbar] : []),
+				...(showToolbar ? [customizedToolbarPlugin()] : []),
 			]}
 			{...props}
 			ref={editorRef}

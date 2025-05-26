@@ -1,4 +1,4 @@
-export const EAS_SCHEMA =
+export const HYPERCERT_ATTESTATION_SCHEMA =
   "uint256 chain_id,address contract_address,uint256 token_id,string title,string description,string[] sources" as const;
 
 export const EAS_CONFIGS = [
@@ -15,3 +15,5 @@ export const EAS_CONFIGS = [
 export const getEASConfig = (chainId: number) => {
   return EAS_CONFIGS.find((config) => config.chainId === chainId);
 };
+
+export type EASConfig = (typeof EAS_CONFIGS)[number];

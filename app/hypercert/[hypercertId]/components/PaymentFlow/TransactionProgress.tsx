@@ -1,11 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
+import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import useCopy from "@/hooks/use-copy";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
 import { cn } from "@/lib/utils";
+import { submitReferral } from "@divvi/referral-sdk";
 import {
 	ChainId,
 	HypercertExchangeClient,
@@ -32,10 +35,17 @@ import React, {
 	useRef,
 	useState,
 } from "react";
+import {
+	createWalletClient,
+	custom,
+	encodeAbiParameters,
+	formatEther,
+	parseAbiParameters,
+} from "viem";
+import { celo } from "viem/chains";
 import { useAccount } from "wagmi";
 import useOrdersInfo from "./hooks/useOrdersInfo";
 import type { OrderPreferences } from "./hooks/usePaymentFlowDialog";
-
 type TransactionProgressStatus = {
 	title: string;
 	description: string;
@@ -54,7 +64,9 @@ const transactionProgressStatusKeys = [
 	"EXECUTING",
 	"SIGNING",
 	"TXN_PENDING",
-	"COMPLETED",
+	"TXN_CONFIRMED",
+	"TIP_SIGNING",
+	"COMPLETE",
 ] as const;
 type TransactionProgressStatusKey =
 	(typeof transactionProgressStatusKeys)[number];
@@ -113,9 +125,19 @@ const transactionProgressStatus: Record<
 			description: "The transaction could not be confirmed.",
 		},
 	},
-	COMPLETED: {
+	TXN_CONFIRMED: {
+		title: "Transaction Confirmed",
+		description: "The transaction was confirmed successfully.",
+	},
+	TIP_SIGNING: {
+		title: "Sign the transaction for the Platform Fee",
+		description: `Please confirm the platform fee transaction of ${formatEther(
+			GAINFOREST_TIP_AMOUNT,
+		)} Celo.`,
+	},
+	COMPLETE: {
 		title: "Transaction Completed",
-		description: "The transaction was completed successfully.",
+		description: "placeholder", // This will be overridden in the JSX
 		isFinalState: true,
 	},
 };
@@ -139,8 +161,9 @@ const TransactionProgress = ({
 	];
 }) => {
 	const [status, setStatus] =
-		useState<TransactionProgressStatusKey>("COMPLETED");
+		useState<TransactionProgressStatusKey>("COMPLETE");
 	const [error, setError] = useState(true);
+	const [userDidTip, setUserDidTip] = useState(false);
 	const [transactionReceipt, setTransactionReceipt] = transactionReceiptState;
 	const { copy: copyTxnHash, isCopied: isTxnHashCopied } = useCopy();
 
@@ -153,6 +176,7 @@ const TransactionProgress = ({
 
 	const startTransaction = async () => {
 		setError(false);
+		setUserDidTip(false);
 		setStatus("PREPARING");
 		const hcExchangeClient = new HypercertExchangeClient(
 			Number(chainId) ?? SUPPORTED_CHAINS[0].id,
@@ -198,11 +222,6 @@ const TransactionProgress = ({
 
 		try {
 			setStatus("SPEND_APPROVAL_PENDING");
-			const receipt = await approveTx.wait();
-			if (!receipt || receipt.status === 0) {
-				throw new Error();
-			}
-			setTransactionReceipt(receipt);
 		} catch (error) {
 			setError(true);
 			return;
@@ -229,12 +248,52 @@ const TransactionProgress = ({
 		}
 		try {
 			setStatus("TXN_PENDING");
-			await transaction.wait();
+			const receipt = await transaction.wait();
+			if (!receipt || receipt.status !== 1) {
+				throw new Error();
+			}
+			setTransactionReceipt(receipt);
 		} catch (error) {
 			setError(true);
 			return;
 		}
-		setStatus("COMPLETED");
+		setStatus("TXN_CONFIRMED");
+
+		// Start the tipping flow
+		setStatus("TIP_SIGNING");
+		try {
+			const walletClient = createWalletClient({
+				chain: celo,
+				transport: custom(
+					// biome-ignore lint/suspicious/noExplicitAny: window.ethereum has to be any
+					"ethereum" in window ? (window.ethereum as any) : null,
+				),
+			});
+			const [account] = await walletClient.getAddresses();
+			const txhash = await walletClient.sendTransaction({
+				account,
+				to: GAINFOREST_TIP_ADDRESS,
+				value: GAINFOREST_TIP_AMOUNT,
+				data: `0x${DIVVI_DATA_SUFFIX}`,
+			});
+
+			if (txhash) {
+				setUserDidTip(true);
+				// We don't wait for confirmation as per requirements
+				submitReferral({
+					txHash: txhash as `0x${string}`,
+					chainId: celo.id,
+				});
+				setStatus("COMPLETE");
+			}
+		} catch (error) {
+			// If platform fee transaction is rejected, continue to complete
+			console.error(
+				"Unable to process platform fee, and report to Divvi:",
+				error,
+			);
+			setStatus("COMPLETE");
+		}
 	};
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(setStatus, startTransaction): We don't want to run the startTransaction all over again due to change in any function dependencies.
@@ -315,6 +374,14 @@ const TransactionProgress = ({
 
 					const showErrorVariant =
 						error && key === status && "errorState" in txnStatus;
+
+					// Special handling for COMPLETE state description
+					const description = txnStatus.isFinalState
+						? userDidTip
+							? "Thank you for your purchase and supporting GainForest!"
+							: "The tip was rejected, but the purchase was successful!"
+						: txnStatus.description;
+
 					return (
 						<div
 							key={key}
@@ -368,7 +435,7 @@ const TransactionProgress = ({
 								<span className="font-sans text-sm">
 									{showErrorVariant
 										? transactionProgressStatus[key].errorState?.description
-										: txnStatus.description}
+										: description}
 								</span>
 								{showErrorVariant && (
 									<div className="flex items-center gap-2">

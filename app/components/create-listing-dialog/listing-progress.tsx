@@ -1,8 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
+import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { cn } from "@/lib/utils";
+import { submitReferral } from "@divvi/referral-sdk";
 
 import type {
 	Currency,
@@ -21,7 +24,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
+import { createWalletClient, custom, formatEther } from "viem";
+import { celo } from "viem/chains";
 import { useAccount, usePublicClient } from "wagmi";
+
 type ListingProgressConfig = {
 	title: string;
 	description: string;
@@ -41,6 +47,7 @@ const listingProgressConfigKeys = [
 	"WAITING_FOR_COLLECTION_CONFIRMATION",
 	"SIGNING_ORDER",
 	"REGISTERING_ORDER",
+	"TIP_SIGNING",
 	"COMPLETED",
 ] as const;
 type ListingProgressConfigKey = (typeof listingProgressConfigKeys)[number];
@@ -118,9 +125,15 @@ const listingProgressConfigs: Record<
 				"Could not register your listing on the marketplace. Please try again.",
 		},
 	},
+	TIP_SIGNING: {
+		title: "Sign the transaction for the Platform Fee",
+		description: `Please confirm the platform fee transaction of ${formatEther(
+			GAINFOREST_TIP_AMOUNT,
+		)} Celo.`,
+	},
 	COMPLETED: {
 		title: "Listing created!",
-		description: "Your hypercert is now listed for sale.",
+		description: "placeholder", // Will be overridden in JSX
 		isFinalState: true,
 	},
 };
@@ -157,6 +170,7 @@ const ListingProgress = ({
 	const [configKey, setConfigKey] =
 		useState<ListingProgressConfigKey>("INITIALIZING");
 	const [error, setError] = useState(false);
+	const [userDidTip, setUserDidTip] = useState(false);
 
 	const { isConnected, address, chainId } = useAccount();
 	const { client } = useHypercertClient();
@@ -164,6 +178,7 @@ const ListingProgress = ({
 
 	const startTransaction = async () => {
 		setError(false);
+		setUserDidTip(false);
 		setConfigKey("INITIALIZING");
 		if (!client || !publicClient || !hypercertExchangeClient || !isConnected) {
 			setError(true);
@@ -179,7 +194,8 @@ const ListingProgress = ({
 
 				return await hypercertExchangeClient.createFractionalSaleMakerAsk({
 					startTime: Math.floor(new Date().getTime() / 1000), // Order start time (in seconds)
-					endTime: Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24 * 365, // [1 Year] Order end time (in seconds)
+					endTime:
+						Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24 * 365 * 100, // [100 Years] Order end time (in seconds)
 					price:
 						BigInt(values.price * 10 ** values.currency.decimals) /
 						hypercert.totalUnits, // price multiplied by decimals
@@ -275,12 +291,46 @@ const ListingProgress = ({
 				}),
 		);
 		if (registrationError || !registrationResult) {
+			console.error("Publishing failed:", registrationError);
 			setError(true);
 			return;
 		}
 
-		// Complete!
-		setConfigKey("COMPLETED");
+		// After successful registration, start the platform fee flow
+		setConfigKey("TIP_SIGNING");
+		try {
+			const walletClient = createWalletClient({
+				chain: celo,
+				transport: custom(
+					// biome-ignore lint/suspicious/noExplicitAny: window.ethereum has to be any
+					"ethereum" in window ? (window.ethereum as any) : null,
+				),
+			});
+			const [account] = await walletClient.getAddresses();
+			const txhash = await walletClient.sendTransaction({
+				account,
+				to: GAINFOREST_TIP_ADDRESS,
+				value: GAINFOREST_TIP_AMOUNT,
+				data: `0x${DIVVI_DATA_SUFFIX}`,
+			});
+
+			if (txhash) {
+				setUserDidTip(true);
+				// We don't wait for confirmation as per requirements
+				submitReferral({
+					txHash: txhash as `0x${string}`,
+					chainId: celo.id,
+				});
+				setConfigKey("COMPLETED");
+			}
+		} catch (error) {
+			// If platform fee transaction is rejected, continue to complete
+			console.error(
+				"Unable to process platform fee, and report to Divvi:",
+				error,
+			);
+			setConfigKey("COMPLETED");
+		}
 	};
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(startTransaction): startTransaction is not something we want to listen for changes here
@@ -401,7 +451,14 @@ const ListingProgress = ({
 								<span className="text-balance font-sans">
 									{showErrorVariant
 										? listingProgressConfigs[key].errorState?.description
-										: listingProgressConfig.description}
+										: listingProgressConfig.isFinalState
+										  ? listingProgressConfigKeys[currentConfigKeyIndex] ===
+											  "COMPLETED"
+												? userDidTip
+													? "Your hypercert is now listed for sale. Thank you for supporting GainForest!"
+													: "The tip was rejected, but your hypercert is now listed for sale!"
+												: "The hypercert was listing successfully!"
+										  : listingProgressConfig.description}
 								</span>
 								{showErrorVariant && (
 									<div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { EAS_SCHEMA, getEASConfig } from "@/config/eas";
+import { HYPERCERT_ATTESTATION_SCHEMA, getEASConfig } from "@/config/eas";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import type { JsonRpcSigner } from "ethers";
 
@@ -44,7 +44,7 @@ export const addAttestation = async (
 	});
 
 	// Initialize SchemaEncoder with the schema string
-	const schemaEncoder = new SchemaEncoder(EAS_SCHEMA);
+	const schemaEncoder = new SchemaEncoder(HYPERCERT_ATTESTATION_SCHEMA);
 	const encodedData = schemaEncoder.encodeData([
 		{ name: "chain_id", value: chainIdValue, type: "uint256" },
 		{ name: "contract_address", value: contractAddress, type: "address" },

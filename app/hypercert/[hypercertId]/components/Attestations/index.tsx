@@ -31,7 +31,13 @@ const Attestations = () => {
 		(a, b) =>
 			Number(b.creationBlockTimestamp) - Number(a.creationBlockTimestamp),
 	);
-	const validAttestations = sortedAttestations;
+	const validAttestations = sortedAttestations.filter((a) => {
+		const attestationType = a.data.sources.at(0)?.type;
+		if (attestationType === "url" || attestationType === undefined) {
+			return true;
+		}
+		return false;
+	});
 	//   const validAttestations = attestations.filter((attestation) =>
 	//     Boolean(EAS_CONFIGS.find((eas) => eas.schemaUID === attestation.schema_uid))
 	//   );
