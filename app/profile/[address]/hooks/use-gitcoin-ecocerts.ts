@@ -68,7 +68,7 @@ const useGitcoinEcocerts = (userHypercertIds: string[], key?: string) => {
 	} = useQuery({
 		queryKey: ["gitcoin-ecocerts", userHypercertIds, key ?? "default"],
 		queryFn: async () => {
-			// return await testFetchGitcoinEcocerts(userHypercertIds);
+			//   return await testFetchGitcoinEcocerts(userHypercertIds);
 			const gitcoinApplicationIds = userHypercertIds
 				.map((id) => {
 					const gitcoinProject = ecocertMappings.find(

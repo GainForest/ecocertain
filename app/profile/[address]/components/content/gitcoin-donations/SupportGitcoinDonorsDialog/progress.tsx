@@ -26,8 +26,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
-import type { WalletClient } from "viem";
+import {
+	type TransactionReceipt,
+	type WalletClient,
+	decodeEventLog,
+} from "viem";
 import { useAccount, usePublicClient } from "wagmi";
+import { bigint } from "zod";
 import { getSplitStatusAndDataByUnitsComparision } from "./utils";
 
 type TransferProgressConfig = {
@@ -234,6 +239,11 @@ const Progress = ({
 			return;
 		}
 		const hcTotalPriceInUSD = 100 * hcPricePerPercentInUSD;
+		console.log({
+			hypercert,
+			hcTotalPriceInUSD,
+			num: Math.floor(hcTotalPriceInUSD * 1000),
+		});
 		const unitsPerUSD =
 			(hypercert.totalUnits * 1000n) /
 			BigInt(Math.floor(hcTotalPriceInUSD * 1000));
@@ -352,54 +362,46 @@ const Progress = ({
 			}
 
 			// Get the successfully split fractions data.
-			const logs = splitTxReceipt.logs;
-			const batchValueTransferLog = logs.find(
-				(log) =>
-					log.topics[0] ===
-					"0x088515a3c7b4e71520602d818f4dec002fadefde30c55e13f390c8d96046990a",
+			const logs = (splitTxReceipt as unknown as TransactionReceipt).logs;
+			const events = logs.map((log) =>
+				decodeEventLog({
+					abi: HypercertMinterAbi,
+					data: log.data,
+					topics: log.topics,
+				}),
 			);
-			if (!batchValueTransferLog) {
-				console.error("No batch value transfer log found");
-				setError(true);
-				return;
-			}
-			const logParser = new Interface(HypercertMinterAbi);
-			const parsedLog = logParser.parseLog(batchValueTransferLog);
-			if (!parsedLog) {
-				console.error("Failed to parse log");
-				setError(true);
-				return;
-			}
-
-			const [splitData, splitDataError] = await tryCatch(async () => {
-				console.log(parsedLog);
-				const splitTokenIds = parsedLog.args.getValue("tokenIds") as string[];
-				const splitTokenAmounts = parsedLog.args.getValue("values") as string[];
-
-				// Also add the origin token id data to make the sum total.
-				splitTokenIds.push(
-					ownerFractionWithHighestUnits.fractionId.split("-")[2],
+			const batchValueTransferEvent = events.find(
+				(event) => event.eventName === "BatchValueTransfer",
+			);
+			if (!batchValueTransferEvent) {
+				console.error(
+					"Failed to process split data: No batch value transfer event found",
 				);
-				const initialFractionUnits = BigInt(
-					ownerFractionWithHighestUnits.units,
-				);
-				const splitFractionUnits = splitTokenAmounts.reduce(
-					(acc, curr) => acc + BigInt(curr),
-					BigInt(0),
-				);
-				splitTokenAmounts.push(
-					(initialFractionUnits - splitFractionUnits).toString(),
-				);
-				return { splitTokenIds, splitTokenAmounts };
-			});
-
-			if (splitDataError) {
-				console.error("Failed to process split data:", splitDataError);
 				setError(true);
 				return;
 			}
 
-			const { splitTokenIds, splitTokenAmounts } = splitData;
+			type BatchValueTransferArgsType = {
+				toTokenIds: bigint[];
+				values: bigint[];
+			};
+			const args =
+				batchValueTransferEvent.args as unknown as BatchValueTransferArgsType;
+			const splitTokenIds = args.toTokenIds.map((id) => id.toString());
+			const splitTokenAmounts = args.values.map((amt) => amt.toString());
+
+			// Also add the origin token id data to make the sum total.
+			splitTokenIds.push(
+				ownerFractionWithHighestUnits.fractionId.split("-")[2],
+			);
+			const initialFractionUnits = BigInt(ownerFractionWithHighestUnits.units);
+			const splitFractionUnits = splitTokenAmounts.reduce(
+				(acc, curr) => acc + BigInt(curr),
+				BigInt(0),
+			);
+			splitTokenAmounts.push(
+				(initialFractionUnits - splitFractionUnits).toString(),
+			);
 
 			// Compute the fraction each donor should receive based on the amount they donated.
 			const { donorFractionsToTransfer: computedDonorFractionsToTransfer } =
@@ -634,19 +636,6 @@ const Progress = ({
 										>
 											<RotateCw size={16} /> Retry
 										</Button>
-									</div>
-								)}
-								{listingProgressConfig.isFinalState && (
-									<div className="flex flex-col gap-2">
-										<Link href={`/hypercert/${ecocertId}`}>
-											<Button size={"sm"} className="gap-2">
-												View hypercert <ArrowRight size={16} />
-											</Button>
-										</Link>
-										<span className="flex items-center gap-1 text-muted-foreground text-xs">
-											<Info size={16} />
-											It might take a few minutes to show up.
-										</span>
 									</div>
 								)}
 							</div>
