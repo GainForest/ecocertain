@@ -1,8 +1,8 @@
 "use client";
 
-import { fetchFullHypercertById } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import { getEASConfig } from "@/config/eas";
+import { fetchFullHypercertById } from "@/graphql/hypercerts/queries/hypercerts";
 import { cn } from "@/lib/utils";
 import type { JsonRpcSigner } from "ethers";
 import { motion } from "framer-motion";
