@@ -22,10 +22,11 @@ import {
 	CircleAlert,
 } from "lucide-react";
 
-import useGitcoinEcocerts from "@/app/profile/[address]/hooks/use-gitcoin-ecocerts";
+import useGitcoinData from "@/app/profile/[address]/components/content/gitcoin-donations/hooks/use-gitcoin-data";
 import UserChip from "@/components/user-chip";
 import Link from "next/link";
 import { useWalletClient } from "wagmi";
+import { useGitcoinEcocerts } from "../hooks/use-gitcoin-ecocerts";
 import Sidebar from "./sidebar";
 
 const ErrorSection = ({
@@ -97,15 +98,20 @@ const SupportGitcoinDonorsDialog = ({
 }) => {
 	const [isProgressVisible, setIsProgressVisible] = useState(false);
 	const { data: walletClient } = useWalletClient();
-	const {
-		gitcoinEcocerts,
-		isGitcoinEcocertsLoading,
-		isRefetchingGitcoinEcocerts,
-		refetchGitcoinEcocerts,
-	} = useGitcoinEcocerts([ecocertId], `donors-dialog-${ecocertId}`);
+	const gitcoinDataArray = useGitcoinData([ecocertId]);
+	const gitcoinData = gitcoinDataArray[0];
 
-	const donations = gitcoinEcocerts?.[0]?.donations ?? [];
-	const gitcoinApplicationId = gitcoinEcocerts?.[0]?.applicationId;
+	const {
+		data: gitcoinEcocerts,
+		isPending: isGitcoinEcocertsPending,
+		isRefetching: isRefetchingGitcoinEcocerts,
+		error: gitcoinEcocertsError,
+		refetch: refetchGitcoinEcocerts,
+	} = useGitcoinEcocerts(gitcoinData ? [gitcoinData] : []);
+
+	const gitcoinEcocert = gitcoinEcocerts?.[0];
+	const donations = gitcoinEcocert?.donations ?? [];
+	const gitcoinApplicationId = gitcoinEcocert?.gitcoinApplicationId;
 
 	const handleShowDialog = () => {
 		refetchGitcoinEcocerts();
@@ -134,20 +140,20 @@ const SupportGitcoinDonorsDialog = ({
 						ecocertId={ecocertId}
 						values={donations.map((donation) => ({
 							amountInUsd: Number(donation.amountInUsd),
-							donorAddress: donation.donorAddress,
+							donorAddress: donation.donor,
 						}))}
 						walletClient={walletClient}
 						onCancel={() => setIsProgressVisible(false)}
 					/>
 				) : (
 					<>
-						{gitcoinEcocerts !== undefined && gitcoinEcocerts[0] !== null && (
+						{gitcoinEcocert && (
 							<div className="flex w-full items-center justify-between rounded-xl border border-border p-1 font-sans shadow-lg">
 								<span className="ml-2">
 									View the associated project on Gitcoin.
 								</span>
 								<Link
-									href={`https://explorer.gitcoin.co/#/round/42220/35/${gitcoinEcocerts[0].applicationId}`}
+									href={`https://explorer.gitcoin.co/#/round/42220/35/${gitcoinEcocert.gitcoinApplicationId}`}
 									target="_blank"
 								>
 									<Button
@@ -160,10 +166,10 @@ const SupportGitcoinDonorsDialog = ({
 								</Link>
 							</div>
 						)}
-						{(gitcoinEcocerts === undefined && isGitcoinEcocertsLoading) ||
-						isRefetchingGitcoinEcocerts ? (
+						{isGitcoinEcocertsPending || isRefetchingGitcoinEcocerts ? (
 							<Skeleton />
-						) : gitcoinEcocerts === undefined || gitcoinEcocerts[0] === null ? (
+						) : gitcoinEcocert === undefined ||
+						  gitcoinEcocert.donations.length === 0 ? (
 							<ErrorSection
 								title="No donations found"
 								description="No donations found for this ecocert."
@@ -179,7 +185,7 @@ const SupportGitcoinDonorsDialog = ({
 												key={donation.transactionHash}
 											>
 												<UserChip
-													address={donation.donorAddress as `0x${string}`}
+													address={donation.donor as `0x${string}`}
 													className="flex-1 rounded-lg bg-transparent"
 													showCopyButton="hover"
 												/>

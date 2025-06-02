@@ -30,7 +30,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import { useAccount, useEnsName } from "wagmi";
-import useGitcoinEcocerts from "../hooks/use-gitcoin-ecocerts";
+import useGitcoinData from "./content/gitcoin-donations/hooks/use-gitcoin-data";
 
 const ProfileCard = ({
 	address,
@@ -52,8 +52,7 @@ const ProfileCard = ({
 		chainId: 1,
 	});
 
-	const { gitcoinEcocerts, isGitcoinEcocertsLoading } =
-		useGitcoinEcocerts(userHypercertIds);
+	const gitcoinData = useGitcoinData(userHypercertIds);
 
 	const { address: connectedWalletAddress } = useAccount();
 	const isUserAddress = address === connectedWalletAddress;
@@ -178,13 +177,7 @@ const ProfileCard = ({
 								</span>
 								<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
 									<span>
-										{isGitcoinEcocertsLoading ? (
-											<Loader2 size={14} className="animate-spin" />
-										) : (
-											gitcoinEcocerts?.filter(
-												(gitcoinEcocert) => gitcoinEcocert !== null,
-											).length
-										)}
+										{gitcoinData.filter((data) => data !== null).length}
 									</span>
 									<ChevronRight size={16} />
 								</span>
