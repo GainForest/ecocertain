@@ -105,7 +105,6 @@ const SupportGitcoinDonorsDialog = ({
 		data: gitcoinEcocerts,
 		isPending: isGitcoinEcocertsPending,
 		isRefetching: isRefetchingGitcoinEcocerts,
-		error: gitcoinEcocertsError,
 		refetch: refetchGitcoinEcocerts,
 	} = useGitcoinEcocerts(gitcoinData ? [gitcoinData] : []);
 

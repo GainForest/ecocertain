@@ -30,11 +30,12 @@ import Link from "next/link";
 import React from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import SupportGitcoinDonorsDialog from "./SupportGitcoinDonorsDialog";
+import { getNonOwnerFractions } from "./SupportGitcoinDonorsDialog/utils";
 import type { GitcoinData } from "./hooks/use-gitcoin-data";
 import { useGitcoinEcocerts } from "./hooks/use-gitcoin-ecocerts";
 
 type GitcoinEcocert = GitcoinData & {
-	ownerFractions: Fraction[] | null;
+	allFractions: Fraction[] | null;
 };
 
 const GitcoinEcocertAccordionItem = ({
@@ -63,7 +64,7 @@ const GitcoinEcocertAccordionItem = ({
 		: "Untitled";
 
 	const alreadyTransferred =
-		(gitcoinEcocert.ownerFractions ?? []).length >
+		getNonOwnerFractions(gitcoinEcocert).length >=
 			gitcoinEcocert.donations.length ||
 		window.localStorage.getItem(
 			`gitcoin-round-35-application-${gitcoinEcocert.gitcoinApplicationId}-completed`,
@@ -229,9 +230,9 @@ const BatchTransferList = ({
 	const sortedEcocerts = gitcoinEcocerts
 		? gitcoinEcocerts.sort((a, b) => {
 				const aTransferred =
-					(a.ownerFractions ?? []).length - a.donations.length;
+					getNonOwnerFractions(a).length - a.donations.length;
 				const bTransferred =
-					(b.ownerFractions ?? []).length - b.donations.length;
+					getNonOwnerFractions(b).length - b.donations.length;
 				return aTransferred - bTransferred;
 		  })
 		: null;

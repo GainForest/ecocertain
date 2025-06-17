@@ -1,9 +1,13 @@
-/**
- * @description This function checks if the hypercert is already split by comparing the units in the fractions to the units to donate.
- * @param ownerFractions - The units in the fractions.
- * @param donorFractions - The units to donate.
- * @returns true if the hypercert is already split, false otherwise.
- */
+import type { GitcoinEcocert } from "../hooks/use-gitcoin-ecocerts";
+
+export const getNonOwnerFractions = (gitcoinEcocert: GitcoinEcocert) => {
+	return (
+		gitcoinEcocert.allFractions?.filter(
+			(f) => f.ownerAddress !== gitcoinEcocert.creatorAddress,
+		) ?? []
+	);
+};
+
 export const getSplitStatusAndDataByUnitsComparision = (
 	ownerFractions: {
 		tokenId: string;

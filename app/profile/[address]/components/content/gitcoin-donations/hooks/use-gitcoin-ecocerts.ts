@@ -1,8 +1,15 @@
 "use client";
 
-import { fetchFractionsByHypercert } from "@/graphql/hypercerts/queries/fractions-by-hypercert";
+import {
+	type Fraction,
+	fetchFractionsByHypercert,
+} from "@/graphql/hypercerts/queries/fractions-by-hypercert";
 import { useQuery } from "@tanstack/react-query";
 import type { GitcoinData } from "./use-gitcoin-data";
+
+export type GitcoinEcocert = GitcoinData & {
+	allFractions: Fraction[] | null;
+};
 
 export const useGitcoinEcocerts = (gitcoinDataArray: GitcoinData[]) => {
 	const gitcoinEcocertIds = gitcoinDataArray.map((data) => data.ecocertId);
@@ -25,13 +32,13 @@ export const useGitcoinEcocerts = (gitcoinDataArray: GitcoinData[]) => {
 			return gitcoinEcocertIds.map((ecocertId, index) => {
 				return {
 					ecocertId,
-					ownerFractions: fractions[index],
+					allFractions: fractions[index],
 				};
 			});
 		},
 	});
 
-	const data = gitcoinEcocertFractions
+	const data: GitcoinEcocert[] | undefined = gitcoinEcocertFractions
 		? gitcoinEcocertFractions
 				.map((fraction) => {
 					const gitcoinData = gitcoinDataArray.find(
@@ -42,7 +49,7 @@ export const useGitcoinEcocerts = (gitcoinDataArray: GitcoinData[]) => {
 					}
 					return {
 						...gitcoinData,
-						ownerFractions: fraction.ownerFractions,
+						allFractions: fraction.allFractions,
 					};
 				})
 				.filter((ecocert) => ecocert !== null)
