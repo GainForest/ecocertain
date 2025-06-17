@@ -202,7 +202,13 @@ const Progress = ({
 		}
 		const hypercertOwner = hypercert.creatorAddress;
 		if (hypercertOwner.toLowerCase() !== address?.toLowerCase()) {
-			console.error("User is not the owner of the hypercert");
+			console.error(
+				"User is not the owner of the hypercert.",
+				"Expected:",
+				hypercertOwner,
+				"Got:",
+				address,
+			);
 			setError(true);
 			return;
 		}
@@ -218,7 +224,8 @@ const Progress = ({
 			return;
 		}
 		const ownerFractions = fractions.filter(
-			(fraction) => fraction.ownerAddress === address,
+			(fraction) =>
+				fraction.ownerAddress.toLowerCase() === address.toLowerCase(),
 		);
 		if (ownerFractions.length === 0) {
 			console.error("No fractions found for owner");
@@ -293,7 +300,7 @@ const Progress = ({
 					units: f.units,
 				})),
 				unitsToTransfer.map((u, i) => ({
-					address: values[i].donorAddress,
+					address: values[i].donorAddress.toLowerCase(),
 					units: u.toString(),
 				})),
 			);
@@ -313,7 +320,13 @@ const Progress = ({
 			BigInt(0),
 		);
 		if (totalUnitsToTransfer > BigInt(ownerFractionWithHighestUnits.units)) {
-			console.error("Total units to transfer exceeds owner's fraction");
+			console.error(
+				"Total units to transfer exceeds owner's fraction.",
+				"Total units to transfer:",
+				totalUnitsToTransfer,
+				"Owner's highest fraction:",
+				ownerFractionWithHighestUnits,
+			);
 			setError(true);
 			return;
 		}
@@ -342,7 +355,6 @@ const Progress = ({
 			if (splitTxError) {
 				console.error("Split transaction failed:", splitTxError);
 				setError(true);
-				console.error(splitTxError);
 				console.log(unitsToTransfer, ownerFractionWithHighestUnits);
 				return;
 			}
@@ -411,7 +423,7 @@ const Progress = ({
 						units: splitTokenAmounts[splitTokenIds.indexOf(t)],
 					})),
 					unitsToTransfer.map((u, i) => ({
-						address: values[i].donorAddress,
+						address: values[i].donorAddress.toLowerCase(),
 						units: u.toString(),
 					})),
 				);
