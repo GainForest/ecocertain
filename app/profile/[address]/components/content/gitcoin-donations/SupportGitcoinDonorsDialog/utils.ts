@@ -3,7 +3,9 @@ import type { GitcoinEcocert } from "../hooks/use-gitcoin-ecocerts";
 export const getNonOwnerFractions = (gitcoinEcocert: GitcoinEcocert) => {
 	return (
 		gitcoinEcocert.allFractions?.filter(
-			(f) => f.ownerAddress !== gitcoinEcocert.creatorAddress,
+			(f) =>
+				f.ownerAddress.toLowerCase() !==
+				gitcoinEcocert.creatorAddress.toLowerCase(),
 		) ?? []
 	);
 };
