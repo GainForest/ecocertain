@@ -28,6 +28,7 @@ const Progress = ({
 	>("loading");
 	const [label, setLabel] = useState<string>("Please wait...");
 	const [txHash, setTxHash] = useState<string | null>(null);
+	const [started, setStarted] = useState(false);
 	const { client: hypercertClient } = useHypercertClient();
 
 	const { chain } = useAccount();
@@ -59,13 +60,14 @@ const Progress = ({
 		}
 	};
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies(transferStatus): transfer status is not a dependency
+	// biome-ignore lint/correctness/useExhaustiveDependencies(transferStatus, setStarted): transfer status or setStarted is not a dependency
 	useEffect(() => {
 		if (transferStatus === "error") return;
-		if (hypercertClient) {
+		if (hypercertClient && !started) {
 			handleTransfer();
+			setStarted(true);
 		}
-	}, [hypercertClient, handleTransfer]);
+	}, [hypercertClient, handleTransfer, started]);
 
 	return (
 		<div className="flex flex-col items-center justify-center rounded-xl bg-muted/50 p-2">
