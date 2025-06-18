@@ -32,7 +32,7 @@ export default function Card({ hypercert }: { hypercert: Hypercert }) {
 					)}
 				</div>
 				<section
-					className="w-full flex-1 space-y-2 border-t border-t-border bg-background/90 p-4 backdrop-blur-md"
+					className="flex w-full flex-1 flex-col space-y-2 border-t border-t-border bg-background/90 p-4 backdrop-blur-md"
 					style={{
 						boxShadow: "0 -10px 10px rgba(0, 0, 0, 0.1)",
 					}}
@@ -76,7 +76,7 @@ export default function Card({ hypercert }: { hypercert: Hypercert }) {
           ))}
         </div> */}
 					<p
-						className={`line-clamp-2 max-h-12 flex-1 text-ellipsis font-baskerville font-semibold text-lg leading-5${
+						className={`line-clamp-2 max-h-12 text-ellipsis font-baskerville font-semibold text-lg leading-5${
 							name ? "text-foreground" : "text-muted-foreground"
 						}`}
 					>
