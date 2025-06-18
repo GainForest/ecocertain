@@ -59,16 +59,12 @@ const Progress = ({
 		}
 	};
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies(transferStatus): transfer status is not a dependency
 	useEffect(() => {
-		const startTransferWithoutHypercertClient = setTimeout(
-			handleTransfer,
-			5000,
-		);
+		if (transferStatus === "error") return;
 		if (hypercertClient) {
-			clearTimeout(startTransferWithoutHypercertClient);
 			handleTransfer();
 		}
-		return () => clearTimeout(startTransferWithoutHypercertClient);
 	}, [hypercertClient, handleTransfer]);
 
 	return (
