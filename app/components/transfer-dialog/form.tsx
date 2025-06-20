@@ -2,8 +2,9 @@ import type { Fraction } from "@/app/graphql-queries/fractions-by-hypercert";
 import type { Hypercert } from "@/app/graphql-queries/hypercerts";
 import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import { gainforestMultisigForTransfers } from "@/config/gainforest";
 import useCopy from "@/hooks/use-copy";
-import { Check, Copy } from "lucide-react";
+import { Check, CircleAlert, Copy } from "lucide-react";
 import { useMemo } from "react";
 
 const Form = ({
@@ -54,6 +55,12 @@ const Form = ({
 
 	return (
 		<div className="flex flex-col gap-6">
+			<div className="flex items-center gap-2 rounded-lg bg-muted/80 p-2 text-muted-foreground">
+				<CircleAlert size={16} />
+				<span className="font-bold text-sm">
+					Transferring a fraction of ecocert might unlist it from sale.
+				</span>
+			</div>
 			<div className="flex flex-col gap-1">
 				<span className="font-bold text-muted-foreground text-sm">
 					Select a fraction by units
@@ -115,6 +122,15 @@ const Form = ({
 					value={recipientAddress}
 					onChange={(e) => setRecipientAddress(e.target.value)}
 				/>
+				{recipientAddress.toLowerCase() ===
+					gainforestMultisigForTransfers.toLowerCase() && (
+					<div>
+						<span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-2 py-1 font-bold text-primary text-sm">
+							<Check size={14} />
+							<span>This address is GainForest's Multisig.</span>
+						</span>
+					</div>
+				)}
 			</div>
 		</div>
 	);

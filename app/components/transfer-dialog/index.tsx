@@ -11,6 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/modern-dialog-extended";
+import { gainforestMultisigForTransfers } from "@/config/gainforest";
 import { useQuery } from "@tanstack/react-query";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -29,7 +30,9 @@ const GetVerifiedDialog = ({
 	trigger: React.ReactNode;
 }) => {
 	const { isConnected, address } = useAccount();
-	const [recipientAddress, setRecipientAddress] = useState<string>("");
+	const [recipientAddress, setRecipientAddress] = useState<string>(
+		gainforestMultisigForTransfers,
+	);
 	const isValidRecipientAddress = useMemo(() => {
 		return isAddress(recipientAddress);
 	}, [recipientAddress]);
