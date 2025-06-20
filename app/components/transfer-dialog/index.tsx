@@ -125,7 +125,7 @@ const GetVerifiedDialog = ({
 										recipientAddress,
 									}}
 									back={() => setIsTransferring(false)}
-									onSuccess={() => setIsTransferring(false)}
+									onSuccess={() => console.log("Transfer succeeded.")}
 								/>
 							) : isSomethingLoading ||
 							  isCreator === undefined ||
