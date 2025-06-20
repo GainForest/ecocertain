@@ -58,6 +58,13 @@ const Form = ({
 			<div className="flex items-center gap-2 rounded-lg bg-muted/80 p-2 text-muted-foreground">
 				<CircleAlert size={16} />
 				<span className="font-bold text-sm">
+					Once an ecocert is transferred, it can not be re-transferred to
+					another user. All transfers are final.
+				</span>
+			</div>
+			<div className="flex items-center gap-2 rounded-lg bg-muted/80 p-2 text-muted-foreground">
+				<CircleAlert size={16} />
+				<span className="font-bold text-sm">
 					Transferring a fraction of ecocert might unlist it from sale.
 				</span>
 			</div>
@@ -122,15 +129,6 @@ const Form = ({
 					value={recipientAddress}
 					onChange={(e) => setRecipientAddress(e.target.value)}
 				/>
-				{recipientAddress.toLowerCase() ===
-					gainforestMultisigForTransfers.toLowerCase() && (
-					<div>
-						<span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-2 py-1 font-bold text-primary text-sm">
-							<Check size={14} />
-							<span>This address is GainForest's Multisig.</span>
-						</span>
-					</div>
-				)}
 			</div>
 		</div>
 	);
