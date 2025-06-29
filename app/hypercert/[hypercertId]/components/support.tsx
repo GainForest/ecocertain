@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
 import { TOKENS_CONFIG } from "@/config/wagmi";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { formatTokens } from "@/lib/format-tokens";
 import {
 	bigintToFormattedDate,
 	convertCurrencyPriceToUSD,
@@ -83,12 +84,21 @@ const Support = ({ hypercert }: { hypercert: FullHypercert }) => {
 		);
 	}
 
-	const addressToSymbol: Record<string, string> = {};
+	const addressToSymbol: Record<
+		string,
+		{
+			symbol: string;
+			decimals: number;
+		}
+	> = {};
 
 	for (const chainId in TOKENS_CONFIG) {
 		const tokens = TOKENS_CONFIG[chainId];
 		for (const token of tokens) {
-			addressToSymbol[token.address] = token.symbol;
+			addressToSymbol[token.address] = {
+				symbol: token.symbol,
+				decimals: token.decimals,
+			};
 		}
 	}
 
@@ -118,20 +128,21 @@ const Support = ({ hypercert }: { hypercert: FullHypercert }) => {
 						.map((sale) => {
 							const saleCurrency = sale.currency;
 							let currencySymbol: string;
+							let currencyDecimals: number;
 							if (
 								saleCurrency in addressToSymbol &&
 								addressToSymbol[saleCurrency]
 							) {
-								currencySymbol = addressToSymbol[saleCurrency];
+								currencySymbol = addressToSymbol[saleCurrency].symbol;
+								currencyDecimals = addressToSymbol[saleCurrency].decimals;
 							} else {
 								return null;
 							}
-							// The currency amount we get from the response is in a multiple of 10^18
-							// We need to divide it by 10^18 to get the actual amount
-							// We first divide by 10^6 so that when we convert to number, we don't get scientific notation.
-							// We then divide by 10^12 to get the actual amount with decimal precision.
-							const saleAmount =
-								Number(sale.currencyAmount / BigInt(10 ** 6)) / 10 ** 12;
+
+							const saleAmount = formatTokens(
+								sale.currencyAmount,
+								currencyDecimals,
+							);
 
 							return (
 								<li
@@ -154,7 +165,7 @@ const Support = ({ hypercert }: { hypercert: FullHypercert }) => {
 										</div>
 									</div>
 									<span className="text-right font-bold text-lg text-primary">
-										<b>{formatDecimals(saleAmount)}</b> {currencySymbol}
+										<b>{saleAmount}</b> {currencySymbol}
 									</span>
 								</li>
 							);
