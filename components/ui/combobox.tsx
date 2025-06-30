@@ -32,6 +32,7 @@ export function Combobox({
 	searchPlaceholder,
 	value,
 	onChange,
+	popoverClassName,
 	...props
 }: Omit<ButtonProps, "onChange"> & {
 	options: ComboboxOption[];
@@ -41,6 +42,7 @@ export function Combobox({
 	allowNoSelection?: boolean;
 	value: string | undefined;
 	onChange: (value: string | undefined) => void;
+	popoverClassName?: string;
 }) {
 	const [open, setOpen] = React.useState(false);
 
@@ -60,7 +62,12 @@ export function Combobox({
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="pointer-events-auto relative z-[100] w-[200px] p-0 font-sans">
+			<PopoverContent
+				className={cn(
+					"pointer-events-auto relative z-[100] w-[200px] p-0 font-sans",
+					popoverClassName,
+				)}
+			>
 				<Command>
 					<CommandInput placeholder={searchPlaceholder ?? "Search..."} />
 					<CommandList>
