@@ -2,10 +2,14 @@
 
 import { X } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function InfoBox({ children }: { children: React.ReactNode }) {
-	const [isVisible, setIsVisible] = useState(true);
+const InfoBox = ({ children }: { children: React.ReactNode }) => {
+	const [isVisible, setIsVisible] = useState(false);
+
+	useEffect(() => {
+		setIsVisible(true);
+	}, []);
 
 	if (!isVisible) return null;
 
@@ -25,4 +29,6 @@ export default function InfoBox({ children }: { children: React.ReactNode }) {
 			</div>
 		</div>
 	);
-}
+};
+
+export default InfoBox;

@@ -1,4 +1,4 @@
-import type { Hypercert } from "@/app/graphql-queries/hypercerts";
+import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { HeartHandshake, Sparkle } from "lucide-react";
 import React from "react";
 import type { CombinedSale } from "../../page";

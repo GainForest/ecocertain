@@ -10,13 +10,13 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { fetchHypercertById } from "@/graphql/hypercerts/queries/hypercerts";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { useQuery } from "@tanstack/react-query";
 import { CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { fetchHypercertById } from "../graphql-queries/hypercerts";
 import { catchError } from "../utils";
 
 // Status type definition

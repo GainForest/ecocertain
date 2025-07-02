@@ -1,19 +1,20 @@
 import Progress from "@/app/components/shared/progress";
 import { FullHypercertProvider } from "@/app/contexts/full-hypercert";
-import { fetchFullHypercertById } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
+import { fetchFullHypercertById } from "@/graphql/hypercerts/queries/hypercerts";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import AttestationsList from "./components/AttestationsList";
 
 type PageProps = {
-	params: { hypercertId: string };
+	params: Promise<{ hypercertId: string }>;
 };
 
 export default async function HypercertProofOfImpactPage({
-	params: { hypercertId },
+	params,
 }: PageProps) {
+	const { hypercertId } = await params;
 	const hypercert = await fetchFullHypercertById(hypercertId);
 
 	if (!hypercert) {
