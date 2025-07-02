@@ -298,13 +298,9 @@ export const fetchFullHypercertById = async (
   }
   const [response, error] = await tryCatch(
     async () =>
-      await fetchGraphQL(
-        fullHypercertByHypercertIdQuery,
-        {
-          hypercert_id: hypercertId,
-        },
-        testingLog
-      )
+      await fetchGraphQL(fullHypercertByHypercertIdQuery, {
+        hypercert_id: hypercertId,
+      })
   );
   if (error) {
     throw error;

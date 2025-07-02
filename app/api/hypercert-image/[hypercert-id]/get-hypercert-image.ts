@@ -1,8 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { graphqlEndpoint } from "@/config/hypercerts";
-import { graphql } from "@/lib/graphql";
-import graphQlrequest from "graphql-request";
+import { fetchHypercertsGraphQL, graphql } from "@/graphql/hypercerts";
 
 const PLACEHOLDER_IMAGE_PATH = path.join(
 	process.cwd(),
@@ -65,8 +64,7 @@ export async function getHypercertImage(
 		const headers = {
 			"Cache-Control": "public, max-age=1800", // 30 minutes in seconds
 		};
-		const res = await graphQlrequest(
-			graphqlEndpoint,
+		const res = await fetchHypercertsGraphQL(
 			IMAGE_QUERY,
 			{
 				hypercert_id: hypercertId,
@@ -75,18 +73,19 @@ export async function getHypercertImage(
 		);
 		const imageOrUrl = res.hypercerts.data?.[0]?.metadata?.image;
 
+		// console.log(
+		//   "imageOrUrl",
+		//   imageOrUrl,
+		//   graphqlEndpoint,
+		//   IMAGE_QUERY,
+		//   headers,
+		//   res,
+		//   res.hypercerts.data?.length,
+		//   res.hypercerts.data
+		// );
+		// console.log("imageOrUrl", res.hypercerts.data?.[0]);
+
 		// Use placeholder image if no image URL or data is found
-		console.log(
-			"imageOrUrl",
-			imageOrUrl,
-			graphqlEndpoint,
-			IMAGE_QUERY,
-			headers,
-			res,
-			res.hypercerts.data?.length,
-			res.hypercerts.data,
-		);
-		console.log("imageOrUrl", res.hypercerts.data?.[0]);
 		if (!imageOrUrl || imageOrUrl === "https://hypercerts.org/logo.png") {
 			return servePlaceholderImage();
 		}
