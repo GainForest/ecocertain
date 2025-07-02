@@ -94,7 +94,9 @@ export const fetchHyperboardById = async (id: string): Promise<Hyperboard> => {
 
   const hyperboardData = {
     id: id,
+    // @ts-expect-error - TODO: this is a problem with the graphql schema
     chainIds: hyperboard.admins.data.map(
+      // @ts-expect-error - TODO: this is a problem with the graphql schema
       (admin) => (admin as { chain_id: number }).chain_id
     ),
     title: hyperboard.name,

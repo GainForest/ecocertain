@@ -8,12 +8,13 @@ import Link from "next/link";
 import AttestationsList from "./components/AttestationsList";
 
 type PageProps = {
-	params: { hypercertId: string };
+	params: Promise<{ hypercertId: string }>;
 };
 
 export default async function HypercertProofOfImpactPage({
-	params: { hypercertId },
+	params,
 }: PageProps) {
+	const { hypercertId } = await params;
 	const hypercert = await fetchFullHypercertById(hypercertId);
 
 	if (!hypercert) {
