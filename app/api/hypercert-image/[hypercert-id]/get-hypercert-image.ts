@@ -76,6 +76,7 @@ export async function getHypercertImage(
 		const imageOrUrl = res.hypercerts.data?.[0]?.metadata?.image;
 
 		// Use placeholder image if no image URL or data is found
+		console.log("imageOrUrl", imageOrUrl);
 		if (!imageOrUrl || imageOrUrl === "https://hypercerts.org/logo.png") {
 			return servePlaceholderImage();
 		}

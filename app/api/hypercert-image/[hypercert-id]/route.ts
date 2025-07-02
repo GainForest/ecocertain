@@ -12,6 +12,7 @@ export async function GET(
 	{ params }: { params: Promise<{ "hypercert-id": string }> },
 ) {
 	const hypercertId = (await params)["hypercert-id"];
+	console.log("hypercertId", hypercertId);
 
 	// Validate hypercert ID
 	if (!hypercertId || Array.isArray(hypercertId)) {
