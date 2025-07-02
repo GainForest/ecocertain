@@ -1,9 +1,9 @@
 // Hypercerts Endpoint Config:
-const productionGraphQL = "https://api.hypercerts.org/v1/graphql";
-const developmentGraphQL = "https://staging-api.hypercerts.org/v1/graphql";
+const productionGraphQL = "https://api.hypercerts.org/v2/graphql";
+const developmentGraphQL = "https://staging-api.hypercerts.org/v2/graphql";
 
-const productionREST = "https://api.hypercerts.org/v1";
-const developmentREST = "https://staging-api.hypercerts.org/v1";
+const productionREST = "https://api.hypercerts.org/v2";
+const developmentREST = "https://staging-api.hypercerts.org/v2";
 
 const HYPERCERTS_API_URL_REST =
   process.env.NEXT_PUBLIC_DEPLOY_ENV === "production"

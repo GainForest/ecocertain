@@ -76,12 +76,15 @@ const frame = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const initialState = cookieToInitialState(config, headers().get("cookie"));
+	const initialState = cookieToInitialState(
+		config,
+		(await headers()).get("cookie"),
+	);
 	return (
 		<html lang="en">
 			<head>

@@ -1,7 +1,7 @@
 "use client";
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import UserChip from "@/components/user-chip";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import autoAnimate from "@formkit/auto-animate";
 import React, { useEffect, useRef, useState } from "react";
 import SectionWrapper from "./SectionWrapper";

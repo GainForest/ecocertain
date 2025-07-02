@@ -2,15 +2,15 @@ import { type Address, getAddress } from "viem";
 
 import PageError from "@/app/components/shared/PageError";
 
-import { fetchHypercertsByUserId } from "@/app/graphql-queries/user-hypercerts";
 import { catchError } from "@/app/utils";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
+import { fetchHypercertsByUserId } from "@/graphql/hypercerts/queries/user-hypercerts";
 
 import {
 	type SaleByUser,
 	type SaleByUserHypercert,
 	fetchSalesByUser,
-} from "@/app/graphql-queries/sales";
+} from "@/graphql/hypercerts/queries/user-sales";
 import {
 	convertCurrencyPriceToUSD,
 	getValueFromSearchParams,

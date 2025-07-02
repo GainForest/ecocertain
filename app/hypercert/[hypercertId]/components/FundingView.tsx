@@ -3,8 +3,8 @@
 import CreateListingDialog from "@/app/components/create-listing-dialog";
 import Progress from "@/app/components/shared/progress";
 import useFullHypercert from "@/app/contexts/full-hypercert";
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatDecimals } from "@/lib/utils";
 import { ArrowRight, BadgeDollarSign, CircleAlert, Clock } from "lucide-react";

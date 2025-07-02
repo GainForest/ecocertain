@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { fetchSalesDataByPeriod } from "@/graphql/hypercerts/queries/period-sales";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Divide, Download } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import RoundDataTable from "./RoundTable";
-import { fetchSalesDataByPeriod } from "./sales-data-by-period";
 
 export type Round = {
 	id: number;

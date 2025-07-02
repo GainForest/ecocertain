@@ -1,9 +1,9 @@
 "use client";
-import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
 import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
+import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import useCopy from "@/hooks/use-copy";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";

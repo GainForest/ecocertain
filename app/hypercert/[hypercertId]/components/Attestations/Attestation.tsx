@@ -1,8 +1,8 @@
-import type { EcocertAttestation } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
 import QuickTooltip from "@/components/ui/quicktooltip";
 import UserChip from "@/components/user-chip";
+import type { EcocertAttestation } from "@/graphql/hypercerts/queries/hypercerts";
 import useCopy from "@/hooks/use-copy";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

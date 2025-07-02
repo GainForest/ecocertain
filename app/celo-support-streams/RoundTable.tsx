@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import UserChip from "@/components/user-chip";
+import type { SalesByHypercert } from "@/graphql/hypercerts/queries/period-sales";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { celo } from "viem/chains";
-import type { SalesByHypercert } from "./sales-data-by-period";
 
 const RoundDataTable = ({ roundData }: { roundData: SalesByHypercert[] }) => {
 	return (
