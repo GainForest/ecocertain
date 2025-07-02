@@ -82,6 +82,7 @@ export async function getHypercertImage(
 			graphqlEndpoint,
 			IMAGE_QUERY,
 			headers,
+			res,
 		);
 		if (!imageOrUrl || imageOrUrl === "https://hypercerts.org/logo.png") {
 			return servePlaceholderImage();
