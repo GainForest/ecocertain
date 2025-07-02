@@ -83,7 +83,10 @@ export async function getHypercertImage(
 			IMAGE_QUERY,
 			headers,
 			res,
+			res.hypercerts.data?.length,
+			res.hypercerts.data,
 		);
+		console.log("imageOrUrl", res.hypercerts.data?.[0]);
 		if (!imageOrUrl || imageOrUrl === "https://hypercerts.org/logo.png") {
 			return servePlaceholderImage();
 		}
