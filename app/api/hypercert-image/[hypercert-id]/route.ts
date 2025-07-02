@@ -9,9 +9,9 @@ export const revalidate = 1800;
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { "hypercert-id": string } },
+	{ params }: { params: Promise<{ "hypercert-id": string }> },
 ) {
-	const hypercertId = params["hypercert-id"];
+	const hypercertId = (await params)["hypercert-id"];
 
 	// Validate hypercert ID
 	if (!hypercertId || Array.isArray(hypercertId)) {
