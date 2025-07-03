@@ -4,3 +4,6 @@ export const verifiedAttestors = new Set<string>(
     "0x40713Ca5223eFb79E861E282495092D2563c1eCE",
   ].map((attestor) => attestor.toLowerCase())
 );
+
+export const gainforestMultisigForTransfers =
+  "0x0C62bDB70f167b720766E18e61FD9c50b7d19442";
