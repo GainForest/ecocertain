@@ -23,6 +23,8 @@ export const hypercert = `
         sales {
           data {
             buyer
+            currency
+            currency_amount
           }
         }
         hypercert_id

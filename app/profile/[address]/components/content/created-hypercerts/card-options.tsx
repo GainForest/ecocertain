@@ -8,6 +8,7 @@ import { ArrowRight, Trash2 } from "lucide-react";
 import React from "react";
 import { useAccount } from "wagmi";
 
+import CircularProgress from "@/components/ui/circular-progress";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
@@ -33,16 +34,7 @@ const CardOptions = () => {
 			{hasOrderListings ? (
 				<div className="flex items-center justify-between gap-2">
 					<div>
-						<CircularProgressbar
-							className="h-10 w-10"
-							styles={buildStyles({
-								pathColor: "hsl(var(--primary))",
-								textColor: "hsl(var(--foreground))",
-								textSize: "26px",
-							})}
-							text={`${Math.floor(100 - (percentAvailable ?? 0))}%`}
-							value={Math.floor(100 - (percentAvailable ?? 0))}
-						/>
+						<CircularProgress value={100 - (percentAvailable ?? 0)} />
 					</div>
 					<UnlistDialog hypercertId={hypercert.hypercertId}>
 						<Button variant={"secondary"} className="gap-2">

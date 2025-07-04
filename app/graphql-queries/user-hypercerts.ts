@@ -62,6 +62,13 @@ export const fetchHypercertsByUserId = async (
 		);
 		const orderNonce = hypercert.orders?.data?.[0]?.orderNonce;
 
+		const sales = hypercert.sales?.data ?? [];
+		const parsedSales = sales.map((sale) => {
+			return {
+				currency: sale.currency.toLowerCase(),
+				currencyAmount: typeCastApiResponseToBigInt(sale.currency_amount) ?? 0n,
+			};
+		});
 		return {
 			hypercertId: hypercert.hypercert_id as string,
 			creatorAddress: hypercert.creator_address as string,
@@ -78,6 +85,7 @@ export const fetchHypercertsByUserId = async (
 				typeCastApiResponseToBigInt(hypercert.creation_block_timestamp) ?? 0n,
 			orderNonce: orderNonce ? Number(orderNonce) : undefined,
 			orderId: hypercert.orders?.data?.[0]?.id,
+			sales: parsedSales,
 		} satisfies Hypercert;
 	});
 

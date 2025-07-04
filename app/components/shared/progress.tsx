@@ -25,6 +25,7 @@ const Progress = ({
 				animate={{ width: `${2 + (percentage / 100) * 99}%` }}
 				transition={{ duration: 0.5 }}
 			/>
+			{props.children}
 		</div>
 	);
 };

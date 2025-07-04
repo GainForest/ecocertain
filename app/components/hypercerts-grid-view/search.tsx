@@ -1,16 +1,31 @@
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Clock, Search as SearchIcon } from "lucide-react";
+import {
+	ArrowDown,
+	ArrowUp,
+	Clock,
+	Search as SearchIcon,
+	SortAsc,
+	SortDesc,
+} from "lucide-react";
 import type React from "react";
 
+export type SortKey = "date" | "price" | "totalSales";
 export type SortOption = {
-	key: "date";
+	key: SortKey;
 	order: "asc" | "desc";
 };
+
+const SORT_OPTIONS = [
+	{ value: "date", label: "By date created" },
+	{ value: "price", label: "By goal" },
+	{ value: "totalSales", label: "By fundings raised" },
+];
 
 const Search = ({
 	inputState,
@@ -18,12 +33,13 @@ const Search = ({
 }: {
 	inputState: [string, React.Dispatch<React.SetStateAction<string>>];
 	sortOptionsState: [
-		SortOption | null,
-		React.Dispatch<React.SetStateAction<SortOption | null>>,
+		SortOption,
+		React.Dispatch<React.SetStateAction<SortOption>>,
 	];
 }) => {
 	const [input, setInput] = inputState;
 	const [sortOptions, setSortOptions] = sortOptionsState;
+
 	return (
 		<div className="mb-4 flex w-full scale-100 flex-col items-center justify-center px-4">
 			<motion.div
@@ -66,29 +82,48 @@ const Search = ({
 					/>
 				</div>
 				<motion.div className="-mt-2 z-[5] w-full rounded-t-0 rounded-b-lg border border-border bg-background/80 p-1 pt-3">
-					<div className="flex items-center gap-2 px-2 py-1 font-sans">
-						<Label
-							className="text-muted-foreground"
-							htmlFor="latest-ecocerts-switch"
-						>
-							Order by recently created
-						</Label>
-						<Switch
-							className="scale-90"
-							id="latest-ecocerts-switch"
-							checked={Boolean(
-								sortOptions &&
-									sortOptions.key === "date" &&
-									sortOptions.order === "desc",
-							)}
-							onCheckedChange={(checked) => {
-								if (checked) {
-									setSortOptions({ key: "date", order: "desc" });
-								} else {
-									setSortOptions(null);
-								}
+					<div className="flex w-full items-center justify-between px-2 py-1 font-sans">
+						<Combobox
+							options={SORT_OPTIONS}
+							value={sortOptions.key}
+							onChange={(val) => {
+								setSortOptions({ ...sortOptions, key: val as SortKey });
 							}}
+							placeholder="Sort by..."
+							className="min-w-[160px]"
 						/>
+						<div className="flex flex-row overflow-hidden rounded-lg border border-border">
+							<Button
+								variant={sortOptions.order === "asc" ? "secondary" : "ghost"}
+								size="sm"
+								onClick={() => setSortOptions({ ...sortOptions, order: "asc" })}
+								className={cn(
+									"rounded-none border-b-2",
+									sortOptions.order === "asc"
+										? "border-primary"
+										: "border-transparent",
+								)}
+								aria-pressed={sortOptions.order === "asc"}
+							>
+								<SortAsc className="h-4 w-4" />
+							</Button>
+							<Button
+								variant={sortOptions.order === "desc" ? "secondary" : "ghost"}
+								size="sm"
+								onClick={() =>
+									setSortOptions({ ...sortOptions, order: "desc" })
+								}
+								className={cn(
+									"rounded-none border-b-2",
+									sortOptions.order === "desc"
+										? "border-primary"
+										: "border-transparent",
+								)}
+								aria-pressed={sortOptions.order === "desc"}
+							>
+								<SortDesc className="h-4 w-4" />
+							</Button>
+						</div>
 					</div>
 				</motion.div>
 			</motion.div>

@@ -12,6 +12,7 @@ import { config } from "@/config/wagmi";
 import { WagmiContextProvider } from "@/contexts/wagmi";
 import { Libre_Baskerville } from "next/font/google";
 import { headers } from "next/headers";
+import { PriceFeedProvider } from "./PriceFeedProvider";
 import FarcasterProvider from "./components/FarcasterProvider";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -97,9 +98,11 @@ export default function RootLayout({
 				<FarcasterProvider>
 					<Analytics />
 					<WagmiContextProvider initialState={initialState}>
-						<Header />
-						<div className="flex-1">{children}</div>
-						<Footer />
+						<PriceFeedProvider>
+							<Header />
+							<div className="flex-1">{children}</div>
+							<Footer />
+						</PriceFeedProvider>
 					</WagmiContextProvider>
 				</FarcasterProvider>
 			</body>

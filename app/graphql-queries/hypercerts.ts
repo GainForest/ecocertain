@@ -83,6 +83,10 @@ export type Hypercert = {
 	name?: string;
 	description?: string;
 	totalUnits: bigint;
+	sales: {
+		currency: string;
+		currencyAmount: bigint; // in wei
+	}[];
 	unitsForSale?: bigint;
 	pricePerPercentInUSD?: number;
 	buyerCount: number;
@@ -128,6 +132,13 @@ export const fetchHypercertById = async (
 
 	const orderNonce = hypercert.orders?.data?.[0]?.orderNonce;
 
+	const sales = hypercert.sales?.data ?? [];
+	const parsedSales = sales.map((sale) => {
+		return {
+			currency: sale.currency.toLowerCase(),
+			currencyAmount: typeCastApiResponseToBigInt(sale.currency_amount) ?? 0n,
+		};
+	});
 	return {
 		hypercertId,
 		creatorAddress: hypercert.creator_address as string,
@@ -138,6 +149,7 @@ export const fetchHypercertById = async (
 		unitsForSale: typeCastApiResponseToBigInt(
 			hypercert.orders?.totalUnitsForSale,
 		),
+		sales: parsedSales,
 		pricePerPercentInUSD: pricePerPercentInUSDNumber,
 		buyerCount: uniqueBuyers.size,
 		creationBlockTimestamp:

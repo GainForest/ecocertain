@@ -4,6 +4,7 @@ import { usePagination } from "@/hooks/use-pagination";
 
 import { Button } from "@/components/ui/button";
 
+import usePriceFeed from "@/app/PriceFeedProvider";
 import type { Hypercert } from "@/app/graphql-queries/hypercerts";
 import { ShowingDisplay, VDPaginator } from "@/components/global/vd-paginator";
 import autoAnimate from "@formkit/auto-animate";
@@ -11,12 +12,33 @@ import Fuse from "fuse.js";
 import { TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Card from "./card";
-import Search, { type SortOption } from "./search";
+import Search, { type SortOption, type SortKey } from "./search";
+
+const calculateHypercertTotalSalesInUSD = (hypercert: Hypercert) => {
+	const priceFeed = usePriceFeed();
+	const { sales } = hypercert;
+	const totalSalesInUSD =
+		priceFeed.status === "ready"
+			? sales.reduce((acc, sale) => {
+					return (
+						acc +
+						(priceFeed.toUSD(
+							sale.currency as `0x${string}`,
+							Number(sale.currencyAmount),
+						) ?? 0)
+					);
+			  }, 0)
+			: null;
+	return totalSalesInUSD;
+};
 
 export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 	const searchInputState = useState("");
 	const [searchInput, setSearchInput] = searchInputState;
-	const sortOptionsState = useState<SortOption | null>(null);
+	const sortOptionsState = useState<SortOption>({
+		key: "totalSales",
+		order: "desc",
+	});
 	const [sortOptions, setSortOptions] = sortOptionsState;
 
 	const filteredHypercerts = useMemo(() => {
@@ -45,18 +67,29 @@ export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 	}, [filteredHypercerts]);
 
 	const sortedHypercerts = useMemo(() => {
-		if (sortOptions) {
-			if (sortOptions.key === "date") {
-				const temp = [...filteredHypercerts].sort((a, b) => {
-					const diff =
-						Number(a.creationBlockTimestamp) - Number(b.creationBlockTimestamp);
-					return sortOptions.order === "asc" ? diff : -diff;
-				});
-				return temp;
-			}
-			return filteredHypercerts;
+		const key = sortOptions.key;
+		const order = sortOptions.order;
+		const arr = [...filteredHypercerts];
+		if (key === "date") {
+			arr.sort((a, b) => {
+				const diff =
+					Number(a.creationBlockTimestamp) - Number(b.creationBlockTimestamp);
+				return order === "asc" ? diff : -diff;
+			});
+		} else if (key === "price") {
+			arr.sort((a, b) => {
+				const aPrice = a.pricePerPercentInUSD ?? 0;
+				const bPrice = b.pricePerPercentInUSD ?? 0;
+				return order === "asc" ? aPrice - bPrice : bPrice - aPrice;
+			});
+		} else if (key === "totalSales") {
+			arr.sort((a, b) => {
+				const aSales = calculateHypercertTotalSalesInUSD(a) ?? 0;
+				const bSales = calculateHypercertTotalSalesInUSD(b) ?? 0;
+				return order === "asc" ? aSales - bSales : bSales - aSales;
+			});
 		}
-		return filteredHypercerts;
+		return arr;
 	}, [filteredHypercerts, sortOptions]);
 
 	return (
@@ -78,7 +111,11 @@ export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 						ref={gridRef}
 					>
 						{sortedHypercerts.map((hypercert: Hypercert) => (
-							<Card hypercert={hypercert} key={hypercert.hypercertId} />
+							<Card
+								hypercert={hypercert}
+								key={hypercert.hypercertId}
+								totalSalesInUSD={calculateHypercertTotalSalesInUSD(hypercert)}
+							/>
 						))}
 					</div>
 				) : (

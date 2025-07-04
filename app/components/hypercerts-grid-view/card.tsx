@@ -1,18 +1,30 @@
+"use client";
+import usePriceFeed from "@/app/PriceFeedProvider";
 import type { Hypercert } from "@/app/graphql-queries/hypercerts";
+import CircularProgress from "@/components/ui/circular-progress";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { cn } from "@/lib/utils";
+import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { CircularProgressbar } from "react-circular-progressbar";
 import Progress from "../shared/progress";
 
 // * REFACTORED from hypercerts-app hypercert-window
-const Card = ({ hypercert }: { hypercert: Hypercert }) => {
+const Card = ({
+	hypercert,
+	totalSalesInUSD,
+}: {
+	hypercert: Hypercert;
+	totalSalesInUSD: number | null;
+}) => {
 	const {
 		hypercertId,
 		name,
 		description,
 		totalUnits,
+		sales,
 		unitsForSale,
 		pricePerPercentInUSD,
 		chainId,
@@ -23,6 +35,7 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 		(x) => x.id === Number(chainId),
 	)?.name;
 	const percentAvailable = calculateBigIntPercentage(unitsForSale, totalUnits);
+
 	return (
 		<Link href={`/hypercert/${hypercertId}`} passHref>
 			<article className="group relative overflow-hidden rounded-2xl border border-border bg-muted">
@@ -36,11 +49,15 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 					/>
 				</div>
 				<section className="absolute top-4 left-4 flex space-x-1 opacity-100 transition-opacity duration-150 ease-out group-hover:opacity-100 md:opacity-0">
-					<div className="rounded-md border border-white/60 bg-black px-2 py-0.5 text-white text-xs shadow-sm">
-						{chainName ?? "Unknown chain"}
-					</div>
-					<div className="rounded-md border border-black/60 bg-black px-2 py-0.5 text-white text-xs shadow-sm">
-						approved
+					<div className="flex items-center gap-1 rounded-md border border-black/60 bg-black px-2 py-0.5 text-white text-xs shadow-sm">
+						<Calendar size={12} />{" "}
+						{new Date(
+							Number(hypercert.creationBlockTimestamp) * 1000,
+						).toLocaleDateString("en-US", {
+							year: "numeric",
+							month: "short",
+							day: "numeric",
+						})}
 					</div>
 				</section>
 				<section
@@ -76,55 +93,26 @@ const Card = ({ hypercert }: { hypercert: Hypercert }) => {
 							</span>
 						</div>
 					) : (
-						<div className="flex items-center justify-between">
-							<div className="space-y-1">
-								<div className="font-semibold text-sm">
-									$
-									{Math.floor(
-										(100 - (percentAvailable ?? 0)) *
-											pricePerPercentInUSD *
-											100,
-									) / 100}{" "}
-									USD raised
+						totalSalesInUSD !== null && (
+							<div className="flex items-center justify-between">
+								<div className="space-y-1">
+									<div className="font-semibold text-sm">
+										${totalSalesInUSD.toFixed(0)} raised
+									</div>
+									<div className="text-muted-foreground text-sm">
+										${Math.floor(pricePerPercentInUSD * 100).toFixed(0)} target
+										· {buyerCount} buyer{buyerCount !== 1 ? "s" : ""}
+									</div>
 								</div>
-								<div className="text-muted-foreground text-sm">
-									${Math.floor(pricePerPercentInUSD * 100)} target ·{" "}
-									{buyerCount} buyer{buyerCount !== 1 ? "s" : ""}
-								</div>
+								<CircularProgress
+									value={totalSalesInUSD / pricePerPercentInUSD}
+									text={`${Math.min(
+										Math.floor(totalSalesInUSD / pricePerPercentInUSD),
+										100,
+									).toFixed(0)}%`}
+								/>
 							</div>
-							<div className="relative h-16 w-16">
-								<div className="absolute inset-0 flex items-center justify-center">
-									<span className="font-medium text-sm">
-										{Math.floor(100 - (percentAvailable ?? 0))}%
-									</span>
-								</div>
-								<svg
-									className="-rotate-90 h-full w-full"
-									aria-label="Progress Circle"
-								>
-									<title>Progress Circle</title>
-									<circle
-										className="stroke-muted"
-										strokeWidth="4"
-										fill="none"
-										r="28"
-										cx="32"
-										cy="32"
-									/>
-									<circle
-										className="stroke-primary"
-										strokeWidth="4"
-										fill="none"
-										r="28"
-										cx="32"
-										cy="32"
-										strokeDasharray={`${
-											((100 - (percentAvailable ?? 0)) * 175.93) / 100
-										} 175.93`}
-									/>
-								</svg>
-							</div>
-						</div>
+						)
 					)}
 				</section>
 			</article>

@@ -1,40 +1,170 @@
 "use client";
 
+import usePriceFeed from "@/app/PriceFeedProvider";
 import CreateListingDialog from "@/app/components/create-listing-dialog";
 import Progress from "@/app/components/shared/progress";
 import useFullHypercert from "@/app/contexts/full-hypercert";
 import type { FullHypercert } from "@/app/graphql-queries/hypercerts";
 import { Button } from "@/components/ui/button";
+import QuickTooltip from "@/components/ui/quicktooltip";
+import { RAW_TOKENS_CONFIG } from "@/config/raw-tokens";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { formatDecimals } from "@/lib/utils";
-import { ArrowRight, BadgeDollarSign, CircleAlert, Clock } from "lucide-react";
+import { convertCurrencyPriceToUSD, formatDecimals } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import {
+	ArrowRight,
+	BadgeDollarSign,
+	CircleAlert,
+	Clock,
+	RefreshCcw,
+} from "lucide-react";
 import React from "react";
 import { useAccount } from "wagmi";
 import PaymentFlow from "./PaymentFlow";
-const OpenVariant = ({ reached, goal }: { reached: number; goal: number }) => {
+
+const ProgressIndicator = ({
+	percentage,
+	tooltipText,
+	tooltipWidth,
+	direction,
+}: {
+	percentage: number;
+	tooltipText: string;
+	tooltipWidth?: number;
+	direction: "top" | "bottom";
+}) => {
 	return (
-		<div className="flex h-full w-full flex-col justify-between">
-			<div className="flex w-full flex-col">
-				<div className="relative z-[5] flex items-center justify-between">
-					<div className="flex flex-col items-start">
-						<span className="text-balance text-center text-muted-foreground">
-							Reached
-						</span>
-						<span className="font-bold text-xl">${reached}</span>
-					</div>
-					<div className="flex flex-col items-end">
-						<span className="text-balance text-center text-muted-foreground">
-							Goal
-						</span>
-						<span className="font-bold text-xl">${goal}</span>
+		<div
+			className={cn(
+				"relative mb-1 h-[12px] w-full",
+				direction === "top" ? "mb-1" : "mt-1",
+			)}
+		>
+			<div
+				className="-translate-x-1/2 absolute top-0 left-[-50%]"
+				style={{
+					left: `${percentage}%`,
+				}}
+			>
+				<div
+					className={cn(
+						"relative mx-auto h-0 w-0 scale-75 border-x-[8px] border-x-transparent transition-all duration-300 group-hover:scale-100",
+						direction === "top"
+							? "origin-bottom border-t-[12px] border-t-beige-muted-foreground"
+							: "origin-top border-b-[12px] border-b-primary/70",
+					)}
+				>
+					<div
+						className={cn(
+							"-translate-x-1/2 pointer-events-none absolute left-1/2 scale-0 rounded-full bg-background px-2 py-0.5 text-center font-bold text-sm opacity-0 shadow-md blur-xl transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 group-hover:blur-none",
+							direction === "top"
+								? "bottom-[14px] mb-1 origin-bottom text-beige-muted-foreground"
+								: "top-[14px] mt-1 origin-top text-primary",
+						)}
+						style={{
+							width: tooltipWidth ? `${tooltipWidth}px` : undefined,
+						}}
+					>
+						{tooltipText}
 					</div>
 				</div>
-				<Progress
-					percentage={(reached * 100) / goal}
-					className="mt-2 bg-beige-muted"
-				/>
 			</div>
-			<div className="mt-4 flex items-center justify-end">
+		</div>
+	);
+};
+
+const LoadingVariant = () => {
+	return (
+		<div className="flex h-full w-full flex-col justify-between font-sans">
+			<div className="group flex w-full flex-col">
+				<div className="flex flex-col items-center gap-1">
+					<span className="h-10 w-40 animate-pulse rounded-lg bg-beige-muted" />
+					<span className="h-8 w-32 animate-pulse rounded-lg bg-beige-muted" />
+				</div>
+				<div className="mt-4 flex w-full flex-col items-center">
+					<div className="relative w-full">
+						<div className="h-6 animate-pulse rounded-sm bg-primary/20" />
+					</div>
+				</div>
+			</div>
+			<div className="mt-2 flex items-center justify-end">
+				<div className="h-8 w-20 animate-pulse rounded-lg bg-beige-muted" />
+			</div>
+		</div>
+	);
+};
+
+const ErrorVariant = () => {
+	return (
+		<div className="flex h-full w-full flex-col items-center justify-center gap-2">
+			<div className="flex flex-col items-center justify-center gap-2">
+				<CircleAlert size={40} className="text-muted-foreground opacity-50" />
+				<span className="font-bold text-lg text-muted-foreground">
+					Unable to load funding statistics.
+				</span>
+				<Button
+					variant={"outline"}
+					size={"sm"}
+					className="gap-2"
+					onClick={() => window?.location.reload()}
+				>
+					<RefreshCcw size={14} />
+					<span>Retry</span>
+				</Button>
+			</div>
+		</div>
+	);
+};
+
+const OpenVariant = ({
+	totalSalesInUSD,
+	percentageUnitsSold,
+	goalInUSD,
+}: {
+	totalSalesInUSD: number;
+	percentageUnitsSold: number;
+	goalInUSD: number;
+}) => {
+	const goalPercentageOnBar =
+		totalSalesInUSD <= goalInUSD ? 100 : (goalInUSD / totalSalesInUSD) * 100;
+
+	return (
+		<div className="flex h-full w-full flex-col justify-between font-sans">
+			<div className="group flex w-full flex-col">
+				<div className="flex flex-col items-center">
+					<span className="font-bold text-3xl text-primary">
+						${totalSalesInUSD}
+					</span>
+					<span className="font-bold text-beige-muted-foreground text-xl">
+						out of ${goalInUSD}
+					</span>
+					<span className="font-bold text-muted-foreground text-sm">
+						sold so far.
+					</span>
+				</div>
+				<div className="mt-4 flex w-full flex-col items-center">
+					<div className="relative w-full">
+						<Progress
+							percentage={Math.min((totalSalesInUSD * 100) / goalInUSD, 100)}
+							className="h-6 rounded-sm bg-beige-muted"
+						/>
+						{goalPercentageOnBar < 99 && (
+							<div
+								className="-translate-x-[2px] absolute top-1 bottom-1 w-[4px] rounded-full bg-white shadow-md"
+								style={{
+									left: `${goalPercentageOnBar}%`,
+								}}
+							/>
+						)}
+					</div>
+					<ProgressIndicator
+						percentage={goalPercentageOnBar}
+						tooltipText={"Goal"}
+						direction="bottom"
+					/>
+				</div>
+			</div>
+			<div className="mt-2 flex items-center justify-end">
 				<PaymentFlow>
 					<Button className="gap-2" size={"sm"}>
 						Buy <ArrowRight size={16} />
@@ -105,8 +235,37 @@ const VariantSelector = () => {
 		totalUnits,
 		unitsForSale,
 		cheapestOrder: { pricePerPercentInUSD },
+		sales,
 	} = hypercert;
 	const { address } = useAccount();
+	const priceFeed = usePriceFeed();
+
+	// Calculate total sales in USD synchronously
+	const totalSalesInUSD = React.useMemo(() => {
+		if (priceFeed.status !== "ready" || !sales || sales.length === 0) {
+			return 0;
+		}
+		let total = 0;
+		for (const sale of sales) {
+			const usd = priceFeed.toUSD(
+				sale.currency as `0x${string}`,
+				Number(sale.currencyAmount),
+			);
+			if (usd !== null) {
+				total += usd;
+			}
+		}
+		return total;
+	}, [sales, priceFeed]);
+
+	if (priceFeed.status === "loading") {
+		return <LoadingVariant />;
+	}
+
+	if (priceFeed.status === "error") {
+		return <ErrorVariant />;
+	}
+
 	if (pricePerPercentInUSD === undefined) {
 		if (hypercert.creatorAddress.toLowerCase() === address?.toLowerCase()) {
 			return <ListingOptionVariant />;
@@ -119,8 +278,9 @@ const VariantSelector = () => {
 	if (percentCompleted === undefined) return <SoldVariant />;
 	return (
 		<OpenVariant
-			reached={formatDecimals(percentCompleted * pricePerPercentInUSD)}
-			goal={formatDecimals(100 * pricePerPercentInUSD)}
+			percentageUnitsSold={percentCompleted}
+			goalInUSD={formatDecimals(100 * pricePerPercentInUSD)}
+			totalSalesInUSD={formatDecimals(totalSalesInUSD)}
 		/>
 	);
 };
