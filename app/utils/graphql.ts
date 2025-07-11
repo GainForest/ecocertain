@@ -16,7 +16,7 @@ export type ApiError = {
 };
 
 const headers = {
-	"Cache-Control": "no-cache",
+	"Cache-Control": "no-store",
 	Pragma: "no-cache",
 	"x-timestamp": Date.now().toString(),
 	// Add any other headers you need

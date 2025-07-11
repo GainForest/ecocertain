@@ -3,7 +3,7 @@ import getPriceFeed from "@/lib/pricefeed";
 
 import { cookieStorage, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
-import { sepolia, celo, mainnet } from "viem/chains";
+import { sepolia, celo, mainnet, celoAlfajores } from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
 
 // Get projectId at https://cloud.walletconnect.com
@@ -11,7 +11,7 @@ export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
 
 if (!projectId) throw new Error("Project ID is not defined");
 
-const DEV_CHAINS = [sepolia] as const;
+const DEV_CHAINS = [celo] as const;
 const PROD_CHAINS = [celo] as const;
 export const SUPPORTED_CHAINS =
   process.env.NEXT_PUBLIC_DEPLOY_ENV === "production"

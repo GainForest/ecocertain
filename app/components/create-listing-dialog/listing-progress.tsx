@@ -156,6 +156,7 @@ const ListingProgress = ({
 	values,
 	visible = false,
 	setVisible,
+	setIsListingComplete,
 	hypercertExchangeClient,
 }: {
 	hypercert: FullHypercert;
@@ -165,6 +166,7 @@ const ListingProgress = ({
 	};
 	visible?: boolean;
 	setVisible: (visible: boolean) => void;
+	setIsListingComplete: (isListingComplete: boolean) => void;
 	hypercertExchangeClient: HypercertExchangeClient | null;
 }) => {
 	const [configKey, setConfigKey] =
@@ -322,6 +324,7 @@ const ListingProgress = ({
 					chainId: celo.id,
 				});
 				setConfigKey("COMPLETED");
+				setIsListingComplete(true);
 			}
 		} catch (error) {
 			// If platform fee transaction is rejected, continue to complete
@@ -330,6 +333,7 @@ const ListingProgress = ({
 				error,
 			);
 			setConfigKey("COMPLETED");
+			setIsListingComplete(true);
 		}
 	};
 

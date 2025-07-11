@@ -82,17 +82,20 @@ const combineSales = async (sales: SaleByUser[]) => {
 };
 
 export default async function ProfilePage({
-	params: { address },
+	params,
 	searchParams,
 }: {
-	params: { address: Address };
-	searchParams: { view: string | string[] | undefined };
+	params: Promise<{ address: Address }>;
+	searchParams: Promise<{ view: string | string[] | undefined }>;
 }) {
-	const formattedAddress = getAddress(address);
-	const view = getValueFromSearchParams(searchParams, "view", "supported", [
-		"created",
+	const { address } = await params;
+	const formattedAddress = getAddress(address) as `0x${string}`;
+	const view = getValueFromSearchParams(
+		await searchParams,
+		"view",
 		"supported",
-	]);
+		["created", "supported"],
+	);
 	// const DUMMY_ADDRESS = "0x223c656ed35bfb7a8e358140ca1e2077be090b2e";
 
 	// Remove the catchError wrapper and let errors propagate

@@ -20,10 +20,11 @@ import LeftContent from "./components/left-content";
 import RightContent from "./components/right-content";
 
 export default async function HypercertPage({
-	params: { hypercertId },
+	params,
 }: {
-	params: { hypercertId: string };
+	params: Promise<{ hypercertId: string }>;
 }) {
+	const { hypercertId } = await params;
 	const hypercert = await fetchFullHypercertById(hypercertId);
 
 	return (

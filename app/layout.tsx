@@ -124,7 +124,6 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const initialState = cookieToInitialState(config, headers().get("cookie"));
 	return (
 		<html lang="en">
 			<head>
@@ -139,7 +138,7 @@ export default function RootLayout({
 			>
 				<FarcasterProvider>
 					<Analytics />
-					<WagmiContextProvider initialState={initialState}>
+					<WagmiContextProvider>
 						<PriceFeedProvider>
 							<Header />
 							<div className="flex-1">{children}</div>

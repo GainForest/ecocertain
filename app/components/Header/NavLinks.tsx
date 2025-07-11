@@ -25,6 +25,7 @@ import React, {
 	AnchorHTMLAttributes,
 	type FC,
 	ReactNode,
+	Suspense,
 	SVGProps,
 	useCallback,
 } from "react";
@@ -194,7 +195,11 @@ const NavLinks = () => {
 				{navLinks.map((link) => {
 					const isActive = getIsActive(link);
 					if (link.type === "dynamic") {
-						return <link.clientNode.Desktop key={link.id} />;
+						return (
+							<Suspense key={link.id}>
+								<link.clientNode.Desktop />
+							</Suspense>
+						);
 					}
 					return (
 						<DesktopNavLink key={link.href} link={link} isActive={isActive} />
@@ -234,7 +239,11 @@ const NavLinks = () => {
 						{navLinks.map((link) => {
 							const isActive = getIsActive(link);
 							if (link.type === "dynamic") {
-								return <link.clientNode.Mobile key={link.id} />;
+								return (
+									<Suspense key={link.id}>
+										<link.clientNode.Mobile />
+									</Suspense>
+								);
 							}
 							return (
 								<PhoneNavLink key={link.href} link={link} isActive={isActive} />

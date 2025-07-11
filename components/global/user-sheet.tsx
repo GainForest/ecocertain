@@ -135,7 +135,7 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 														<span>Copied</span>
 													</span>
 												) : (
-													<ENSName address={address} />
+													<ENSName address={address as `0x${string}`} />
 												)}
 											</span>
 										</TooltipTrigger>

@@ -40,7 +40,10 @@ const WalletProfile = () => {
 				>
 					{chain?.name ?? "Unknown"}
 				</span>
-				<EthAvatar address={address ? address : "0x0"} size={32} />
+				<EthAvatar
+					address={address ? (address as `0x${string}`) : "0x0"}
+					size={32}
+				/>
 			</div>
 		</UserSheet>
 	);

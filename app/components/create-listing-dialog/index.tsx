@@ -101,6 +101,12 @@ const CreateListingDialog = ({
 	});
 
 	const [isProgressVisible, setIsProgressVisible] = useState(false);
+	const [isListingComplete, setIsListingComplete] = useState(false);
+	useEffect(() => {
+		if (!isProgressVisible) {
+			setIsListingComplete(false);
+		}
+	}, [isProgressVisible]);
 
 	const [price, setPrice] = useState(1);
 	const [priceValidityError, setPriceValidityError] = useState<string | null>(
@@ -110,9 +116,10 @@ const CreateListingDialog = ({
 	const currencyOptions = getCurrenciesSupportedOnChainByHypercerts(
 		currentChain?.id,
 	);
+	const usdgloCurrency = currencyOptions.find((c) => c.symbol === "USDGLO");
 	const [selectedCurrency, setSelectedCurrency] = useState<
 		Currency | undefined
-	>(currencyOptions.length > 0 ? currencyOptions[0] : undefined);
+	>(usdgloCurrency ? usdgloCurrency : currencyOptions[0]);
 
 	const shouldDisplayForm =
 		isCurrentChainSupported &&
@@ -193,6 +200,7 @@ const CreateListingDialog = ({
 								visible={isProgressVisible}
 								setVisible={setIsProgressVisible}
 								hypercertExchangeClient={hcExchangeClient}
+								setIsListingComplete={setIsListingComplete}
 							/>
 						)
 					) : (
@@ -210,7 +218,7 @@ const CreateListingDialog = ({
 							setIsProgressVisible(false);
 						}}
 					>
-						Cancel
+						{isListingComplete ? "Close" : "Cancel"}
 					</DialogCancel>
 					{shouldDisplayForm ? (
 						<Button
