@@ -87,20 +87,12 @@ const SelectAmountBody = ({
 	currency: Currency;
 }) => {
 	const { hide, pushModalByVariant } = useModal();
-	const tokenIds = selectedOrder.itemIds;
-	const fractionIds = tokenIds.map((tokenId) => {
-		const [chainId, contractAddress] = hypercert.hypercertId.split("-");
-		return `${chainId}-${contractAddress}-${tokenId}`;
-	});
 
 	const selectedTab: TabType = usePurchaseFlowStore(
 		(state) => state.amountSelectionCurrentTab,
 	);
 	const setSelectedTab: (tab: TabType) => void = usePurchaseFlowStore(
 		(state) => state.setAmountSelectionCurrentTab,
-	);
-	const totalUnitsInOrder = usePurchaseFlowStore(
-		(state) => state.totalUnitsInOrder,
 	);
 	const amountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.amountSelectedInUnits,
@@ -118,9 +110,7 @@ const SelectAmountBody = ({
 		});
 	};
 
-	if (totalUnitsInOrder === null) {
-		return <TotalUnitsHandlerUI fractionIds={fractionIds} />;
-	}
+	const totalUnitsInOrder = hypercert.totalUnits;
 	const fundsByUserInUnits = calcUnitsFromTokens(
 		Number(userFunds.data.formatted ?? "0"),
 		totalUnitsInOrder,
@@ -242,85 +232,6 @@ const SelectAmountBody = ({
 			</ModalFooter>
 		</>
 	);
-};
-
-const TotalUnitsHandlerUI = ({ fractionIds }: { fractionIds: string[] }) => {
-	const { hide } = useModal();
-	const totalUnitsInOrder = usePurchaseFlowStore(
-		(state) => state.totalUnitsInOrder,
-	);
-	const setTotalUnitsInOrder: (units: bigint) => void = usePurchaseFlowStore(
-		(state) => state.setTotalUnitsInOrder,
-	);
-
-	const {
-		data: fetchedFractionUnits,
-		isPending: isFetchedFractionUnitsPending,
-		isError: isFetchedFractionUnitsError,
-		refetch: refetchFetchedFractionUnits,
-	} = useQuery({
-		queryKey: ["fraction-units", fractionIds],
-		queryFn: async () => {
-			const fractionIdPromises = fractionIds.map((fractionId) => {
-				return fetchFractionById(fractionId);
-			});
-			const fractions = await Promise.all(fractionIdPromises);
-			const fractionUnits = fractions.map((fraction) => {
-				const units = fraction.units;
-				if (
-					typeof units === "bigint" ||
-					typeof units === "number" ||
-					typeof units === "string"
-				) {
-					return BigInt(units);
-				}
-				throw new Error("Units is not a bigint or number");
-			});
-			return fractionUnits.reduce((acc, units) => acc + units, 0n);
-		},
-	});
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies(setTotalUnitsInOrder): setTotalUnitsInOrder should not be a trigger for this side effect.
-	useEffect(() => {
-		if (totalUnitsInOrder !== null) return;
-		if (fetchedFractionUnits === undefined) return;
-
-		setTotalUnitsInOrder(fetchedFractionUnits);
-	}, [totalUnitsInOrder, fetchedFractionUnits]);
-
-	if (isFetchedFractionUnitsPending) {
-		return (
-			<>
-				<div className="my-6 flex flex-col items-center gap-2 rounded-lg bg-muted/50 p-4">
-					<Loader2 className="size-6 animate-spin text-primary" />
-					<span className="animate-pulse text-muted-foreground">
-						Gathering purchase info...
-					</span>
-				</div>
-				<ModalFooter>
-					<Button
-						variant={"secondary"}
-						className="flex-1"
-						onClick={() => hide()}
-					>
-						Cancel
-					</Button>
-				</ModalFooter>
-			</>
-		);
-	}
-	if (isFetchedFractionUnitsError || fetchedFractionUnits === undefined) {
-		return (
-			<ErrorModalBody
-				errorMessage="Unable to gather info"
-				errorDescription="We couldn't gather the information for this purchase. Please try again."
-				ctaText="Try again"
-				ctaAction={() => refetchFetchedFractionUnits()}
-			/>
-		);
-	}
-
-	return null;
 };
 
 export default SelectAmount;

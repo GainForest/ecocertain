@@ -52,9 +52,6 @@ const Paymentprogress = () => {
 	const amountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.amountSelectedInUnits,
 	);
-	const totalUnitsInOrder = usePurchaseFlowStore(
-		(state) => state.totalUnitsInOrder,
-	);
 	const hypercertExchangeClient = useHypercertExchangeClient();
 	const { open } = useWeb3Modal();
 	const { address } = useAccount();
@@ -63,7 +60,6 @@ const Paymentprogress = () => {
 		hypercert === null ||
 		selectedOrder === null ||
 		currency === null ||
-		totalUnitsInOrder === null ||
 		amountSelectedInUnits[currentAmountSelectionTab] === null
 	) {
 		return (
