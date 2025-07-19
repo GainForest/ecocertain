@@ -23,6 +23,7 @@
     "@hypercerts-org/marketplace-sdk": "^0.8.0",
     "@hypercerts-org/sdk": "^2.9.0-alpha.1",
     "@mdxeditor/editor": "^3.31.1",
+    "@privy-io/react-auth": "^2.18.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
