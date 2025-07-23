@@ -48,13 +48,12 @@ const SelfVerifier = ({
 			</div>
 		);
 
-	const userId = addressToUuid(address);
-
 	const selfApp = new SelfAppBuilder({
 		appName: "Ecocertain",
 		scope: "gainforest",
 		endpoint: "https://gainforest-self-xyz.vercel.app/api/self-xyz/verify",
-		userId,
+		userId: address,
+		userIdType: "hex",
 		disclosures: {
 			nationality: true,
 		},
