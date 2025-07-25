@@ -137,11 +137,12 @@ const usePaymentProgressStore = create<
 			set({ currentStepIndex: 2 });
 			errorTitle = "Approval not confirmed";
 			errorDescription = "The spending cap could not be approved.";
-			const tokensToPayInWei = unitsToBuy * BigInt(order.price);
+			// We approve more than we need to avoid issues with some arithmetics while executing the order
+			const tokensToApproveInWei = (unitsToBuy + 100n) * BigInt(order.price);
 			const [, approveTxError] = await tryCatch(() =>
 				hcExchangeClient.approveErc20(
 					order.currency as `0x${string}`,
-					tokensToPayInWei,
+					tokensToApproveInWei,
 				),
 			);
 			console.log(unitsToBuy, order.price);
@@ -164,6 +165,7 @@ const usePaymentProgressStore = create<
 				unitsToBuy, // Number of units to buy.
 				order.price, // Price per unit, in wei.
 			);
+			const tokensToPayInWei = unitsToBuy * BigInt(order.price);
 			const overrides =
 				order.currency === "0x0000000000000000000000000000000000000000"
 					? {
