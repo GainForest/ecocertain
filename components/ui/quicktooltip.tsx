@@ -22,28 +22,24 @@ const QuickTooltip = ({
 
 	if (openOnClick) {
 		return (
-			<TooltipProvider>
-				<Tooltip open={open} onOpenChange={setOpen}>
-					<TooltipTrigger
-						onClick={() => setOpen(true)}
-						// onBlur={() => setOpen(false)}
+			<Tooltip open={open} onOpenChange={setOpen}>
+				<TooltipTrigger
+					onClick={() => setOpen(true)}
+					// onBlur={() => setOpen(false)}
 
-						asChild={asChild}
-					>
-						{children}
-					</TooltipTrigger>
-					<TooltipContent className="text-center">{content}</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
+					asChild={asChild}
+				>
+					{children}
+				</TooltipTrigger>
+				<TooltipContent className="text-center">{content}</TooltipContent>
+			</Tooltip>
 		);
 	}
 	return (
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
-				<TooltipContent className="text-center">{content}</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
+		<Tooltip>
+			<TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
+			<TooltipContent className="text-center">{content}</TooltipContent>
+		</Tooltip>
 	);
 };
 
