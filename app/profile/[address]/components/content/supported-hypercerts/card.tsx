@@ -30,15 +30,14 @@ export default function Card({ combinedSale }: { combinedSale: CombinedSale }) {
 					width={200}
 					className="h-auto w-full transition group-hover:scale-[1.05] group-hover:blur-sm group-hover:brightness-75"
 				/>
-				{hypercertId !== undefined && (
-					<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-						<Link href={`/hypercert/${hypercertId}`}>
-							<Button variant={"secondary"} className="gap-2">
-								View Hypercert <ArrowRight size={20} />
-							</Button>
-						</Link>
-					</div>
-				)}
+
+				<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
+					<Link href={`/hypercert/${hypercertId}`}>
+						<Button variant={"secondary"} className="gap-2">
+							View Hypercert
+						</Button>
+					</Link>
+				</div>
 			</div>
 			<section
 				className="w-full flex-1 space-y-2 border-t border-t-border bg-background/90 p-4 backdrop-blur-md"
