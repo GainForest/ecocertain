@@ -1,10 +1,10 @@
 "use client";
 
 import QuickTooltip from "@/components/ui/quicktooltip";
+import useAccount from "@/hooks/use-account";
 import { CircleAlert, Sparkle } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { FC } from "react";
-import { useAccount } from "wagmi";
 import { DesktopNavLink, type NavLinkConfig, PhoneNavLink } from "./NavLinks";
 
 export type ClientLink = {

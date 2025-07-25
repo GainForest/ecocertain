@@ -7,6 +7,7 @@ import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { cn } from "@/lib/utils";
 import { submitReferral } from "@divvi/referral-sdk";
 
+import useAccount from "@/hooks/use-account";
 import type {
 	Currency,
 	HypercertExchangeClient,
@@ -26,7 +27,7 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { createWalletClient, custom, formatEther } from "viem";
 import { celo } from "viem/chains";
-import { useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
 
 type ListingProgressConfig = {
 	title: string;
