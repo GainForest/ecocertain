@@ -21,7 +21,7 @@ const HeroTitle = () => {
 		<h2 className="absolute right-0 bottom-0 left-0">
 			<div className="relative flex flex-col items-center gap-2 px-4 py-6 text-center font-baskerville font-bold text-4xl text-foreground/80 leading-none">
 				<motion.div
-					className="absolute top-[50%] left-[50%] h-36 w-72 rounded-full bg-beige blur-xl"
+					className="absolute top-[50%] left-[50%] h-36 w-60 rounded-full bg-beige blur-xl sm:w-72"
 					initial={{ opacity: 1, scale: 1.5, x: "-50%", y: "-50%" }}
 				/>
 				<motion.div

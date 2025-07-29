@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { getEASConfig } from "@/config/eas";
 import { fetchFullHypercertById } from "@/graphql/hypercerts/queries/hypercerts";
+import useAccount from "@/hooks/use-account";
 import { cn } from "@/lib/utils";
 import type { JsonRpcSigner } from "ethers";
 import { motion } from "framer-motion";
@@ -18,7 +19,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
 import { addAttestation } from "./utils";
 
 type AttestationProgressConfig = {

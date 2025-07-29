@@ -8,12 +8,12 @@ import {
 	type FullHypercert,
 	fetchHypercertIDs,
 } from "@/graphql/hypercerts/queries/hypercerts";
+import useAccount from "@/hooks/use-account";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { useAccount } from "wagmi";
 
 const EvaluationDetails = ({ hypercert }: { hypercert: FullHypercert }) => {
 	const { attestations } = hypercert;

@@ -1,8 +1,9 @@
 "use client";
 import Logo from "@/assets/Hypercerts.svg";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
+import useAccount from "@/hooks/use-account";
 import { cn } from "@/lib/utils";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useLogin, useLogout } from "@privy-io/react-auth";
 import { blo } from "blo";
 import {
 	AlertCircle,
@@ -20,8 +21,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
 import { useState } from "react";
-import { useAccount } from "wagmi";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import ENSName from "../ui/ens-name";
 import EthAvatar from "../ui/eth-avatar";
@@ -35,13 +34,12 @@ import {
 
 const UserSheet = ({ children }: { children: React.ReactNode }) => {
 	const [open, setOpen] = useState(false);
-	const { open: openWeb3Modal } = useWeb3Modal();
-
-	const { address, isConnecting, isDisconnected, chain } = useAccount();
-	const isChainSupported =
-		SUPPORTED_CHAINS.find(
-			(supportedChain) => supportedChain.id === chain?.id,
-		) !== undefined;
+	const { address, isConnecting, isConnected, chainId } = useAccount();
+	const chain = SUPPORTED_CHAINS.find(
+		(supportedChain) => supportedChain.id === chainId,
+	);
+	const { login } = useLogin();
+	const { logout } = useLogout();
 
 	const [isAddressCopied, setIsAddressCopied] = useState(false);
 	const copyAddress = () => {
@@ -53,9 +51,14 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 		}, 2000);
 	};
 
-	const closeUserSheetAndOpenWeb3Modal = () => {
+	const closeUserSheetAndLogin = () => {
 		setOpen(false);
-		openWeb3Modal();
+		login();
+	};
+
+	const closeUserSheetAndLogout = () => {
+		setOpen(false);
+		logout();
 	};
 
 	return (
@@ -82,7 +85,7 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 					</span>
 					<div className="absolute right-0 bottom-0 left-0 h-16 w-full bg-gradient-to-b from-transparent to-background" />
 				</div>
-				{isDisconnected ? (
+				{!isConnected ? (
 					<div className="-mt-12 flex w-full flex-1 flex-col">
 						<div className="flex w-full flex-col items-center gap-4 px-4">
 							<div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-destructive/50 bg-background/50 shadow-xl backdrop-blur-lg">
@@ -94,10 +97,7 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 							<p className="flex w-[80%] items-center justify-center text-center text-muted-foreground">
 								Please connect your wallet to use the app.
 							</p>
-							<Button
-								className="gap-2"
-								onClick={closeUserSheetAndOpenWeb3Modal}
-							>
+							<Button className="gap-2" onClick={closeUserSheetAndLogin}>
 								<Wallet size={16} />
 								Connect
 							</Button>
@@ -146,7 +146,7 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 							<span
 								className={cn(
 									"rounded-full px-3 py-1 font-bold font-sans",
-									isChainSupported
+									chain
 										? "bg-green-500/20 text-green-700 dark:text-green-300"
 										: "bg-red-500/20 text-red-700 dark:text-red-300",
 								)}
@@ -182,7 +182,7 @@ const UserSheet = ({ children }: { children: React.ReactNode }) => {
 							<Button
 								variant={"destructive"}
 								className="w-full gap-2"
-								onClick={closeUserSheetAndOpenWeb3Modal}
+								onClick={closeUserSheetAndLogout}
 							>
 								<LogOut size={16} />
 								Disconnect

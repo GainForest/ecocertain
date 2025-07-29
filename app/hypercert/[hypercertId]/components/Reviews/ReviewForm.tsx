@@ -3,29 +3,29 @@ import { Button } from "@/components/ui/button";
 import MarkdownEditor from "@/components/ui/mdx-editor";
 import { Textarea } from "@/components/ui/textarea";
 import { getEASConfig } from "@/config/eas";
+import useAccount from "@/hooks/use-account";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useLogin } from "@privy-io/react-auth";
 import { ArrowRight, CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
 import { useReviewSubmission } from "./contexts/ReviewSubmission";
 const ReviewForm = () => {
-	const { isConnected, chain } = useAccount();
-	const { open } = useWeb3Modal();
+	const { isConnected, chainId } = useAccount();
+	const { login } = useLogin();
 	const { submitReview, state, dispatch } = useReviewSubmission();
 	const { status, pendingReview } = state;
 	const hypercert = useFullHypercert();
 	const { hypercertId } = hypercert;
 	const signer = useEthersSigner();
 
-	if (!isConnected || !chain || !signer) {
+	if (!isConnected || chainId === undefined || !signer) {
 		return (
 			<div className="flex h-full items-center justify-center">
 				<Button
 					variant="outline"
 					className="w-3/4"
 					onClick={() => {
-						open();
+						login();
 					}}
 				>
 					Connect Wallet to Review
@@ -34,19 +34,11 @@ const ReviewForm = () => {
 		);
 	}
 
-	const easConfig = getEASConfig(chain.id);
+	const easConfig = getEASConfig(chainId);
 	if (!easConfig) {
 		return (
 			<div className="justify-cente flex h-full items-center gap-2">
 				<p>Adding reviews is not supported on this chain.</p>
-				<Button
-					variant="outline"
-					onClick={() => {
-						open({ view: "Networks" });
-					}}
-				>
-					Switch Network
-				</Button>
 			</div>
 		);
 	}

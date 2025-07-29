@@ -22,6 +22,7 @@ import ListingProgress from "./listing-progress";
 
 import { Button } from "@/components/ui/button";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
+import useAccount from "@/hooks/use-account";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import {
 	type ChainId,
@@ -30,7 +31,6 @@ import {
 	currenciesByNetwork,
 } from "@hypercerts-org/marketplace-sdk";
 import { useQuery } from "@tanstack/react-query";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
 	ArrowRightLeft,
 	CircleAlert,
@@ -38,7 +38,6 @@ import {
 	RefreshCcw,
 	RefreshCw,
 } from "lucide-react";
-import { useAccount } from "wagmi";
 import PriceForm from "./price-form";
 import Sidebar from "./sidebar";
 
@@ -84,11 +83,10 @@ const CreateListingDialog = ({
 }) => {
 	const { client: hcExchangeClient } = useHypercertExchangeClient();
 
-	const { chain: currentChain } = useAccount();
+	const { chainId } = useAccount();
 	const isCurrentChainSupported = SUPPORTED_CHAINS.find(
-		(chain) => chain.id === currentChain?.id,
+		(chain) => chain.id === chainId,
 	);
-	const { open } = useWeb3Modal();
 
 	const {
 		data: hypercert,
@@ -113,9 +111,7 @@ const CreateListingDialog = ({
 		null,
 	);
 
-	const currencyOptions = getCurrenciesSupportedOnChainByHypercerts(
-		currentChain?.id,
-	);
+	const currencyOptions = getCurrenciesSupportedOnChainByHypercerts(chainId);
 	const usdgloCurrency = currencyOptions.find((c) => c.symbol === "USDGLO");
 	const [selectedCurrency, setSelectedCurrency] = useState<
 		Currency | undefined
@@ -145,16 +141,7 @@ const CreateListingDialog = ({
 						<ErrorSection
 							title="This chain is not supported"
 							description="Please switch to a supported chain to list your ecocert."
-							cta={
-								<Button
-									onClick={() => open({ view: "Networks" })}
-									size={"sm"}
-									className="mt-3 gap-2"
-								>
-									<ArrowRightLeft size={16} />
-									Switch Chain
-								</Button>
-							}
+							cta={null}
 						/>
 					) : hypercertError ? (
 						<ErrorSection
