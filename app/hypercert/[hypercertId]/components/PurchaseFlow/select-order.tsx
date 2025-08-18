@@ -105,7 +105,7 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 				{address &&
 					(validOrdersOnCurrentChain.length === 0 ? (
 						<div className="flex flex-col items-center rounded-xl bg-muted p-4 py-8 text-muted-foreground text-sm">
-							No orders found on this chain...
+							No orders found on this chain :{"("}
 						</div>
 					) : (
 						<div className="flex flex-col gap-3">

@@ -65,13 +65,13 @@ const HypercertMintDialog = ({
 						{mintStatus === "idle" && (
 							<>
 								<Badge className="h-5 w-5" />
-								<p>Preparing to mint hypercert...</p>
+								<p>Preparing to mint hypercert</p>
 							</>
 						)}
 						{mintStatus === "pending" && (
 							<>
 								<Loader className="h-5 w-5 animate-spin" />
-								<p>Minting hypercert on chain...</p>
+								<p>Minting hypercert on chain</p>
 							</>
 						)}
 						{mintStatus === "success" && (
@@ -96,13 +96,13 @@ const HypercertMintDialog = ({
 						{!isReceiptSuccess && !isReceiptLoading && !isReceiptError && (
 							<>
 								<Badge className="h-5 w-5" />
-								<p>Waiting for transaction to process...</p>
+								<p>Waiting for transaction to process</p>
 							</>
 						)}
 						{isReceiptLoading && (
 							<>
 								<Loader className="h-5 w-5 animate-spin" />
-								<p>Waiting for transaction receipt...</p>
+								<p>Waiting for transaction receipt</p>
 							</>
 						)}
 						{isReceiptSuccess && (
@@ -127,13 +127,13 @@ const HypercertMintDialog = ({
 						{googleSheetsStatus === "idle" && (
 							<>
 								<Badge className="h-5 w-5" />
-								<p>Waiting to send to GainForest.Earth for approval...</p>
+								<p>Waiting to send to GainForest.Earth for approval</p>
 							</>
 						)}
 						{googleSheetsStatus === "pending" && (
 							<>
 								<Loader className="h-5 w-5 animate-spin" />
-								<p>Sending to GainForest.Earth team...</p>
+								<p>Sending to GainForest.Earth team</p>
 							</>
 						)}
 						{googleSheetsStatus === "success" && (

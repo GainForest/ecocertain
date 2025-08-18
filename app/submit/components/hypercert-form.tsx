@@ -776,7 +776,7 @@ const HypercertForm = () => {
 																				(activity) =>
 																					activity.value === field.value,
 																		  )?.label
-																		: "Select an activity..."}
+																		: "Select an activity"}
 																	<ChevronDown className="ml-2 h-4 w-4 opacity-50" />
 																</Button>
 															</DropdownMenuTrigger>

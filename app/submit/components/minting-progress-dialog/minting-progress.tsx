@@ -60,7 +60,7 @@ const mintingProgressConfigs: Record<
 > = {
 	INITIALIZING: {
 		title: "Initializing",
-		description: "Accumulating your choices and requisites...",
+		description: "Accumulating your choices and requisites.",
 		errorState: {
 			title: "Unable to process your request",
 			description: "Please make sure your wallet is connected, and try again.",
@@ -68,7 +68,7 @@ const mintingProgressConfigs: Record<
 	},
 	GENERATING_IMG: {
 		title: "Generating Image",
-		description: "Please wait while we generate image for the hypercert...",
+		description: "Please wait while we generate image for the hypercert.",
 		errorState: {
 			title: "Unable to generate image",
 			description:
@@ -77,7 +77,7 @@ const mintingProgressConfigs: Record<
 	},
 	PARSING_GEOJSON: {
 		title: "Parsing GeoJSON",
-		description: "Please wait while we parse the GeoJSON file...",
+		description: "Please wait while we parse the GeoJSON file.",
 		errorState: {
 			title: "Unable to parse GeoJSON",
 			description: "The GeoJSON file could not be parsed. Please try again.",
@@ -85,7 +85,7 @@ const mintingProgressConfigs: Record<
 	},
 	UPLOADING_GEOJSON: {
 		title: "Uploading GeoJSON",
-		description: "Please wait while the GeoJSON is being uploaded to IPFS...",
+		description: "Please wait while the GeoJSON is being uploaded to IPFS.",
 		errorState: {
 			title: "Unable to upload GeoJSON",
 			description:
@@ -94,7 +94,7 @@ const mintingProgressConfigs: Record<
 	},
 	GENERATING_METADATA: {
 		title: "Generating metadata",
-		description: "Please wait while we prepare metadata for the mint...",
+		description: "Please wait while we prepare metadata for the mint.",
 		errorState: {
 			title: "Something went wrong",
 			description:
@@ -103,7 +103,7 @@ const mintingProgressConfigs: Record<
 	},
 	MINTING: {
 		title: "Minting Hypercert",
-		description: "Please sign the mint transaction when asked for approval.",
+		description: "Please sign the mint transaction when asked for approval",
 		errorState: {
 			title: "Transaction Rejected",
 			description: "The transaction was rejected.",
