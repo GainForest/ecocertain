@@ -55,7 +55,7 @@ const ReviewForm = () => {
 		<div className="space-y-4">
 			<h3 className="font-baskerville font-semibold text-xl">Write a Review</h3>
 			<MarkdownEditor
-				placeholder="Share your thoughts about this project..."
+				placeholder="Share your thoughts about this project"
 				markdown={pendingReview?.text || ""}
 				onChange={(s) =>
 					dispatch({ type: "UPDATE_PENDING_REVIEW", payload: s })

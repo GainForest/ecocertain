@@ -7,7 +7,7 @@ const VerifiedStatus = () => {
 		<>
 			<div className="flex flex-col justify-between md:flex-row md:items-center">
 				<Button className="md:min-w-48" disabled>
-					Verification coming soon...
+					Verification coming soon.
 				</Button>
 			</div>
 		</>

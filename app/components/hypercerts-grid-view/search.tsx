@@ -89,7 +89,7 @@ const Search = ({
 							onChange={(val) => {
 								setSortOptions({ ...sortOptions, key: val as SortKey });
 							}}
-							placeholder="Sort by..."
+							placeholder="Sort by"
 							className="min-w-[160px]"
 						/>
 						<div className="flex flex-row overflow-hidden rounded-lg border border-border">

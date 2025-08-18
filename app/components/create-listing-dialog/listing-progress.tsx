@@ -58,7 +58,7 @@ const listingProgressConfigs: Record<
 > = {
 	INITIALIZING: {
 		title: "Initializing",
-		description: "Accumulating your choices and requisites...",
+		description: "Accumulating your choices and requisites",
 		errorState: {
 			title: "Unable to process your request",
 			description: "Please make sure your wallet is connected, and try again.",
@@ -66,7 +66,7 @@ const listingProgressConfigs: Record<
 	},
 	CREATING_LISTING: {
 		title: "Creating Listing",
-		description: "Setting up your listing parameters...",
+		description: "Setting up your listing parameters",
 		errorState: {
 			title: "Unable to create listing",
 			description: "The listing could not be created. Please try again.",
@@ -74,7 +74,7 @@ const listingProgressConfigs: Record<
 	},
 	WAITING_FOR_TRANSFER_MANAGER_APPROVAL: {
 		title: "Waiting for Marketplace Approval",
-		description: "Please sign to approve marketplace interaction...",
+		description: "Please sign to approve marketplace interaction.",
 		errorState: {
 			title: "Marketplace approval rejected",
 			description:
@@ -83,7 +83,7 @@ const listingProgressConfigs: Record<
 	},
 	WAITING_FOR_TRANSFER_MANAGER_CONFIRMATION: {
 		title: "Confirming Approval",
-		description: "Waiting for marketplace approval transaction to confirm...",
+		description: "Waiting for marketplace approval transaction to confirm",
 		errorState: {
 			title: "Approval not confirmed",
 			description:
@@ -92,7 +92,7 @@ const listingProgressConfigs: Record<
 	},
 	WAITING_FOR_COLLECTION_APPROVAL: {
 		title: "Waiting for Hypercert Approval",
-		description: "Please sign to approve trading of your hypercert...",
+		description: "Please sign to approve trading of your hypercert.",
 		errorState: {
 			title: "Trading approval rejected",
 			description: "The trading approval was rejected.",
@@ -100,7 +100,7 @@ const listingProgressConfigs: Record<
 	},
 	WAITING_FOR_COLLECTION_CONFIRMATION: {
 		title: "Confirming Trading Approval",
-		description: "Waiting for hypercert approval transaction to confirm...",
+		description: "Waiting for hypercert approval transaction to confirm",
 		errorState: {
 			title: "Trading approval not confirmed",
 			description:
@@ -109,7 +109,7 @@ const listingProgressConfigs: Record<
 	},
 	SIGNING_ORDER: {
 		title: "Sign Listing",
-		description: "Please sign the transaction to create your listing...",
+		description: "Please sign the transaction to create your listing.",
 		errorState: {
 			title: "Listing not signed",
 			description:
@@ -118,7 +118,7 @@ const listingProgressConfigs: Record<
 	},
 	REGISTERING_ORDER: {
 		title: "Publishing Listing",
-		description: "Registering your listing on the marketplace...",
+		description: "Registering your listing on the marketplace",
 		errorState: {
 			title: "Publishing failed",
 			description:
