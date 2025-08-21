@@ -3,11 +3,11 @@ import GetVerifiedDialog from "@/app/components/get-verified-dialog";
 import useFullHypercert from "@/app/contexts/full-hypercert";
 import { verifiedAttestors } from "@/config/gainforest";
 import { fetchHypercertIDs } from "@/graphql/hypercerts/queries/hypercerts";
+import useAccount from "@/hooks/use-account";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 import React from "react";
-import { useAccount } from "wagmi";
 
 const VerificationIndicator = () => {
 	const { address } = useAccount();

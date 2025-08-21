@@ -3,8 +3,18 @@ import getPriceFeed from "@/lib/pricefeed";
 
 import { cookieStorage, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
-import { sepolia, celo, mainnet, celoAlfajores } from "viem/chains";
+import {
+  sepolia,
+  celo,
+  mainnet,
+  optimism,
+  arbitrum,
+  base,
+  polygon,
+  avalanche,
+} from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
+import { createConfig } from "@privy-io/wagmi";
 
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -85,14 +95,14 @@ const metadata = {
 };
 
 // Create wagmiConfig
-export const config = defaultWagmiConfig({
-  chains: SUPPORTED_CHAINS, // required
-  projectId, // required
-  metadata, // required
-  ssr: true,
-  storage: createStorage({
-    storage: cookieStorage,
-  }),
+export const config = createConfig({
+  chains: [...SUPPORTED_CHAINS], // required
+  // projectId, // required
+  // metadata, // required
+  // ssr: true,
+  // storage: createStorage({
+  //   storage: cookieStorage,
+  // }),
   transports: {
     [celo.id]: http("https://forno.celo.org"),
   },

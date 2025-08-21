@@ -3,10 +3,10 @@ import CreateListingDialog from "@/app/components/create-listing-dialog";
 import UnlistDialog from "@/app/components/unlist-dialog";
 import useHypercert from "@/app/contexts/hypercert";
 import { Button } from "@/components/ui/button";
+import useAccount from "@/hooks/use-account";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { ArrowRight, Trash2 } from "lucide-react";
 import React from "react";
-import { useAccount } from "wagmi";
 
 import CircularProgress from "@/components/ui/circular-progress";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
