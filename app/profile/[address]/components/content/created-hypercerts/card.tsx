@@ -23,9 +23,9 @@ export default function Card({ hypercert }: { hypercert: Hypercert }) {
 					/>
 					{hypercertId !== undefined && (
 						<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-							<Link href={`/hypercert/${hypercertId}`} target="_blank" passHref>
+							<Link href={`/hypercert/${hypercertId}`}>
 								<Button variant={"secondary"} className="gap-2">
-									View Hypercert <ArrowUpRight size={20} />
+									View Hypercert
 								</Button>
 							</Link>
 						</div>
