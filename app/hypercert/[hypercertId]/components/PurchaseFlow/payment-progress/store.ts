@@ -17,7 +17,7 @@ import {
 	Loader2,
 	type LucideProps,
 } from "lucide-react";
-import { createWalletClient, custom, formatEther } from "viem";
+import { createWalletClient, custom, erc20Abi, formatEther } from "viem";
 import { celo } from "viem/chains";
 import { create } from "zustand";
 
@@ -247,11 +247,13 @@ const usePaymentProgressStore = create<
 					),
 				});
 				const [account] = await walletClient.getAddresses();
-				const txhash = await walletClient.sendTransaction({
+				const txhash = await walletClient.writeContract({
 					account,
-					to: GAINFOREST_TIP_ADDRESS,
-					value: GAINFOREST_TIP_AMOUNT,
-					data: `0x${DIVVI_DATA_SUFFIX}`,
+					address: "0x471EcE3750Da237f93B8E339c536989b8978a438", // Celo CELO token address
+					abi: erc20Abi,
+					functionName: "transfer",
+					args: [GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT],
+					dataSuffix: `0x${DIVVI_DATA_SUFFIX}`,
 				});
 				// We don't wait for confirmation as per requirements
 				submitReferral({
