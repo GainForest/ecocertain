@@ -14,6 +14,7 @@ import useCopy from "@/hooks/use-copy";
 import { cn, getUrl } from "@/lib/utils";
 import { blo } from "blo";
 import {
+	Building,
 	Check,
 	ChevronRight,
 	Copy,
@@ -29,7 +30,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React, { useCallback } from "react";
-import { useEnsName } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 
 const ProfileCard = ({
 	address,
@@ -42,18 +43,21 @@ const ProfileCard = ({
 		hypercertsSupported: number;
 		salesMadeCount: number;
 	};
-	view: "created" | "supported";
+	view: "created" | "supported" | "organizations";
 }) => {
 	const { data: ensName, isFetching: isEnsNameLoading } = useEnsName({
 		address,
 		chainId: 1,
 	});
 
+	const { address: connectedAddress } = useAccount();
 	const { copy: copyAddress, isCopied: isAddressCopied } = useCopy();
 	const { copy: copyProfileLink, isCopied: isProfileLinkCopied } = useCopy();
 	const { show, isOpen, clear, pushModalByVariant } = useModal();
 	const profileLink = getUrl(`/profile/${address}`);
 	const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+	const isPersonalProfile = connectedAddress === address;
 
 	const handleSelfXYZVerification = useCallback(() => {
 		if (isOpen) return;
@@ -139,7 +143,7 @@ const ProfileCard = ({
 						>
 							<span className="flex items-center justify-start gap-2 text-left">
 								<Sparkle size={16} className="text-primary" />
-								My Hypercerts
+								{isPersonalProfile ? "My" : "Created"} Hypercerts
 							</span>
 							<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
 								<span>{stats.hypercertsCreated}</span>
@@ -161,6 +165,24 @@ const ProfileCard = ({
 							</span>
 							<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
 								<span>{stats.hypercertsSupported}</span>
+								<ChevronRight size={16} />
+							</span>
+						</Button>
+					</Link>
+				</li>
+				<li>
+					<Link href={"?view=organizations"}>
+						<Button
+							variant={view === "organizations" ? "secondary" : "ghost"}
+							className="w-full justify-between"
+							size={"sm"}
+						>
+							<span className="flex items-center justify-start gap-2 text-left">
+								<Building size={16} className="text-primary" />
+								{isPersonalProfile ? "My Organizations" : "Organizations"}
+							</span>
+							<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
+								<span>0</span>
 								<ChevronRight size={16} />
 							</span>
 						</Button>

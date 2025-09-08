@@ -94,7 +94,7 @@ export default async function ProfilePage({
 		await searchParams,
 		"view",
 		"supported",
-		["created", "supported"],
+		["created", "supported", "organizations"],
 	);
 	// const DUMMY_ADDRESS = "0x223c656ed35bfb7a8e358140ca1e2077be090b2e";
 

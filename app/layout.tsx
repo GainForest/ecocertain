@@ -9,6 +9,7 @@ import { cookieToInitialState } from "wagmi";
 import ChainSwitchProvider from "@/components/providers/ChainSwitch";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClient";
 import PrivyConfigProvider from "@/components/providers/Privy";
+import { UserProvider } from "@/components/providers/User";
 import { ModalProvider } from "@/components/ui/modal/context";
 import { siteConfig } from "@/config/site";
 import { config } from "@/config/wagmi";
@@ -143,17 +144,19 @@ export default function RootLayout({
 				<FarcasterProvider>
 					<Analytics />
 					<PrivyConfigProvider>
-						<HypercertExchangeClientProvider>
-							<PriceFeedProvider>
-								<ModalProvider modalVariants={[]}>
-									<ChainSwitchProvider>
-										<Header />
-										<div className="flex-1">{children}</div>
-										<Footer />
-									</ChainSwitchProvider>
-								</ModalProvider>
-							</PriceFeedProvider>
-						</HypercertExchangeClientProvider>
+						<UserProvider>
+							<HypercertExchangeClientProvider>
+								<PriceFeedProvider>
+									<ModalProvider modalVariants={[]}>
+										<ChainSwitchProvider>
+											<Header />
+											<div className="flex-1">{children}</div>
+											<Footer />
+										</ChainSwitchProvider>
+									</ModalProvider>
+								</PriceFeedProvider>
+							</HypercertExchangeClientProvider>
+						</UserProvider>
 					</PrivyConfigProvider>
 				</FarcasterProvider>
 			</body>
