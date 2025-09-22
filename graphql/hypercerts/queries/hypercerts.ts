@@ -131,18 +131,6 @@ export const fetchHypercertById = async (
     };
   });
 
-  // ADD UNINDEXED SALES:
-  if (
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-33347671958251969419410711528313284722688" ||
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-35389366159777600200190959172903893991424"
-  ) {
-    parsedSales.push({
-      currency: "0x471EcE3750Da237f93B8E339c536989b8978a438", // CELO,
-      currencyAmount: BigInt(2175 * 10 ** 18),
-    });
-  }
   return {
     hypercertId,
     creatorAddress: hypercert.creator_address as string,
