@@ -2,11 +2,12 @@
 
 import { useModal } from "@/components/ui/modal/context";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
+import useAccount from "@/hooks/use-account";
 import { formatCurrency } from "@/lib/utils";
+import { useLogin } from "@privy-io/react-auth";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { CheckCircle, CheckCircle2, Circle, CircleAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
 import { Button } from "../../../../../components/ui/button";
 import {
 	ModalContent,
@@ -21,7 +22,7 @@ import { getCurrencyFromAddress } from "./utils/getCurrencyFromAddress";
 
 const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 	const { address, chainId } = useAccount();
-	const { open } = useWeb3Modal();
+	const { login } = useLogin();
 	const { hide, pushModalByVariant } = useModal();
 
 	const setHypercert = usePurchaseFlowStore((state) => state.setHypercert);
@@ -95,7 +96,7 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 						<Button
 							size={"sm"}
 							className="mt-4 rounded-full"
-							onClick={() => open()}
+							onClick={() => login()}
 						>
 							Connect Wallet
 						</Button>

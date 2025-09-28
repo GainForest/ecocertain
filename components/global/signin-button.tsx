@@ -5,16 +5,16 @@ import useAccount from "@/hooks/use-account";
 import { useLogin, useLogout } from "@privy-io/react-auth";
 import { useEffect } from "react";
 
-const ConnectButton = () => {
-	const { isConnected } = useAccount();
+const SignInButton = () => {
+	const { authenticated } = useAccount();
 	const { login } = useLogin();
 
 	return (
-		<Button disabled={isConnected} onClick={() => login()}>
+		<Button disabled={authenticated} onClick={() => login()}>
 			Connect Wallet
 		</Button>
 	);
 };
-ConnectButton.displayName = "ConnectButton";
+SignInButton.displayName = "SignInButton";
 
-export { ConnectButton };
+export { SignInButton };

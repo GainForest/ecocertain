@@ -1,7 +1,9 @@
 "use client";
+import SelfXYZVerificationStep0 from "@/components/modals/self-xyz-verification/step-0";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
+import { useModal } from "@/components/ui/modal/context";
 import {
 	Tooltip,
 	TooltipContent,
@@ -12,6 +14,7 @@ import useCopy from "@/hooks/use-copy";
 import { cn, getUrl } from "@/lib/utils";
 import { blo } from "blo";
 import {
+	Building,
 	Check,
 	ChevronRight,
 	Copy,
@@ -24,9 +27,10 @@ import {
 	UserRoundCheck,
 	UserRoundPlus,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { useEnsName } from "wagmi";
+import React, { useCallback } from "react";
+import { useAccount, useEnsName } from "wagmi";
 
 const ProfileCard = ({
 	address,
@@ -39,17 +43,31 @@ const ProfileCard = ({
 		hypercertsSupported: number;
 		salesMadeCount: number;
 	};
-	view: "created" | "supported";
+	view: "created" | "supported" | "organizations";
 }) => {
 	const { data: ensName, isFetching: isEnsNameLoading } = useEnsName({
 		address,
 		chainId: 1,
 	});
 
+	const { address: connectedAddress } = useAccount();
 	const { copy: copyAddress, isCopied: isAddressCopied } = useCopy();
 	const { copy: copyProfileLink, isCopied: isProfileLinkCopied } = useCopy();
+	const { show, isOpen, clear, pushModalByVariant } = useModal();
 	const profileLink = getUrl(`/profile/${address}`);
 	const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+	const isPersonalProfile = connectedAddress === address;
+
+	const handleSelfXYZVerification = useCallback(() => {
+		if (isOpen) return;
+		clear();
+		pushModalByVariant({
+			id: "self-xyz-verification-step-0",
+			content: <SelfXYZVerificationStep0 />,
+		});
+		show();
+	}, [isOpen, show, clear, pushModalByVariant]);
 
 	return (
 		<div className="flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-background">
@@ -125,7 +143,7 @@ const ProfileCard = ({
 						>
 							<span className="flex items-center justify-start gap-2 text-left">
 								<Sparkle size={16} className="text-primary" />
-								My Hypercerts
+								{isPersonalProfile ? "My" : "Created"} Hypercerts
 							</span>
 							<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
 								<span>{stats.hypercertsCreated}</span>
@@ -152,7 +170,46 @@ const ProfileCard = ({
 						</Button>
 					</Link>
 				</li>
+				<li>
+					<Link href={"?view=organizations"}>
+						<Button
+							variant={view === "organizations" ? "secondary" : "ghost"}
+							className="w-full justify-between"
+							size={"sm"}
+						>
+							<span className="flex items-center justify-start gap-2 text-left">
+								<Building size={16} className="text-primary" />
+								{isPersonalProfile ? "My Organizations" : "Organizations"}
+							</span>
+							<span className="flex items-center justify-end gap-1 text-right text-muted-foreground">
+								<span>0</span>
+								<ChevronRight size={16} />
+							</span>
+						</Button>
+					</Link>
+				</li>
 			</ul>
+			<div className="relative flex flex-col gap-2 border-t border-t-border p-2 font-sans">
+				<div className="flex flex-col items-center justify-center">
+					{/* <Image
+            src="/assets/media/brandings/self.xyz.jpg"
+            alt="Self XYZ Branding"
+            width={100}
+            height={40}
+            className="h-6 w-auto rounded-md border border-border absolute top-1 right-1"
+          /> */}
+					<span className="text-balance text-center text-sm">
+						Verify your humanity and get your verification badge.
+					</span>
+				</div>
+				<Button
+					className="w-full"
+					size={"sm"}
+					onClick={handleSelfXYZVerification}
+				>
+					Get Started
+				</Button>
+			</div>
 		</div>
 	);
 };

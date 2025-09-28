@@ -9,6 +9,7 @@ import { useModal } from "@/components/ui/modal/context";
 import QuickTooltip from "@/components/ui/quicktooltip";
 import { RAW_TOKENS_CONFIG } from "@/config/raw-tokens";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
+import useAccount from "@/hooks/use-account";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { convertCurrencyPriceToUSD, formatDecimals } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,6 @@ import {
 	RefreshCcw,
 } from "lucide-react";
 import React from "react";
-import { useAccount } from "wagmi";
 import usePaymentProgressStore from "./PurchaseFlow/payment-progress/store";
 import SelectAmount from "./PurchaseFlow/select-amount";
 import SelectOrder from "./PurchaseFlow/select-order";

@@ -1,7 +1,8 @@
 import { formatTokens } from "@/lib/format-tokens";
 import React, { useEffect, useState } from "react";
 import { erc20Abi } from "viem";
-import { useAccount, useReadContract } from "wagmi";
+import { useReadContract } from "wagmi";
+import useAccount from "@/hooks/use-account";
 
 export type UserFunds = {
   data: {

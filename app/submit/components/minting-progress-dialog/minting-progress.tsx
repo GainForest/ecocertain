@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
 import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
+import useAccount from "@/hooks/use-account";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { sendEmailAndUpdateGoogle } from "@/lib/sendEmailAndUpdateGoogle";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { createWalletClient, custom, formatEther } from "viem";
 import { celo } from "viem/chains";
-import { useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
 import type { MintingFormValues } from "../hypercert-form";
 
 type MintingProgressConfig = {

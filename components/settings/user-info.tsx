@@ -1,7 +1,8 @@
 "use client";
+import useAccount from "@/hooks/use-account";
 import { useRouter } from "next/navigation";
+import { useEnsName } from "wagmi";
 
-import { useAccount, useEnsName } from "wagmi";
 import { mainnet } from "wagmi/chains";
 
 import { Label } from "@/components/ui/label";

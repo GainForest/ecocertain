@@ -1,8 +1,9 @@
 import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
-import { HeartHandshake, Sparkle } from "lucide-react";
+import { Building, HeartHandshake, Sparkle } from "lucide-react";
 import React from "react";
 import type { CombinedSale } from "../../page";
 import CreatedHypercerts from "./created-hypercerts";
+import OrganizationsPage from "./organizations";
 import SupportedHypercerts from "./supported-hypercerts";
 
 const Content = ({
@@ -10,7 +11,7 @@ const Content = ({
 	combinedSales,
 	createdHypercerts,
 }: {
-	view: "created" | "supported";
+	view: "created" | "supported" | "organizations";
 	combinedSales: CombinedSale[];
 	createdHypercerts: Hypercert[];
 }) => {
@@ -19,15 +20,25 @@ const Content = ({
 			<span className="ml-4 flex items-center gap-4 font-baskerville font-bold text-3xl">
 				{view === "created" ? (
 					<Sparkle className="text-primary" size={36} />
-				) : (
+				) : view === "supported" ? (
 					<HeartHandshake className="text-primary" size={36} />
+				) : (
+					<Building className="text-primary" size={36} />
 				)}
-				<span>{view === "created" ? "My" : "Supported"} Hypercerts</span>
+				<span>
+					{view === "created"
+						? "Created Hypercerts"
+						: view === "supported"
+						  ? "Supported Hypercerts"
+						  : "Organizations"}{" "}
+				</span>
 			</span>
 			{view === "created" ? (
 				<CreatedHypercerts hypercerts={createdHypercerts} />
-			) : (
+			) : view === "supported" ? (
 				<SupportedHypercerts combinedSales={combinedSales} />
+			) : (
+				<OrganizationsPage />
 			)}
 		</section>
 	);

@@ -2,7 +2,8 @@
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { HypercertClient } from "@hypercerts-org/sdk";
 import { useEffect, useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useWalletClient } from "wagmi";
+import useAccount from "@/hooks/use-account";
 
 export const useHypercertClient = () => {
   const { data: walletClient } = useWalletClient();

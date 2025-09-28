@@ -6,11 +6,15 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { cookieToInitialState } from "wagmi";
 
-import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
+import ChainSwitchProvider from "@/components/providers/ChainSwitch";
+import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClient";
+import PrivyConfigProvider from "@/components/providers/Privy";
+import { UserProvider } from "@/components/providers/User";
 import { ModalProvider } from "@/components/ui/modal/context";
 import { siteConfig } from "@/config/site";
 import { config } from "@/config/wagmi";
 import { WagmiContextProvider } from "@/contexts/wagmi";
+import { PrivyProvider } from "@privy-io/react-auth";
 import { Libre_Baskerville } from "next/font/google";
 import { headers } from "next/headers";
 import { PriceFeedProvider } from "./PriceFeedProvider";
@@ -139,17 +143,21 @@ export default function RootLayout({
 			>
 				<FarcasterProvider>
 					<Analytics />
-					<WagmiContextProvider>
-						<HypercertExchangeClientProvider>
-							<PriceFeedProvider>
-								<ModalProvider modalVariants={[]}>
-									<Header />
-									<div className="flex-1">{children}</div>
-									<Footer />
-								</ModalProvider>
-							</PriceFeedProvider>
-						</HypercertExchangeClientProvider>
-					</WagmiContextProvider>
+					<PrivyConfigProvider>
+						<UserProvider>
+							<HypercertExchangeClientProvider>
+								<PriceFeedProvider>
+									<ModalProvider modalVariants={[]}>
+										<ChainSwitchProvider>
+											<Header />
+											<div className="flex-1">{children}</div>
+											<Footer />
+										</ChainSwitchProvider>
+									</ModalProvider>
+								</PriceFeedProvider>
+							</HypercertExchangeClientProvider>
+						</UserProvider>
+					</PrivyConfigProvider>
 				</FarcasterProvider>
 			</body>
 		</html>
