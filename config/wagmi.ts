@@ -5,6 +5,7 @@ import { cookieStorage, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
 import { sepolia, celo, mainnet, celoAlfajores } from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
+import { farcasterMiniApp as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
 
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -96,4 +97,5 @@ export const config = defaultWagmiConfig({
   transports: {
     [celo.id]: http("https://forno.celo.org"),
   },
+  connectors: [miniAppConnector()],
 });
