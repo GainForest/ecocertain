@@ -1,10 +1,10 @@
 "use client";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 
 import { Button } from "@/components/ui/button";
 
 const ConnectButton = () => {
-	const { open } = useWeb3Modal();
+	const { open } = useWalletConnectionModal();
 	return <Button onClick={() => open()}>Connect Wallet</Button>;
 };
 ConnectButton.displayName = "ConnectButton";

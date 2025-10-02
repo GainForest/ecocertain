@@ -23,6 +23,7 @@ import ListingProgress from "./listing-progress";
 import { Button } from "@/components/ui/button";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
+import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import {
 	type ChainId,
 	type Currency,
@@ -88,7 +89,7 @@ const CreateListingDialog = ({
 	const isCurrentChainSupported = SUPPORTED_CHAINS.find(
 		(chain) => chain.id === currentChain?.id,
 	);
-	const { open } = useWeb3Modal();
+	const { open } = useWalletConnectionModal();
 
 	const {
 		data: hypercert,

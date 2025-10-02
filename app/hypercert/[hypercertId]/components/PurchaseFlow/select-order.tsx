@@ -2,6 +2,7 @@
 
 import { useModal } from "@/components/ui/modal/context";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
+import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import { formatCurrency } from "@/lib/utils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { CheckCircle, CheckCircle2, Circle, CircleAlert } from "lucide-react";
@@ -21,7 +22,7 @@ import { getCurrencyFromAddress } from "./utils/getCurrencyFromAddress";
 
 const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 	const { address, chainId } = useAccount();
-	const { open } = useWeb3Modal();
+	const { open } = useWalletConnectionModal();
 	const { hide, pushModalByVariant } = useModal();
 
 	const setHypercert = usePurchaseFlowStore((state) => state.setHypercert);
