@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 const FarcasterProvider = ({ children }: { children: React.ReactNode }) => {
 	useEffect(() => {
-		sdk.actions.ready();
+		sdk.actions.ready({});
 	}, []);
 	return <>{children}</>;
 };

@@ -137,20 +137,20 @@ export default function RootLayout({
 					archia.variable,
 				)}
 			>
-				<FarcasterProvider>
-					<Analytics />
-					<WagmiContextProvider>
-						<HypercertExchangeClientProvider>
-							<PriceFeedProvider>
+				<Analytics />
+				<WagmiContextProvider>
+					<HypercertExchangeClientProvider>
+						<PriceFeedProvider>
+							<FarcasterProvider>
 								<ModalProvider modalVariants={[]}>
 									<Header />
 									<div className="flex-1">{children}</div>
 									<Footer />
 								</ModalProvider>
-							</PriceFeedProvider>
-						</HypercertExchangeClientProvider>
-					</WagmiContextProvider>
-				</FarcasterProvider>
+							</FarcasterProvider>
+						</PriceFeedProvider>
+					</HypercertExchangeClientProvider>
+				</WagmiContextProvider>
 			</body>
 		</html>
 	);
