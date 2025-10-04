@@ -21,6 +21,8 @@ const useWalletConnectionModal = () => {
     async (options?: OpenOptions) => {
       // Try Farcaster connector first (if present and ready)
       console.log("connectors:", connectors);
+      console.log("farcaster" in window ? window.farcaster : "no farcaster");
+      console.log(JSON.stringify(window));
 
       open(options);
     },
