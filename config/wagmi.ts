@@ -1,7 +1,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import getPriceFeed from "@/lib/pricefeed";
 
-import { cookieStorage, createStorage, http } from "wagmi";
+import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
 import { sepolia, celo, mainnet, celoAlfajores } from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
@@ -89,10 +89,10 @@ const metadata = {
 };
 
 // Create wagmiConfig
-export const config = defaultWagmiConfig({
+export const config = createConfig({
   chains: SUPPORTED_CHAINS, // required
-  projectId, // required
-  metadata, // required
+  // projectId, // required
+  // metadata, // required
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
