@@ -4,7 +4,6 @@ import MarkdownEditor from "@/components/ui/mdx-editor";
 import { Textarea } from "@/components/ui/textarea";
 import { getEASConfig } from "@/config/eas";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
-import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { ArrowRight, CircleAlert, CircleCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -12,7 +11,7 @@ import { useAccount, useWalletClient } from "wagmi";
 import { useReviewSubmission } from "./contexts/ReviewSubmission";
 const ReviewForm = () => {
 	const { isConnected, chain } = useAccount();
-	const { open } = useWalletConnectionModal();
+	const { open } = useWeb3Modal();
 	const { submitReview, state, dispatch } = useReviewSubmission();
 	const { status, pendingReview } = state;
 	const hypercert = useFullHypercert();

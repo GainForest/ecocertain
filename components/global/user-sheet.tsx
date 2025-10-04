@@ -1,7 +1,6 @@
 "use client";
 import Logo from "@/assets/Hypercerts.svg";
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
-import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import { cn } from "@/lib/utils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { blo } from "blo";
@@ -36,7 +35,7 @@ import {
 
 const UserSheet = ({ children }: { children: React.ReactNode }) => {
 	const [open, setOpen] = useState(false);
-	const { open: openWeb3Modal } = useWalletConnectionModal();
+	const { open: openWeb3Modal } = useWeb3Modal();
 
 	const { address, isConnecting, isDisconnected, chain } = useAccount();
 	const isChainSupported =

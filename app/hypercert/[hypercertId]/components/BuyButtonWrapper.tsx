@@ -1,6 +1,5 @@
 "use client";
 import { Button, type ButtonProps } from "@/components/ui/button";
-import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import React from "react";
 import { useAccount } from "wagmi";
@@ -13,7 +12,7 @@ const BuyButton = ({
 	...props
 }: ButtonProps) => {
 	const { isConnected, isConnecting } = useAccount();
-	const { open } = useWalletConnectionModal();
+	const { open } = useWeb3Modal();
 	return (
 		<Button
 			{...props}

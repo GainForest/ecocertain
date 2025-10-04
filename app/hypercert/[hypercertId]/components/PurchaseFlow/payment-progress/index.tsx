@@ -10,7 +10,6 @@ import {
 	ModalTitle,
 } from "@/components/ui/modal/modal";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
-import useWalletConnectionModal from "@/hooks/use-wallet-connection-modal";
 import { cn } from "@/lib/utils";
 import type {
 	Currency,
@@ -54,7 +53,7 @@ const Paymentprogress = () => {
 		(state) => state.amountSelectedInUnits,
 	);
 	const hypercertExchangeClient = useHypercertExchangeClient();
-	const { open } = useWalletConnectionModal();
+	const { open } = useWeb3Modal();
 	const { address } = useAccount();
 
 	if (
