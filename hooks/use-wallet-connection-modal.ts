@@ -24,8 +24,8 @@ const useWalletConnectionModal = () => {
       const connector = connectors.find((connector) =>
         connector.name.toLowerCase().includes("farcaster")
       );
-      if (!connector) throw new Error("Farcaster connector not found");
       try {
+        if (!connector) throw new Error("Farcaster connector not found");
         connect({
           connector: connector,
           chainId: SUPPORTED_CHAINS[0].id,
