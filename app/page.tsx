@@ -9,7 +9,7 @@ import PageError from "./components/shared/PageError";
 
 export default async function Home() {
 	return (
-		<main className="flex flex-col gap-4 pb-[64px] md:pb-0">
+		<main className="flex flex-col gap-4 pt-4 pb-[64px] md:pb-0">
 			{/* <div className="flex items-center justify-center">
 				<InfoBox variant="success" className="max-w-4xl">
 					<span className="text-base">⚠️</span>
@@ -30,7 +30,7 @@ export default async function Home() {
 					</p>
 				</InfoBox>
 			</div> */}
-			<section className="flex flex-col items-center gap-4 p-8 pt-0">
+			<section className="flex flex-col items-center gap-4 p-8">
 				<div className="flex w-full flex-col items-center px-4">
 					<HeroSection />
 				</div>
