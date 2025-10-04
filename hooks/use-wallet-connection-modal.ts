@@ -1,3 +1,4 @@
+import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useCallback } from "react";
 import { useConnect } from "wagmi";
@@ -15,18 +16,31 @@ export type OpenOptions = {
 
 const useWalletConnectionModal = () => {
   const { open, close } = useWeb3Modal();
-  const { connectors, connectAsync, status } = useConnect();
+  const { connectors, connect, status } = useConnect();
 
   const handleConnect = useCallback(
     async (options?: OpenOptions) => {
-      // Try Farcaster connector first (if present and ready)
-      console.log("connectors:", connectors);
-      console.log("farcaster" in window ? window.farcaster : "no farcaster");
-      console.log(JSON.stringify(window));
+      if (options?.view === undefined || options.view === "Connect") {
+        if (window && window.navigator.userAgent.includes("Farcaster")) {
+          const connector = connectors.find(
+            (connector) => connector.id === "injected"
+          );
+          try {
+            if (!connector) throw new Error("Injected connector not found");
+            connect({
+              connector: connector,
+              chainId: SUPPORTED_CHAINS[0].id,
+            });
+            return;
+          } catch (error) {
+            console.error("Connecting with Farcaster failed", error);
+          }
+        }
+      }
 
       open(options);
     },
-    [connectAsync, connectors, open]
+    [connect, connectors, open]
   );
 
   return { open: handleConnect, close };

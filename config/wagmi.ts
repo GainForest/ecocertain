@@ -100,5 +100,5 @@ export const config = defaultWagmiConfig({
   transports: {
     [celo.id]: http("https://forno.celo.org"),
   },
-  connectors: [farcasterFrame(), miniAppConnector()],
+  connectors: [miniAppConnector()],
 });
