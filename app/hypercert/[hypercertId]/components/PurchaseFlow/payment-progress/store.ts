@@ -138,6 +138,7 @@ const usePaymentProgressStore = create<
 				console.error("Error fetching orders:", ordersFetchError);
 				return;
 			}
+			console.log("Hypercert Exchange Client for debugging:", hcExchangeClient);
 
 			// =========== STEP 2
 			set({ currentStepIndex: 2 });
