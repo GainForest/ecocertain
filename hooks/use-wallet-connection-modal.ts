@@ -20,29 +20,8 @@ const useWalletConnectionModal = () => {
   const handleConnect = useCallback(
     async (options?: OpenOptions) => {
       // Try Farcaster connector first (if present and ready)
-      const farcasterConnector = connectors.find(
-        (connector) =>
-          connector.id === "farcaster" ||
-          connector.id === "farcaster-miniapp" ||
-          connector.name.toLowerCase().includes("farcaster")
-      );
+      console.log("connectors:", connectors);
 
-      const preferredConnector = farcasterConnector ?? connectors[0];
-      console.log("Trying to connect with", preferredConnector);
-
-      if (preferredConnector) {
-        try {
-          await connectAsync({ connector: preferredConnector });
-          return;
-        } catch (err) {
-          console.error("Connecting with wallet failed", err);
-          // Fall through to external wallet modal
-        }
-      } else {
-        console.error("No preferred connector found");
-      }
-
-      // If Farcaster isn't available/ready or connect failed, open Web3Modal
       open(options);
     },
     [connectAsync, connectors, open]
