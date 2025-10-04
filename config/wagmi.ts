@@ -1,11 +1,11 @@
-import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import getPriceFeed from "@/lib/pricefeed";
 
-import { cookieStorage, createStorage, http } from "wagmi";
+import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
 import { sepolia, celo, mainnet, celoAlfajores } from "viem/chains";
 import { RAW_TOKENS_CONFIG, TokensConfig } from "./raw-tokens";
 import { farcasterMiniApp as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
+import { walletConnect } from "wagmi/connectors";
 
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -86,10 +86,10 @@ const metadata = {
 };
 
 // Create wagmiConfig
-export const config = defaultWagmiConfig({
+export const config = createConfig({
   chains: SUPPORTED_CHAINS, // required
-  projectId, // required
-  metadata, // required
+  // projectId, // required
+  // metadata, // required
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
@@ -97,5 +97,12 @@ export const config = defaultWagmiConfig({
   transports: {
     [celo.id]: http("https://forno.celo.org"),
   },
-  connectors: [miniAppConnector()],
+  connectors: [
+    miniAppConnector(),
+    walletConnect({
+      projectId,
+      metadata,
+      showQrModal: false,
+    }),
+  ],
 });
