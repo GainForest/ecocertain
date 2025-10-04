@@ -19,14 +19,15 @@ export type OpenOptions = {
 const useWalletConnectionModal = () => {
   const { open, close } = useWeb3Modal();
   const { connectors, connect, status } = useConnect();
+  const isClient = typeof window !== "undefined";
   const { data: isFarcasterAvailable } = useQuery({
-    queryKey: ["is-farcaster-available", window?.location.href],
+    queryKey: ["is-farcaster-available", isClient],
     queryFn: async () => {
       const context = await sdk.context;
       return !!context;
     },
     refetchInterval: 60 * 1000, // 1 minute
-    enabled: typeof window !== "undefined",
+    enabled: isClient,
   });
 
   const handleConnect = async (options?: OpenOptions) => {
