@@ -1,7 +1,9 @@
 import { SUPPORTED_CHAINS } from "@/config/wagmi";
+import { useQuery } from "@tanstack/react-query";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useCallback } from "react";
 import { useConnect } from "wagmi";
+import { sdk } from "@farcaster/frame-sdk";
 
 // Hardcoding Open Options here since it's not exported from the library.
 // Update this type if library is updated.
@@ -17,9 +19,21 @@ export type OpenOptions = {
 const useWalletConnectionModal = () => {
   const { open, close } = useWeb3Modal();
   const { connectors, connect, status } = useConnect();
+  const { data: isFarcasterAvailable } = useQuery({
+    queryKey: ["is-farcaster-available", window?.location.href],
+    queryFn: async () => {
+      const context = await sdk.context;
+      return !!context;
+    },
+    refetchInterval: 60 * 1000, // 1 minute
+    enabled: typeof window !== "undefined",
+  });
 
   const handleConnect = async (options?: OpenOptions) => {
-    if (options?.view === undefined || options.view === "Connect") {
+    if (
+      isFarcasterAvailable &&
+      (options?.view === undefined || options.view === "Connect")
+    ) {
       console.log("All connectors:", connectors);
       const connector = connectors.find((connector) =>
         connector.name.toLowerCase().includes("farcaster")

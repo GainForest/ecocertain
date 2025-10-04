@@ -1,5 +1,6 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import getPriceFeed from "@/lib/pricefeed";
+import { walletConnect, injected, coinbaseWallet } from "wagmi/connectors";
 
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { BASE_URL } from "./endpoint";
@@ -88,6 +89,30 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/46801808"],
 };
 
+// Overrides the default Wagmi config from web3modal/wagmi/react/config
+// function generateWagmiConfig({ projectId, chains, metadata, enableInjected, enableCoinbase, enableEmail, enableWalletConnect, enableEIP6963, ...wagmiConfig }) {
+//   const connectors = [];
+//   if (enableWalletConnect !== false) {
+//       connectors.push(walletConnect({ projectId, metadata, showQrModal: false }));
+//   }
+//   // if (enableInjected !== false) {
+//   //     connectors.push(injected({ shimDisconnect: true }));
+//   // }
+//   // if (enableCoinbase !== false) {
+//   //     connectors.push(coinbaseWallet({
+//   //         appName: metadata?.name ?? 'Unknown',
+//   //         appLogoUrl: metadata?.icons[0] ?? 'Unknown',
+//   //         enableMobileWalletLink: true
+//   //     }));
+//   // }
+//   return createConfig({
+//       chains,
+//       multiInjectedProviderDiscovery: enableEIP6963 !== false,
+//       ...wagmiConfig,
+//       connectors
+//   });
+// }
+
 // Create wagmiConfig
 export const config = createConfig({
   chains: SUPPORTED_CHAINS, // required
@@ -100,5 +125,12 @@ export const config = createConfig({
   transports: {
     [celo.id]: http("https://forno.celo.org"),
   },
-  connectors: [miniAppConnector()],
+  connectors: [
+    miniAppConnector(),
+    walletConnect({
+      projectId,
+      metadata,
+      showQrModal: false,
+    }),
+  ],
 });
