@@ -21,19 +21,19 @@ const useWalletConnectionModal = () => {
   const handleConnect = useCallback(
     async (options?: OpenOptions) => {
       if (options?.view === undefined || options.view === "Connect") {
-        alert(
-          "Available connectors: " +
-            JSON.stringify(connectors.map((connector) => connector.name))
+        const connector = connectors.find((connector) =>
+          connector.name.toLowerCase().includes("farcaster")
         );
-        // try {
-        //   connect({
-        //     connector: connector,
-        //     chainId: SUPPORTED_CHAINS[0].id,
-        //   });
-        //   return;
-        // } catch (error) {
-        //   console.error("Connecting with Farcaster failed", error);
-        // }
+        if (!connector) throw new Error("Injected connector not found");
+        try {
+          connect({
+            connector: connector,
+            chainId: SUPPORTED_CHAINS[0].id,
+          });
+          return;
+        } catch (error) {
+          console.error("Connecting with Farcaster failed", error);
+        }
       }
 
       open(options);
