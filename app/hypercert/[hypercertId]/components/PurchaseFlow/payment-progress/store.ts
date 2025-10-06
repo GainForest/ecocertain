@@ -142,46 +142,46 @@ const usePaymentProgressStore = create<
 
 			// =========== STEP 2
 			set({ currentStepIndex: 2 });
-			errorTitle = "Approval not confirmed";
-			errorDescription = "The spending cap could not be approved.";
-			// We approve more than we need to avoid issues with some arithmetics while executing the order
+			// errorTitle = "Approval not confirmed";
+			// errorDescription = "The spending cap could not be approved.";
+			// // We approve more than we need to avoid issues with some arithmetics while executing the order
 			const tokensToApproveInWei = unitsToBuy * BigInt(order.price);
-			const [approveTx, approveTxError] = await tryCatch(() =>
-				hcExchangeClient.approveErc20(
-					order.currency as `0x${string}`,
-					tokensToApproveInWei,
-				),
-			);
-			if (approveTxError) {
-				set({
-					status: "error",
-					errorState: { title: errorTitle, description: errorDescription },
-				});
-				console.error("Error approving spending cap:", approveTxError);
-				return;
-			}
+			// const [approveTx, approveTxError] = await tryCatch(() =>
+			// 	hcExchangeClient.approveErc20(
+			// 		order.currency as `0x${string}`,
+			// 		tokensToApproveInWei,
+			// 	),
+			// );
+			// if (approveTxError) {
+			// 	set({
+			// 		status: "error",
+			// 		errorState: { title: errorTitle, description: errorDescription },
+			// 	});
+			// 	console.error("Error approving spending cap:", approveTxError);
+			// 	return;
+			// }
 
 			// =========== STEP 3
 			set({ currentStepIndex: 3 });
-			const [approveTxReceipt, approveTxReceiptError] = await tryCatch(() =>
-				approveTx.wait(),
-			);
-			if (approveTxReceiptError) {
-				set({
-					status: "error",
-					errorState: { title: errorTitle, description: errorDescription },
-				});
-				console.error("Error getting approval receipt:", approveTxReceiptError);
-				return;
-			}
-			if (approveTxReceipt?.status !== 1) {
-				set({
-					status: "error",
-					errorState: { title: errorTitle, description: errorDescription },
-				});
-				console.error("Error approving spending cap:", approveTxReceipt);
-				return;
-			}
+			// const [approveTxReceipt, approveTxReceiptError] = await tryCatch(() =>
+			// 	approveTx.wait(),
+			// );
+			// if (approveTxReceiptError) {
+			// 	set({
+			// 		status: "error",
+			// 		errorState: { title: errorTitle, description: errorDescription },
+			// 	});
+			// 	console.error("Error getting approval receipt:", approveTxReceiptError);
+			// 	return;
+			// }
+			// if (approveTxReceipt?.status !== 1) {
+			// 	set({
+			// 		status: "error",
+			// 		errorState: { title: errorTitle, description: errorDescription },
+			// 	});
+			// 	console.error("Error approving spending cap:", approveTxReceipt);
+			// 	return;
+			// }
 
 			// =========== STEP 4
 			set({ currentStepIndex: 4 });
