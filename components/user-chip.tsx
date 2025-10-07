@@ -9,6 +9,7 @@ import { useEnsName } from "wagmi";
 import { Button } from "./ui/button";
 import ENSName from "./ui/ens-name";
 import EthAvatar from "./ui/eth-avatar";
+import QuickTooltip from "./ui/quicktooltip";
 
 const UserChip = ({
 	address,
@@ -123,65 +124,92 @@ const UserChip = ({
 			: ensName ?? address;
 
 	return (
-		<li
-			className={cn(
-				"group/user-chip inline-flex items-center justify-between gap-1.5 rounded-full border border-transparent bg-muted/80 p-2 text-sm hover:border-border hover:bg-muted",
-				className,
-			)}
+		<QuickTooltip
+			content={
+				<div className="flex min-w-40 flex-col items-center gap-2 font-sans">
+					<div className="flex items-center gap-2 p-2">
+						<EthAvatar address={address} size={40} />
+						<div className="flex flex-col items-start">
+							<span className="w-36 truncate font-bold">
+								{ensName ?? address}
+							</span>
+							<Link
+								href={`/profile/${address}`}
+								className="text-primary focus:underline hover:underline"
+							>
+								View Profile
+							</Link>
+						</div>
+					</div>
+					{/* <hr className="border-t-border w-full" />
+          <div className="w-full flex items-center gap-1">
+            <div className="h-12 bg-muted flex-1 rounded-lg"></div>
+            <div className="h-12 bg-muted flex-1 rounded-lg"></div>
+          </div> */}
+				</div>
+			}
+			asChild
 		>
-			<div
-				className="flex flex-1 items-center justify-center"
-				style={{ gap: `${avatarAndLabelGap}px` }}
+			<li
+				className={cn(
+					"group/user-chip inline-flex items-center justify-between gap-1.5 rounded-full border border-transparent bg-muted/80 p-2 text-sm hover:border-border hover:bg-muted",
+					className,
+				)}
 			>
-				{showAvatar && <EthAvatar address={address} size={avatarSize} />}
-				<Link
-					href={`/profile/${address}`}
-					style={{ flex: 1, minWidth: 0 }}
-					className="group/user-chip-link focus:outline-none"
-					tabIndex={0}
+				<div
+					className="flex flex-1 items-center justify-center"
+					style={{ gap: `${avatarAndLabelGap}px` }}
 				>
-					<input
-						ref={inputRef}
+					{showAvatar && <EthAvatar address={address} size={avatarSize} />}
+					<Link
+						href={`/profile/${address}`}
+						style={{ flex: 1, minWidth: 0 }}
+						className="group/user-chip-link focus:outline-none"
+						tabIndex={0}
+					>
+						<input
+							ref={inputRef}
+							className={cn(
+								"min-w-0 flex-1 cursor-pointer border-none bg-transparent outline-none focus:outline-none focus:ring-0",
+								ellipsisLocation === "end" ? "truncate" : "",
+								"group-focus/user-chip-link:text-primary group-hover/user-chip-link:text-primary group-focus/user-chip-link:underline group-hover/user-chip-link:underline",
+							)}
+							value={displayValue}
+							size={ellipsisLocation === "middle" ? 16 : 12}
+							readOnly
+							disabled
+							style={{
+								pointerEvents: "none",
+								width: "100%",
+								background: "transparent",
+							}}
+						/>
+					</Link>
+				</div>
+				{showCopyButton !== "never" && (
+					<button
+						type="button"
 						className={cn(
-							"min-w-0 flex-1 cursor-pointer border-none bg-transparent outline-none focus:outline-none focus:ring-0",
-							ellipsisLocation === "end" ? "truncate" : "",
-							"group-focus/user-chip-link:text-primary group-hover/user-chip-link:text-primary group-focus/user-chip-link:underline group-hover/user-chip-link:underline",
+							showCopyButton === "hover" ? "opacity-0" : "opacity-50",
+							"flex shrink-0 items-center justify-center rounded-full p-0 focus:opacity-100 group-hover/user-chip:opacity-100",
 						)}
-						value={displayValue}
-						size={ellipsisLocation === "middle" ? 16 : 12}
-						readOnly
-						disabled
 						style={{
-							pointerEvents: "none",
-							width: "100%",
-							background: "transparent",
+							height: `${avatarSize}px`,
+							width: `${avatarSize}px`,
 						}}
-					/>
-				</Link>
-			</div>
-			{showCopyButton !== "never" && (
-				<button
-					type="button"
-					className={cn(
-						showCopyButton === "hover" ? "opacity-0" : "opacity-50",
-						"flex shrink-0 items-center justify-center rounded-full p-0 focus:opacity-100 group-hover/user-chip:opacity-100",
-					)}
-					style={{
-						height: `${avatarSize}px`,
-						width: `${avatarSize}px`,
-					}}
-					onClick={() => {
-						copy(address);
-					}}
-				>
-					{isCopied ? (
-						<Check size={avatarSize / 1.75} />
-					) : (
-						<Copy size={avatarSize / 1.75} />
-					)}
-				</button>
-			)}
-		</li>
+						onClick={() => {
+							copy(address);
+						}}
+					>
+						{isCopied ? (
+							<Check size={avatarSize / 1.75} />
+						) : (
+							<Copy size={avatarSize / 1.75} />
+						)}
+					</button>
+				)}
+			</li>
+		</QuickTooltip>
 	);
 };
 
