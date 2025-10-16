@@ -8,6 +8,7 @@ import { cookieToInitialState } from "wagmi";
 
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
 import { ModalProvider } from "@/components/ui/modal/context";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/config/site";
 import { config } from "@/config/wagmi";
 import { WagmiContextProvider } from "@/contexts/wagmi";
@@ -143,9 +144,11 @@ export default function RootLayout({
 						<HypercertExchangeClientProvider>
 							<PriceFeedProvider>
 								<ModalProvider modalVariants={[]}>
-									<Header />
-									<div className="flex-1">{children}</div>
-									<Footer />
+									<TooltipProvider>
+										<Header />
+										<div className="flex-1">{children}</div>
+										<Footer />
+									</TooltipProvider>
 								</ModalProvider>
 							</PriceFeedProvider>
 						</HypercertExchangeClientProvider>
