@@ -139,3 +139,79 @@ export const getValueFromSearchParams = <T extends string>(
   }
   return defaultValue;
 };
+
+// balances.ts
+import { createPublicClient, http, formatUnits } from 'viem'
+import { mainnet, polygon, base, celo, arbitrum } from 'viem/chains'
+import { erc20Abi } from 'viem'
+import { symbol } from "zod";
+
+// 1) Define which chains are "trade-supported" vs "view-only"
+export const TRADE_SUPPORTED = new Set([mainnet.id, base.id, arbitrum.id, celo.id]) // example
+export const VIEW_ONLY_CHAINS = [polygon]           
+
+// 2) Make read-only public clients (no wallet needed)
+const clients = {
+  [mainnet.id]: createPublicClient({ chain: mainnet, transport: http('https://eth.llamarpc.com') }),
+  [arbitrum.id]: createPublicClient({ chain: arbitrum, transport: http('https://arb1.arbitrum.io/rpc')}),
+  // [polygon.id]: createPublicClient({ chain: polygon, transport: http('https://polygon.drpc.org') }),
+  // [base.id]:    createPublicClient({ chain: base,    transport: http('https://base.llamarpc.com') }),
+  [celo.id]:    createPublicClient({ chain: celo,    transport: http('https://forno.celo.org') }),
+}
+
+// 3) Token lists you care about per chain (you can expand this)
+const TOKENS: Record<number, Array<{ symbol: string; address: `0x${string}`; decimals?: number }>> = {
+  [mainnet.id]: [
+    { symbol: 'USDC', address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
+    { symbol: 'DAI',  address: '0x6B175474E89094C44Da98b954EedeAC495271d0F' },
+  ],
+  [arbitrum.id]: [
+    { symbol: 'USDC', address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'}
+  ],
+  [celo.id]: [
+    { symbol: 'USDC', address: '0x765DE816845861e75A25fCA122bb6898B8B1282a' },
+  ],
+}
+
+// 4) Helpers to read native + ERC20
+export async function getNativeBalance(chainId: keyof typeof clients , address: `0x${string}`) {
+  const client = clients[chainId]
+  const value = await client.getBalance({ address })
+  return value // bigint in wei
+}
+
+export async function getErc20Balances(chainId: keyof typeof clients, address: `0x${string}`) {
+  const client = clients[chainId]
+  const list = TOKENS[chainId] ?? []
+  const out: Array<{ symbol: string; value: string }> = []
+
+  for (const t of list) {
+    const [raw, decimals] = await Promise.all([
+      client.readContract({ address: t.address, abi: erc20Abi, functionName: 'balanceOf', args: [address] }) as Promise<bigint>,
+      t.decimals
+        ? Promise.resolve(t.decimals)
+        : client.readContract({ address: t.address, abi: erc20Abi, functionName: 'decimals' }) as Promise<number>,
+    ])
+    out.push({ symbol: t.symbol, value: formatUnits(raw, decimals) })
+  }
+  return out
+}
+
+// 5) Single function to collect a simple “portfolio view” across specific chains
+export async function getCrossChainPortfolio(address: `0x${string}`) {
+  const chains = [mainnet, celo, arbitrum] // read from both supported + view-only
+  const results = await Promise.all(chains.map(async (c) => {
+    const [native, erc20s] = await Promise.all([
+      getNativeBalance(c.id, address),
+      getErc20Balances(c.id, address),
+    ])
+    return {
+      chainId: c.id,
+      chainName: c.name,
+      supportedForTrading: TRADE_SUPPORTED.has(c.id as 1 | 8453),
+      native: native, 
+      erc20s,
+    }
+  }))
+  return results
+}

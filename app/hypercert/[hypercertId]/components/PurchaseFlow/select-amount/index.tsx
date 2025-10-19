@@ -5,12 +5,15 @@ import { useModal } from "@/components/ui/modal/context";
 import { fetchFractionById } from "@/graphql/hypercerts/queries/fractions";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import useUserFunds from "@/hooks/use-user-funds";
-import { cn } from "@/lib/utils";
+import { cn, getCrossChainPortfolio } from "@/lib/utils";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Info, Loader2, Percent, RefreshCcw } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { formatEther } from "viem";
+import { arbitrum, celo, mainnet } from "viem/chains";
+import { useAccount, useBalance, useReadContracts } from "wagmi";
 import { Button } from "../../../../../../components/ui/button";
 import {
 	ModalContent,
@@ -25,6 +28,12 @@ import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
 import PercentageTab from "./PercentageTab";
+
+const NATIVE_BY_CHAIN: Record<number, { symbol: string; decimals: number }> = {
+	[mainnet.id]: { symbol: "ETH", decimals: 18 },
+	[arbitrum.id]: { symbol: "ETH", decimals: 18 },
+	[celo.id]: { symbol: "CELO", decimals: 18 },
+};
 
 const AnimatedTabContent = ({ children }: { children: React.ReactNode }) => {
 	return (
@@ -86,7 +95,81 @@ const SelectAmountBody = ({
 	selectedOrder: FullHypercert["orders"][number];
 	currency: Currency;
 }) => {
+	const { address } = useAccount();
+
 	const { hide, pushModalByVariant } = useModal();
+	const [portfolio, setPortfolio] = useState<
+		Array<{
+			chainId: number;
+			chainName: string;
+			supportedForTrading: boolean;
+			native: bigint; // wei
+			erc20s: Array<{ symbol: string; value: string }>;
+		}>
+	>([]);
+
+	const [portfolioLoading, setPortfolioLoading] = useState(false);
+
+	useEffect(() => {
+		let mounted = true;
+		if (!address) return;
+
+		setPortfolioLoading(true);
+		getCrossChainPortfolio(address as `0x${string}`)
+			.then((res) => {
+				if (!mounted) return;
+				setPortfolio(res);
+			})
+			.finally(() => mounted && setPortfolioLoading(false));
+
+		return () => {
+			mounted = false;
+		};
+	}, [address]);
+	const nonZeroAssets = useMemo(() => {
+		const items: Array<{
+			chainId: number;
+			chainName: string;
+			token: string; // symbol
+			amount: string; // formatted string
+			isNative: boolean;
+			supportedForTrading: boolean;
+		}> = [];
+
+		for (const row of portfolio) {
+			// native
+			const nativeMeta = NATIVE_BY_CHAIN[row.chainId];
+			if (nativeMeta) {
+				const nativeAmount = Number(formatEther(row.native));
+				if (nativeAmount > 0) {
+					items.push({
+						chainId: row.chainId,
+						chainName: row.chainName,
+						token: nativeMeta.symbol,
+						amount: nativeAmount.toLocaleString(),
+						isNative: true,
+						supportedForTrading: row.supportedForTrading,
+					});
+				}
+			}
+
+			// erc20s
+			for (const t of row.erc20s) {
+				const amt = Number.parseFloat(t.value);
+				if (amt > 0) {
+					items.push({
+						chainId: row.chainId,
+						chainName: row.chainName,
+						token: t.symbol,
+						amount: amt.toLocaleString(),
+						isNative: false,
+						supportedForTrading: row.supportedForTrading,
+					});
+				}
+			}
+		}
+		return items;
+	}, [portfolio]);
 
 	const selectedTab: TabType = usePurchaseFlowStore(
 		(state) => state.amountSelectionCurrentTab,
@@ -211,6 +294,71 @@ const SelectAmountBody = ({
 						creator of the ecocert minus a small platform fee worth{" "}
 						<span className="font-bold text-foreground">0.1 Celo</span>.
 					</p>
+				</div>
+				{/* Info Box */}
+				<div className="mt-2 flex items-start gap-2 rounded-lg border bg-muted/50 p-3 font-sans text-muted-foreground text-xs">
+					<Info className="mt-0.5 h-4 w-4 shrink-0" />
+					<p>
+						All proceeds from the purchase of this ecocert go directly to the
+						creator of the ecocert minus a small platform fee worth{" "}
+						<span className="font-bold text-foreground">0.1 Celo</span>.
+					</p>
+				</div>
+
+				{/* 🔹 Non-zero cross-chain balances */}
+				<div className="mt-3 rounded-lg border p-3">
+					<div className="mb-1 flex items-center justify-between">
+						<span className="font-semibold text-sm">
+							Swap these assets to donate more easily
+						</span>
+						{portfolioLoading && (
+							<span className="flex items-center gap-1 text-muted-foreground text-xs">
+								<Loader2 className="size-3 animate-spin" /> Loading
+							</span>
+						)}
+					</div>
+
+					{nonZeroAssets.length === 0 && !portfolioLoading ? (
+						<div className="text-muted-foreground text-xs">
+							No balances detected on other networks.
+						</div>
+					) : (
+						<div className="mt-1 grid gap-1">
+							{nonZeroAssets.map((a, idx) => (
+								<div
+									key={`${a.chainId}-${a.token}-${idx}`}
+									className="flex items-center justify-between rounded-md bg-muted/40 px-2 py-1.5"
+								>
+									<div className="flex min-w-0 items-center gap-2">
+										<span className="truncate text-sm">
+											<span className="font-medium">{a.amount}</span>{" "}
+											<span className="text-muted-foreground">{a.token}</span>
+											<span className="text-muted-foreground">
+												{" "}
+												· {a.chainName}
+											</span>
+										</span>
+									</div>
+									<div className="flex items-center gap-2">
+										{a.supportedForTrading ? (
+											<span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-700 text-xs">
+												Supported
+											</span>
+										) : (
+											<span className="rounded bg-amber-100 px-2 py-0.5 text-amber-700 text-xs">
+												View only
+											</span>
+										)}
+									</div>
+								</div>
+							))}
+						</div>
+					)}
+
+					<div className="mt-2 text-muted-foreground text-xs">
+						You can swap one of these assets into the required currency to
+						complete your purchase.
+					</div>
 				</div>
 			</div>
 			<ModalFooter className="flex flex-row items-center gap-2">

@@ -45,6 +45,7 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 	);
 
 	const handleOrderSelect = (order: FullHypercert["orders"][number]) => {
+		console.log(order, "ORDER");
 		setSelectedOrder(order);
 	};
 
