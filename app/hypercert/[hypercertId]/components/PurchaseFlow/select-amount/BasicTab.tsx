@@ -1,7 +1,9 @@
+import { useModal } from "@/components/ui/modal/context";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Button } from "../../../../../../components/ui/button";
 import usePurchaseFlowStore from "../store";
+import { Widget } from "../swapper/LifiWidget";
 import { calcUnitsFromUSD } from "../utils/calcUnitsFromUSD";
 
 const quickAmounts = [
@@ -40,6 +42,7 @@ const BasicTab = ({
 	totalUnitsInOrder: bigint;
 	fundsByUserInUnits: bigint;
 }) => {
+	const { pushModalByVariant } = useModal();
 	const amountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.amountSelectedInUnits,
 	);
@@ -68,6 +71,13 @@ const BasicTab = ({
 	}, [amountSelectedInUnits, selectedOrder, totalUnitsInOrder]);
 
 	if (!selectedOrder) return null;
+
+	const handleSwapShow = () => {
+		pushModalByVariant({
+			id: "swap-flow",
+			content: <Widget />,
+		});
+	};
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -110,8 +120,23 @@ const BasicTab = ({
 			</div>
 			{amountSelectedInUnits.basic !== null &&
 				fundsByUserInUnits < amountSelectedInUnits.basic && (
-					<div className="flex items-center justify-center rounded-lg bg-muted py-1 text-center text-red-500 text-sm">
-						Insufficient Balance
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center justify-center rounded-lg bg-muted py-1 text-center text-red-500 text-sm">
+							Insufficient Balance
+						</div>
+						<div className="rounded-lg border bg-background p-2">
+							<Button
+								className="w-full"
+								onClick={handleSwapShow}
+								aria-label="Swap other tokens into CELO"
+							>
+								Swap other tokens into CELO
+							</Button>
+							<p className="mt-1 text-center text-muted-foreground text-xs">
+								Have assets elsewhere? Swap them to CELO to complete this
+								purchase.
+							</p>
+						</div>
 					</div>
 				)}
 		</div>

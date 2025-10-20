@@ -23,7 +23,9 @@
     "@hypercerts-org/contracts": "^2.0.0-alpha.12",
     "@hypercerts-org/marketplace-sdk": "^0.8.0",
     "@hypercerts-org/sdk": "^2.9.0-alpha.1",
+    "@lifi/widget": "^3.33.1",
     "@mdxeditor/editor": "^3.31.1",
+    "@mysten/dapp-kit": "^0.19.5",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
@@ -97,7 +99,7 @@
     "use-dehydrated-state": "^0.1.0",
     "vaul": "^0.9.0",
     "viem": "^2.21.35",
-    "wagmi": "^2.12.25",
+    "wagmi": "^2.18.1",
     "zod": "^3.23.8",
     "zustand": "^5.0.6"
   },
