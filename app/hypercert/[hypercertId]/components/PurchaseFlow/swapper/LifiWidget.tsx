@@ -2,6 +2,7 @@
 
 import type { WidgetConfig } from "@lifi/widget";
 import { LiFiWidget, WidgetSkeleton } from "@lifi/widget";
+import { celo, mainnet } from "viem/chains";
 import { ClientOnly } from "./ClientOnly";
 
 export function Widget() {
@@ -15,6 +16,8 @@ export function Widget() {
 				minWidth: "340px",
 			},
 		},
+		toChain: celo.id,
+		toToken: "0x471EcE3750Da237f93B8E339c536989b8978a438",
 	} as Partial<WidgetConfig>;
 
 	return (
