@@ -11,7 +11,14 @@ import {
 import type { WidgetConfig } from "@lifi/widget";
 import { LiFiWidget, WidgetSkeleton } from "@lifi/widget";
 import { ChevronLeft } from "lucide-react";
-import { celo, mainnet } from "viem/chains";
+import {
+	arbitrum,
+	celo,
+	filecoin,
+	mainnet,
+	optimism,
+	polygon,
+} from "viem/chains";
 import { ClientOnly } from "./ClientOnly";
 
 export interface WidgetProps {
@@ -32,6 +39,16 @@ export function Widget() {
 		},
 		toChain: celo.id,
 		toToken: "0x471EcE3750Da237f93B8E339c536989b8978a438",
+		chains: {
+			allow: [
+				arbitrum.id,
+				mainnet.id,
+				celo.id,
+				polygon.id,
+				optimism.id,
+				filecoin.id,
+			],
+		},
 	} as Partial<WidgetConfig>;
 	const { popModal } = useModal();
 
