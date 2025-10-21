@@ -49,6 +49,7 @@ const BasicTab = ({
 	const setAmountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.setAmountSelectedInUnits,
 	);
+	const currency = usePurchaseFlowStore((state) => state.currency);
 	const selectedOrder = usePurchaseFlowStore((state) => state.selectedOrder);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(setAmountSelectedInUnits): setAmountSelectedInUnits should not be a trigger for this side effect.
@@ -75,7 +76,7 @@ const BasicTab = ({
 	const handleSwapShow = () => {
 		pushModalByVariant({
 			id: "swap-flow",
-			content: <Widget />,
+			content: <Widget toToken={currency?.address || ""} />,
 		});
 	};
 

@@ -8,9 +8,16 @@ import {
 	ModalHeader,
 	ModalTitle,
 } from "@/components/ui/modal/modal";
-import type { WidgetConfig } from "@lifi/widget";
-import { LiFiWidget, WidgetSkeleton } from "@lifi/widget";
+import type { Route, WidgetConfig } from "@lifi/widget";
+import {
+	LiFiWidget,
+	WidgetEvent,
+	WidgetSkeleton,
+	useWidgetEvents,
+} from "@lifi/widget";
 import { ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import {
 	arbitrum,
 	celo,
@@ -19,14 +26,15 @@ import {
 	optimism,
 	polygon,
 } from "viem/chains";
+import { useSwitchChain } from "wagmi";
 import { ClientOnly } from "./ClientOnly";
 
 export interface WidgetProps {
-	toChainId: number;
 	toToken: string;
 }
-
-export function Widget() {
+export function Widget({ toToken }: WidgetProps) {
+	const widgetEvents = useWidgetEvents();
+	const { switchChain } = useSwitchChain();
 	const config = {
 		appearance: "light",
 		theme: {
@@ -37,8 +45,7 @@ export function Widget() {
 				minWidth: "340px",
 			},
 		},
-		toChain: celo.id,
-		toToken: "0x471EcE3750Da237f93B8E339c536989b8978a438",
+		toToken: toToken,
 		chains: {
 			allow: [
 				arbitrum.id,
@@ -49,8 +56,20 @@ export function Widget() {
 				filecoin.id,
 			],
 		},
+		disabledUI: ["toAddress"],
 	} as Partial<WidgetConfig>;
 	const { popModal } = useModal();
+	useEffect(() => {
+		const onCompleted = async (route: Route) => {
+			const targetId = route?.toChainId ?? celo.id;
+			switchChain({ chainId: targetId });
+			toast.success("Swap completed successfully");
+			popModal();
+		};
+
+		widgetEvents.on(WidgetEvent.RouteExecutionCompleted, onCompleted);
+		return () => widgetEvents.all.clear();
+	}, [widgetEvents, popModal, switchChain]);
 
 	return (
 		<ModalContent dismissible={false} className="font-sans">
