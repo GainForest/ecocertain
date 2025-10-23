@@ -1,6 +1,7 @@
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import { getCurrencyFromAddress } from "./utils/getCurrencyFromAddress";
 
 type PurchaseFlowState = {
@@ -43,8 +44,8 @@ const DEFAULT_STATE: PurchaseFlowState = {
 	customInputMode: "currency",
 };
 
-const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>(
-	(set) => ({
+const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>()(
+	devtools((set) => ({
 		...DEFAULT_STATE,
 		setHypercert: (hypercert) => set({ hypercert }),
 		setSelectedOrder: (selectedOrder) =>
@@ -64,7 +65,7 @@ const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>(
 		setAmountSelectionCurrentTab: (amountSelectionCurrentTab) =>
 			set({ amountSelectionCurrentTab }),
 		setCustomInputMode: (customInputMode) => set({ customInputMode }),
-	}),
+	})),
 );
 
 export default usePurchaseFlowStore;
