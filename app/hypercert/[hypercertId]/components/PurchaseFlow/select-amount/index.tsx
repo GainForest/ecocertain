@@ -24,6 +24,7 @@ import {
 } from "../../../../../../components/ui/modal/modal";
 import Paymentprogress from "../payment-progress";
 import usePurchaseFlowStore from "../store";
+import { Widget } from "../swapper/LifiWidget";
 import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
@@ -95,82 +96,7 @@ const SelectAmountBody = ({
 	selectedOrder: FullHypercert["orders"][number];
 	currency: Currency;
 }) => {
-	const { address } = useAccount();
-
 	const { hide, pushModalByVariant } = useModal();
-	const [portfolio, setPortfolio] = useState<
-		Array<{
-			chainId: number;
-			chainName: string;
-			supportedForTrading: boolean;
-			native: bigint; // wei
-			erc20s: Array<{ symbol: string; value: string }>;
-		}>
-	>([]);
-
-	const [portfolioLoading, setPortfolioLoading] = useState(false);
-
-	useEffect(() => {
-		let mounted = true;
-		if (!address) return;
-
-		setPortfolioLoading(true);
-		getCrossChainPortfolio(address as `0x${string}`)
-			.then((res) => {
-				if (!mounted) return;
-				setPortfolio(res);
-			})
-			.finally(() => mounted && setPortfolioLoading(false));
-
-		return () => {
-			mounted = false;
-		};
-	}, [address]);
-	const nonZeroAssets = useMemo(() => {
-		const items: Array<{
-			chainId: number;
-			chainName: string;
-			token: string; // symbol
-			amount: string; // formatted string
-			isNative: boolean;
-			supportedForTrading: boolean;
-		}> = [];
-
-		for (const row of portfolio) {
-			// native
-			const nativeMeta = NATIVE_BY_CHAIN[row.chainId];
-			if (nativeMeta) {
-				const nativeAmount = Number(formatEther(row.native));
-				if (nativeAmount > 0) {
-					items.push({
-						chainId: row.chainId,
-						chainName: row.chainName,
-						token: nativeMeta.symbol,
-						amount: nativeAmount.toLocaleString(),
-						isNative: true,
-						supportedForTrading: row.supportedForTrading,
-					});
-				}
-			}
-
-			// erc20s
-			for (const t of row.erc20s) {
-				const amt = Number.parseFloat(t.value);
-				if (amt > 0) {
-					items.push({
-						chainId: row.chainId,
-						chainName: row.chainName,
-						token: t.symbol,
-						amount: amt.toLocaleString(),
-						isNative: false,
-						supportedForTrading: row.supportedForTrading,
-					});
-				}
-			}
-		}
-		return items;
-	}, [portfolio]);
-
 	const selectedTab: TabType = usePurchaseFlowStore(
 		(state) => state.amountSelectionCurrentTab,
 	);
@@ -199,6 +125,35 @@ const SelectAmountBody = ({
 		totalUnitsInOrder,
 		selectedOrder.pricePerPercentInToken,
 	);
+
+	const showSwapperOption = () => {
+		if (selectedTab === "basic") {
+			return !!(
+				amountSelectedInUnits.basic !== null &&
+				fundsByUserInUnits < amountSelectedInUnits?.basic
+			);
+		}
+		if (selectedTab === "custom") {
+			return !!(
+				amountSelectedInUnits.custom !== null &&
+				amountSelectedInUnits?.custom > fundsByUserInUnits
+			);
+		}
+		if (selectedTab === "percentage") {
+			return !!(
+				amountSelectedInUnits.percentage !== null &&
+				amountSelectedInUnits.percentage > fundsByUserInUnits
+			);
+		}
+		return false;
+	};
+
+	const handleShowSwap = () => {
+		pushModalByVariant({
+			id: "swap-flow",
+			content: <Widget toToken={currency?.address || ""} />,
+		});
+	};
 
 	// --- UI ---
 	return (
@@ -286,6 +241,21 @@ const SelectAmountBody = ({
 						</AnimatedTabContent>
 					)}
 				</AnimatePresence>
+				{showSwapperOption() && (
+					<div className="rounded-lg border bg-background p-2">
+						<Button
+							className="w-full"
+							onClick={handleShowSwap}
+							aria-label="Swap other tokens into CELO"
+						>
+							Swap other tokens into CELO
+						</Button>
+						<p className="mt-1 text-center text-muted-foreground text-xs">
+							Have assets elsewhere? Swap them to CELO to complete this
+							purchase.
+						</p>
+					</div>
+				)}
 				{/* Info Box */}
 				<div className="mt-2 flex items-start gap-2 rounded-lg border bg-muted/50 p-3 font-sans text-muted-foreground text-xs">
 					<Info className="mt-0.5 h-4 w-4 shrink-0" />

@@ -73,13 +73,6 @@ const BasicTab = ({
 
 	if (!selectedOrder) return null;
 
-	const handleSwapShow = () => {
-		pushModalByVariant({
-			id: "swap-flow",
-			content: <Widget toToken={currency?.address || ""} />,
-		});
-	};
-
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="mb-2 grid grid-cols-2 gap-1">
@@ -124,19 +117,6 @@ const BasicTab = ({
 					<div className="flex flex-col gap-2">
 						<div className="flex items-center justify-center rounded-lg bg-muted py-1 text-center text-red-500 text-sm">
 							Insufficient Balance
-						</div>
-						<div className="rounded-lg border bg-background p-2">
-							<Button
-								className="w-full"
-								onClick={handleSwapShow}
-								aria-label="Swap other tokens into CELO"
-							>
-								Swap other tokens into CELO
-							</Button>
-							<p className="mt-1 text-center text-muted-foreground text-xs">
-								Have assets elsewhere? Swap them to CELO to complete this
-								purchase.
-							</p>
 						</div>
 					</div>
 				)}
