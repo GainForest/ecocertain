@@ -1,9 +1,7 @@
-import { useModal } from "@/components/ui/modal/context";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Button } from "../../../../../../components/ui/button";
 import usePurchaseFlowStore from "../store";
-import { Widget } from "../swapper/LifiWidget";
 import { calcUnitsFromUSD } from "../utils/calcUnitsFromUSD";
 
 const quickAmounts = [
@@ -48,7 +46,6 @@ const BasicTab = ({
 	const setAmountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.setAmountSelectedInUnits,
 	);
-	const currency = usePurchaseFlowStore((state) => state.currency);
 	const selectedOrder = usePurchaseFlowStore((state) => state.selectedOrder);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(setAmountSelectedInUnits): setAmountSelectedInUnits should not be a trigger for this side effect.
@@ -113,10 +110,8 @@ const BasicTab = ({
 			</div>
 			{amountSelectedInUnits.basic !== null &&
 				fundsByUserInUnits < amountSelectedInUnits.basic && (
-					<div className="flex flex-col gap-2">
-						<div className="flex items-center justify-center rounded-lg bg-muted py-1 text-center text-red-500 text-sm">
-							Insufficient Balance
-						</div>
+					<div className="flex items-center justify-center rounded-lg bg-muted py-1 text-center text-red-500 text-sm">
+						Insufficient Balance
 					</div>
 				)}
 		</div>
