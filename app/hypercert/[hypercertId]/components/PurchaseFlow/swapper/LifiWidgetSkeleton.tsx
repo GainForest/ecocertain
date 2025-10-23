@@ -44,7 +44,6 @@ export default function WidgetSkeleton() {
 
 	return (
 		<ModalContent dismissible={false} className="font-sans">
-			{/* --- Keep this header exactly as requested --- */}
 			<ModalHeader className="flex items-center gap-4">
 				<Button
 					variant={"secondary"}
