@@ -32,6 +32,7 @@ import { ClientOnly } from "./ClientOnly";
 export interface WidgetProps {
 	toToken: string;
 }
+
 export function Widget({ toToken }: WidgetProps) {
 	const widgetEvents = useWidgetEvents();
 	const { switchChain } = useSwitchChain();
@@ -43,6 +44,37 @@ export function Widget({ toToken }: WidgetProps) {
 				borderRadius: "16px",
 				maxWidth: "340px",
 				minWidth: "340px",
+			},
+			palette: {
+				primary: {
+					main: "#16a34a",
+				},
+				secondary: {
+					main: "#f4f4f5",
+				},
+			},
+			typography: "ui-sans-serif",
+			components: {
+				MuiAppBar: {
+					styleOverrides: {
+						root: {
+							"& p": {
+								fontSize: "1rem",
+								lineHeight: 1.2,
+							},
+						},
+					},
+				},
+				MuiButton: {
+					styleOverrides: {
+						root: {
+							textTransform: "none",
+							"&:hover": {
+								backgroundColor: "#16a34ae6",
+							},
+						},
+					},
+				},
 			},
 		},
 		toToken: toToken,
@@ -61,8 +93,8 @@ export function Widget({ toToken }: WidgetProps) {
 	const { popModal } = useModal();
 	useEffect(() => {
 		const onCompleted = async (route: Route) => {
-			const targetId = route?.toChainId ?? celo.id;
-			switchChain({ chainId: targetId });
+			// hardcoded celo since celo is the only supported chain for ecocerts rn
+			switchChain({ chainId: celo.id });
 			toast.success("Swap completed successfully");
 			popModal();
 		};
