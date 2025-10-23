@@ -2,18 +2,13 @@
 
 import ErrorModalBody from "@/components/modals/error-body";
 import { useModal } from "@/components/ui/modal/context";
-import { fetchFractionById } from "@/graphql/hypercerts/queries/fractions";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import useUserFunds from "@/hooks/use-user-funds";
-import { cn, getCrossChainPortfolio } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
-import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Info, Loader2, Percent, RefreshCcw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { formatEther } from "viem";
 import { arbitrum, celo, mainnet } from "viem/chains";
-import { useAccount, useBalance, useReadContracts } from "wagmi";
 import { Button } from "../../../../../../components/ui/button";
 import {
 	ModalContent,
