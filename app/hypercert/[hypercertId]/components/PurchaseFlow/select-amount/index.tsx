@@ -7,8 +7,7 @@ import useUserFunds from "@/hooks/use-user-funds";
 import { cn } from "@/lib/utils";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, Info, Loader2, Percent, RefreshCcw } from "lucide-react";
-import { arbitrum, celo, mainnet } from "viem/chains";
+import { ChevronLeft, Info, Percent, RefreshCcw } from "lucide-react";
 import { Button } from "../../../../../../components/ui/button";
 import {
 	ModalContent,
@@ -24,12 +23,6 @@ import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
 import PercentageTab from "./PercentageTab";
-
-const NATIVE_BY_CHAIN: Record<number, { symbol: string; decimals: number }> = {
-	[mainnet.id]: { symbol: "ETH", decimals: 18 },
-	[arbitrum.id]: { symbol: "ETH", decimals: 18 },
-	[celo.id]: { symbol: "CELO", decimals: 18 },
-};
 
 const AnimatedTabContent = ({ children }: { children: React.ReactNode }) => {
 	return (

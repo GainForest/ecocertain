@@ -91,17 +91,24 @@ export function Widget({ toToken }: WidgetProps) {
 		disabledUI: ["toAddress"],
 	} as Partial<WidgetConfig>;
 	const { popModal } = useModal();
+
 	useEffect(() => {
 		const onCompleted = async (route: Route) => {
-			// hardcoded celo since celo is the only supported chain for ecocerts rn
-			switchChain({ chainId: celo.id });
 			toast.success("Swap completed successfully");
-			popModal();
+			// hardcoded celo since celo is the only supported chain for ecocerts rn
+			switchChain(
+				{ chainId: celo.id },
+				{
+					onSuccess: () => {
+						popModal();
+					},
+				},
+			);
 		};
 
 		widgetEvents.on(WidgetEvent.RouteExecutionCompleted, onCompleted);
 		return () => widgetEvents.all.clear();
-	}, [widgetEvents, popModal, switchChain]);
+	}, [popModal, switchChain, widgetEvents]);
 
 	return (
 		<ModalContent dismissible={false} className="font-sans">
@@ -110,7 +117,6 @@ export function Widget({ toToken }: WidgetProps) {
 					variant={"secondary"}
 					size={"sm"}
 					className="h-6 w-6 rounded-full p-0.5"
-					onClick={() => popModal()}
 				>
 					<ChevronLeft />
 				</Button>

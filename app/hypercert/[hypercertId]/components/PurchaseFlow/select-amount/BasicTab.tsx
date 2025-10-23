@@ -42,7 +42,6 @@ const BasicTab = ({
 	totalUnitsInOrder: bigint;
 	fundsByUserInUnits: bigint;
 }) => {
-	const { pushModalByVariant } = useModal();
 	const amountSelectedInUnits = usePurchaseFlowStore(
 		(state) => state.amountSelectedInUnits,
 	);
