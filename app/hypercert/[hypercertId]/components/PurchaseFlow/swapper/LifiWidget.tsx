@@ -33,7 +33,7 @@ export interface WidgetProps {
 	toToken: string;
 }
 
-export function Widget({ toToken }: WidgetProps) {
+export default function Widget({ toToken }: WidgetProps) {
 	const widgetEvents = useWidgetEvents();
 	const { switchChain } = useSwitchChain();
 	const config = {
@@ -117,6 +117,7 @@ export function Widget({ toToken }: WidgetProps) {
 					variant={"secondary"}
 					size={"sm"}
 					className="h-6 w-6 rounded-full p-0.5"
+					onClick={() => popModal()}
 				>
 					<ChevronLeft />
 				</Button>

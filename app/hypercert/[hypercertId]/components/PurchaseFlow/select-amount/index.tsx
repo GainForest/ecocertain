@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, Info, Percent, RefreshCcw } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Button } from "../../../../../../components/ui/button";
 import {
 	ModalContent,
@@ -18,11 +19,15 @@ import {
 } from "../../../../../../components/ui/modal/modal";
 import Paymentprogress from "../payment-progress";
 import usePurchaseFlowStore from "../store";
-import { Widget } from "../swapper/LifiWidget";
+import WidgetSkeleton from "../swapper/LifiWidgetSkeleton";
 import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
 import PercentageTab from "./PercentageTab";
+
+const Widget = dynamic(() => import("../swapper/LifiWidget"), {
+	loading: () => <WidgetSkeleton />,
+});
 
 const AnimatedTabContent = ({ children }: { children: React.ReactNode }) => {
 	return (
