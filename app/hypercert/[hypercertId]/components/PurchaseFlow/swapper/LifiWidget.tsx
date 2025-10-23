@@ -16,7 +16,7 @@ import {
 	useWidgetEvents,
 } from "@lifi/widget";
 import { ChevronLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import {
 	arbitrum,
@@ -35,7 +35,7 @@ export interface WidgetProps {
 
 export default function Widget({ toToken }: WidgetProps) {
 	const widgetEvents = useWidgetEvents();
-	const { switchChain } = useSwitchChain();
+	const { switchChainAsync } = useSwitchChain();
 	const config = {
 		appearance: "light",
 		theme: {
@@ -92,23 +92,26 @@ export default function Widget({ toToken }: WidgetProps) {
 	} as Partial<WidgetConfig>;
 	const { popModal } = useModal();
 
+	const switchAndPop = useCallback(async () => {
+		await switchChainAsync(
+			{ chainId: celo.id },
+			{
+				onSuccess: () => {
+					popModal();
+				},
+			},
+		);
+	}, [switchChainAsync, popModal]);
+
 	useEffect(() => {
 		const onCompleted = async (route: Route) => {
 			toast.success("Swap completed successfully");
-			// hardcoded celo since celo is the only supported chain for ecocerts rn
-			switchChain(
-				{ chainId: celo.id },
-				{
-					onSuccess: () => {
-						popModal();
-					},
-				},
-			);
+			switchAndPop();
 		};
 
 		widgetEvents.on(WidgetEvent.RouteExecutionCompleted, onCompleted);
 		return () => widgetEvents.all.clear();
-	}, [popModal, switchChain, widgetEvents]);
+	}, [switchAndPop, widgetEvents]);
 
 	return (
 		<ModalContent dismissible={false} className="font-sans">
@@ -117,7 +120,7 @@ export default function Widget({ toToken }: WidgetProps) {
 					variant={"secondary"}
 					size={"sm"}
 					className="h-6 w-6 rounded-full p-0.5"
-					onClick={() => popModal()}
+					onClick={switchAndPop}
 				>
 					<ChevronLeft />
 				</Button>
