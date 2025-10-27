@@ -246,8 +246,8 @@ const SelectAmountBody = ({
 							Swap other tokens into {currency?.symbol || "CELO"}
 						</Button>
 						<p className="mt-1 text-center text-muted-foreground text-xs">
-							Have assets elsewhere? Swap them to CELO to complete this
-							purchase.
+							Have assets elsewhere? Swap them to {currency?.symbol || "CELO"}{" "}
+							to complete this purchase.
 						</p>
 					</div>
 				)}
