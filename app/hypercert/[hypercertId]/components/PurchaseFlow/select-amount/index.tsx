@@ -239,9 +239,11 @@ const SelectAmountBody = ({
 						<Button
 							className="w-full"
 							onClick={handleShowSwap}
-							aria-label="Swap other tokens into CELO"
+							aria-label={`Swap other tokens into ${
+								currency?.symbol || "CELO"
+							}`}
 						>
-							Swap other tokens into CELO
+							Swap other tokens into {currency?.symbol || "CELO"}
 						</Button>
 						<p className="mt-1 text-center text-muted-foreground text-xs">
 							Have assets elsewhere? Swap them to CELO to complete this
