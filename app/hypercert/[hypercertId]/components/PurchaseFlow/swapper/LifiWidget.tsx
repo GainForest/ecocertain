@@ -77,6 +77,7 @@ export default function Widget({ toToken }: WidgetProps) {
 				},
 			},
 		},
+		toChain: celo.id,
 		toToken: toToken,
 		chains: {
 			allow: [
