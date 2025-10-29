@@ -44,28 +44,33 @@ const DEFAULT_STATE: PurchaseFlowState = {
 	customInputMode: "currency",
 };
 
+const isDevEnvironment = process.env.NEXT_PUBLIC_VERCEL_ENV === "development";
+
 const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>()(
-	devtools((set) => ({
-		...DEFAULT_STATE,
-		setHypercert: (hypercert) => set({ hypercert }),
-		setSelectedOrder: (selectedOrder) =>
-			set(() => {
-				return {
-					selectedOrder,
-					currency: selectedOrder
-						? getCurrencyFromAddress(
-								Number.parseInt(selectedOrder.chainId),
-								selectedOrder.currency,
-						  )
-						: null,
-				};
-			}),
-		setAmountSelectedInUnits: (amountSelectedInUnits) =>
-			set({ amountSelectedInUnits }),
-		setAmountSelectionCurrentTab: (amountSelectionCurrentTab) =>
-			set({ amountSelectionCurrentTab }),
-		setCustomInputMode: (customInputMode) => set({ customInputMode }),
-	})),
+	devtools(
+		(set) => ({
+			...DEFAULT_STATE,
+			setHypercert: (hypercert) => set({ hypercert }),
+			setSelectedOrder: (selectedOrder) =>
+				set(() => {
+					return {
+						selectedOrder,
+						currency: selectedOrder
+							? getCurrencyFromAddress(
+									Number.parseInt(selectedOrder.chainId),
+									selectedOrder.currency,
+							  )
+							: null,
+					};
+				}),
+			setAmountSelectedInUnits: (amountSelectedInUnits) =>
+				set({ amountSelectedInUnits }),
+			setAmountSelectionCurrentTab: (amountSelectionCurrentTab) =>
+				set({ amountSelectionCurrentTab }),
+			setCustomInputMode: (customInputMode) => set({ customInputMode }),
+		}),
+		{ enabled: isDevEnvironment },
+	),
 );
 
 export default usePurchaseFlowStore;
