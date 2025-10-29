@@ -50,9 +50,6 @@ const LifiWidgetConfig: Partial<WidgetConfig> = {
 				main: "#f4f4f5",
 			},
 		},
-		typography: {
-			fontFamily: "ui-sans-serif",
-		},
 		components: {
 			MuiAppBar: {
 				styleOverrides: {
