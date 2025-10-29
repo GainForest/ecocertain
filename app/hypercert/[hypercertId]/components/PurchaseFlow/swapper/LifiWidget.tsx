@@ -33,64 +33,67 @@ export interface WidgetProps {
 	toToken: string;
 }
 
+const LifiWidgetConfig: Partial<WidgetConfig> = {
+	appearance: "light",
+	theme: {
+		container: {
+			boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.08)",
+			borderRadius: "16px",
+			maxWidth: "340px",
+			minWidth: "340px",
+		},
+		palette: {
+			primary: {
+				main: "#16a34a",
+			},
+			secondary: {
+				main: "#f4f4f5",
+			},
+		},
+		typography: {
+			fontFamily: "ui-sans-serif",
+		},
+		components: {
+			MuiAppBar: {
+				styleOverrides: {
+					root: {
+						"& p": {
+							fontSize: "1rem",
+							lineHeight: 1.2,
+						},
+					},
+				},
+			},
+			MuiButton: {
+				styleOverrides: {
+					root: {
+						textTransform: "none",
+						"&:hover": {
+							backgroundColor: "#16a34ae6",
+						},
+					},
+				},
+			},
+		},
+	},
+	toChain: celo.id,
+	chains: {
+		allow: [
+			arbitrum.id,
+			mainnet.id,
+			celo.id,
+			polygon.id,
+			optimism.id,
+			filecoin.id,
+		],
+	},
+	disabledUI: ["toAddress"],
+};
+
 export default function Widget({ toToken }: WidgetProps) {
 	const widgetEvents = useWidgetEvents();
 	const { switchChainAsync } = useSwitchChain();
-	const config = {
-		appearance: "light",
-		theme: {
-			container: {
-				boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.08)",
-				borderRadius: "16px",
-				maxWidth: "340px",
-				minWidth: "340px",
-			},
-			palette: {
-				primary: {
-					main: "#16a34a",
-				},
-				secondary: {
-					main: "#f4f4f5",
-				},
-			},
-			typography: "ui-sans-serif",
-			components: {
-				MuiAppBar: {
-					styleOverrides: {
-						root: {
-							"& p": {
-								fontSize: "1rem",
-								lineHeight: 1.2,
-							},
-						},
-					},
-				},
-				MuiButton: {
-					styleOverrides: {
-						root: {
-							textTransform: "none",
-							"&:hover": {
-								backgroundColor: "#16a34ae6",
-							},
-						},
-					},
-				},
-			},
-		},
-		toChain: celo.id,
-		toToken: toToken,
-		chains: {
-			allow: [
-				arbitrum.id,
-				mainnet.id,
-				celo.id,
-				polygon.id,
-				optimism.id,
-				filecoin.id,
-			],
-		},
-		disabledUI: ["toAddress"],
-	} as Partial<WidgetConfig>;
+	const config = { ...LifiWidgetConfig, toToken } as Partial<WidgetConfig>;
 	const { popModal } = useModal();
 
 	const switchAndPop = useCallback(async () => {
