@@ -9,16 +9,19 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Toaster as Sonner } from "sonner";
+import useMediaQuery from "./modal/use-media-query";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
 	const { theme = "system" } = useTheme();
+	const isMobile = useMediaQuery("(max-width: 512px)");
 
 	return (
 		<Sonner
 			theme={theme as ToasterProps["theme"]}
 			className="toaster group"
+			position={isMobile ? "top-center" : "bottom-right"}
 			richColors
 			icons={{
 				success: <CircleCheck className="h-4 w-4" />,
