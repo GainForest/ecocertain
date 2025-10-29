@@ -60,7 +60,7 @@ const PercentageTab = ({
 					max={100}
 					value={percentageInput}
 					onChange={(e) => {
-						setPercentageInput(e.target.value);
+						setPercentageInput(e.target.value.replace(",", "."));
 						const parsed = Number.parseFloat(e.target.value);
 						if (Number.isNaN(parsed)) {
 							setAmountSelectedInUnits({
