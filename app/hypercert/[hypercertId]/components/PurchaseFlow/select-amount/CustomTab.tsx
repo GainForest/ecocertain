@@ -143,10 +143,12 @@ const CustomTab = ({
 				<Input
 					className="border-transparent border-b-border bg-background"
 					type="number"
+					lang="en-US"
 					min={0}
 					value={customInputMode === "currency" ? currencyInput : usdInput}
 					onChange={(e) => {
-						const value = e.target.value;
+						// sometimes based on locale/browser settings the decimal separator is a comma.
+						const value = e.target.value.replace(",", ".");
 						const parsed = Number.parseFloat(value);
 						let units: bigint | null = null;
 						if (customInputMode === "currency") {
