@@ -1,6 +1,7 @@
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import { getCurrencyFromAddress } from "./utils/getCurrencyFromAddress";
 
 type PurchaseFlowState = {
@@ -43,28 +44,33 @@ const DEFAULT_STATE: PurchaseFlowState = {
 	customInputMode: "currency",
 };
 
-const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>(
-	(set) => ({
-		...DEFAULT_STATE,
-		setHypercert: (hypercert) => set({ hypercert }),
-		setSelectedOrder: (selectedOrder) =>
-			set(() => {
-				return {
-					selectedOrder,
-					currency: selectedOrder
-						? getCurrencyFromAddress(
-								Number.parseInt(selectedOrder.chainId),
-								selectedOrder.currency,
-						  )
-						: null,
-				};
-			}),
-		setAmountSelectedInUnits: (amountSelectedInUnits) =>
-			set({ amountSelectedInUnits }),
-		setAmountSelectionCurrentTab: (amountSelectionCurrentTab) =>
-			set({ amountSelectionCurrentTab }),
-		setCustomInputMode: (customInputMode) => set({ customInputMode }),
-	}),
+const isDevEnvironment = process.env.NEXT_PUBLIC_VERCEL_ENV === "development";
+
+const usePurchaseFlowStore = create<PurchaseFlowState & PurchaseFlowActions>()(
+	devtools(
+		(set) => ({
+			...DEFAULT_STATE,
+			setHypercert: (hypercert) => set({ hypercert }),
+			setSelectedOrder: (selectedOrder) =>
+				set(() => {
+					return {
+						selectedOrder,
+						currency: selectedOrder
+							? getCurrencyFromAddress(
+									Number.parseInt(selectedOrder.chainId),
+									selectedOrder.currency,
+							  )
+							: null,
+					};
+				}),
+			setAmountSelectedInUnits: (amountSelectedInUnits) =>
+				set({ amountSelectedInUnits }),
+			setAmountSelectionCurrentTab: (amountSelectionCurrentTab) =>
+				set({ amountSelectionCurrentTab }),
+			setCustomInputMode: (customInputMode) => set({ customInputMode }),
+		}),
+		{ enabled: isDevEnvironment },
+	),
 );
 
 export default usePurchaseFlowStore;

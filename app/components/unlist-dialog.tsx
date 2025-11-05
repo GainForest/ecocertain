@@ -80,11 +80,11 @@ const UnlistDialog = ({
 		if (address.toLowerCase() !== hypercert.creatorAddress.toLowerCase())
 			throw new Error("You are not authorized for this action.");
 		if (!hcExchangeClient)
-			throw new Error("Something went wrong. Please try again...");
+			throw new Error("Something went wrong. Please try again.");
 
 		setStatus({
 			type: "loading",
-			message: "Please sign the transaction to unlist the ecocert...",
+			message: "Please sign the transaction to unlist the ecocert.",
 		});
 		const [unlistTxError, unlistTx] = await catchError(
 			hcExchangeClient.deleteOrder(hypercert.orderId),
@@ -93,7 +93,7 @@ const UnlistDialog = ({
 
 		if (!unlistTx)
 			throw new Error(
-				"The ecocert could not be listed because transaction failed. Please try again...",
+				"The ecocert could not be listed because transaction failed. Please try again.",
 			);
 	}, [hcExchangeClient, hypercert, isConnected, address]);
 
@@ -144,7 +144,7 @@ const UnlistDialog = ({
 				) : hypercertError ? (
 					<StatusBox
 						variant="error"
-						text="Unable to get ecocert info... Please retry."
+						text="Unable to get ecocert info. Please retry."
 					/>
 				) : hypercert ? (
 					isConnected &&
@@ -175,7 +175,7 @@ const UnlistDialog = ({
 				) : (
 					<StatusBox
 						variant="error"
-						text="Something went wrong... Please retry."
+						text="Something went wrong. Please retry."
 					/>
 				)}
 

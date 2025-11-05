@@ -2,15 +2,13 @@
 
 import ErrorModalBody from "@/components/modals/error-body";
 import { useModal } from "@/components/ui/modal/context";
-import { fetchFractionById } from "@/graphql/hypercerts/queries/fractions";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import useUserFunds from "@/hooks/use-user-funds";
 import { cn } from "@/lib/utils";
 import type { Currency } from "@hypercerts-org/marketplace-sdk";
-import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, Info, Loader2, Percent, RefreshCcw } from "lucide-react";
-import { useEffect } from "react";
+import { ChevronLeft, Info, Percent, RefreshCcw } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Button } from "../../../../../../components/ui/button";
 import {
 	ModalContent,
@@ -21,10 +19,15 @@ import {
 } from "../../../../../../components/ui/modal/modal";
 import Paymentprogress from "../payment-progress";
 import usePurchaseFlowStore from "../store";
+import WidgetSkeleton from "../swapper/LifiWidgetSkeleton";
 import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
 import PercentageTab from "./PercentageTab";
+
+const Widget = dynamic(() => import("../swapper/LifiWidget"), {
+	loading: () => <WidgetSkeleton />,
+});
 
 const AnimatedTabContent = ({ children }: { children: React.ReactNode }) => {
 	return (
@@ -87,7 +90,6 @@ const SelectAmountBody = ({
 	currency: Currency;
 }) => {
 	const { hide, pushModalByVariant } = useModal();
-
 	const selectedTab: TabType = usePurchaseFlowStore(
 		(state) => state.amountSelectionCurrentTab,
 	);
@@ -116,6 +118,35 @@ const SelectAmountBody = ({
 		totalUnitsInOrder,
 		selectedOrder.pricePerPercentInToken,
 	);
+
+	const showSwapperOption = () => {
+		if (selectedTab === "basic") {
+			return !!(
+				amountSelectedInUnits.basic !== null &&
+				fundsByUserInUnits < amountSelectedInUnits?.basic
+			);
+		}
+		if (selectedTab === "custom") {
+			return !!(
+				amountSelectedInUnits.custom !== null &&
+				amountSelectedInUnits?.custom > fundsByUserInUnits
+			);
+		}
+		if (selectedTab === "percentage") {
+			return !!(
+				amountSelectedInUnits.percentage !== null &&
+				amountSelectedInUnits.percentage > fundsByUserInUnits
+			);
+		}
+		return false;
+	};
+
+	const handleShowSwap = () => {
+		pushModalByVariant({
+			id: "swap-flow",
+			content: <Widget toToken={currency?.address || ""} />,
+		});
+	};
 
 	// --- UI ---
 	return (
@@ -203,6 +234,23 @@ const SelectAmountBody = ({
 						</AnimatedTabContent>
 					)}
 				</AnimatePresence>
+				{showSwapperOption() && (
+					<div className="rounded-lg border bg-background p-2">
+						<Button
+							className="w-full"
+							onClick={handleShowSwap}
+							aria-label={`Swap other tokens into ${
+								currency?.symbol || "CELO"
+							}`}
+						>
+							Swap other tokens into {currency?.symbol || "CELO"}
+						</Button>
+						<p className="mt-1 text-center text-muted-foreground text-xs">
+							Have assets elsewhere? Swap them to {currency?.symbol || "CELO"}{" "}
+							to complete this purchase.
+						</p>
+					</div>
+				)}
 				{/* Info Box */}
 				<div className="mt-2 flex items-start gap-2 rounded-lg border bg-muted/50 p-3 font-sans text-muted-foreground text-xs">
 					<Info className="mt-0.5 h-4 w-4 shrink-0" />

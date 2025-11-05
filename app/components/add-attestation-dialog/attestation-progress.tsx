@@ -47,7 +47,7 @@ const attestationProgressConfigs: Record<
 > = {
 	INITIALIZING: {
 		title: "Initializing",
-		description: "Checking for pre-requisites...",
+		description: "Checking for pre-requisites",
 		errorState: {
 			title: "Unable to process your request",
 			description:
@@ -56,7 +56,7 @@ const attestationProgressConfigs: Record<
 	},
 	PREPARING: {
 		title: "Preparing",
-		description: "Preparing to attest...",
+		description: "Preparing to attest",
 		errorState: {
 			title: "Unable to process your request",
 			description:
@@ -65,7 +65,7 @@ const attestationProgressConfigs: Record<
 	},
 	WAITING_TO_SIGN: {
 		title: "Waiting for signature",
-		description: "Please sign the transaction to create your attestation...",
+		description: "Please sign the transaction to create your attestation.",
 		errorState: {
 			title: "Rejected",
 			description: "The transaction was rejected.",
@@ -73,7 +73,7 @@ const attestationProgressConfigs: Record<
 	},
 	WAITING_FOR_CONFIRMATION: {
 		title: "Waiting for confirmation",
-		description: "Waiting for the transaction to confirm...",
+		description: "Waiting for the transaction to confirm",
 		errorState: {
 			title: "Unable to attest",
 			description: "The transaction could not be confirmed. Please try again.",

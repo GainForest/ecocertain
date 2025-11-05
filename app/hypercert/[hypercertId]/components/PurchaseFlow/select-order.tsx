@@ -2,10 +2,9 @@
 
 import { useModal } from "@/components/ui/modal/context";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
-import { formatCurrency } from "@/lib/utils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { CheckCircle, CheckCircle2, Circle, CircleAlert } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Circle, CircleAlert } from "lucide-react";
+import { useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "../../../../../components/ui/button";
 import {
@@ -22,7 +21,7 @@ import { getCurrencyFromAddress } from "./utils/getCurrencyFromAddress";
 const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 	const { address, chainId } = useAccount();
 	const { open } = useWeb3Modal();
-	const { hide, pushModalByVariant } = useModal();
+	const { hide, pushModalByVariant, stack: modalStack } = useModal();
 
 	const setHypercert = usePurchaseFlowStore((state) => state.setHypercert);
 	// biome-ignore lint/correctness/useExhaustiveDependencies(setHypercert): setHypercert should not be a trigger for this side effect.
@@ -45,10 +44,13 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 	);
 
 	const handleOrderSelect = (order: FullHypercert["orders"][number]) => {
+		console.log(order, "ORDER");
 		setSelectedOrder(order);
 	};
 
 	const handleContinue = () => {
+		// Prevent duplicate modals triggered by chain switch during swap
+		if (modalStack.includes("purchase-flow-select-amount")) return;
 		pushModalByVariant({
 			id: "purchase-flow-select-amount",
 			content: <SelectAmount />,
@@ -104,7 +106,7 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 				{address &&
 					(validOrdersOnCurrentChain.length === 0 ? (
 						<div className="flex flex-col items-center rounded-xl bg-muted p-4 py-8 text-muted-foreground text-sm">
-							No orders found on this chain...
+							No orders found on this chain :{"("}
 						</div>
 					) : (
 						<div className="flex flex-col gap-3">

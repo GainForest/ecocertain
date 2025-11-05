@@ -72,7 +72,7 @@ export function reviewSubmissionReducer(
 				...state,
 				status: {
 					type: "signing",
-					label: "Please sign the transaction and wait for confirmation...",
+					label: "Please sign the transaction and wait for confirmation.",
 				},
 			};
 

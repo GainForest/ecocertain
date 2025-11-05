@@ -30,49 +30,55 @@ type Step = {
 
 export const PAYMENT_PROGRESS_STEPS: Step[] = [
 	{
-		title: "Initializing...",
-		description: "Starting the payment process...",
+		title: "Initializing",
+		description: "Starting the payment process.",
 		Icon: Flame,
 		index: 0,
 	},
 	{
-		title: "Preparing...",
-		description: "Please wait while we gather some necessary information...",
+		title: "Preparing",
+		description: "Please wait while we gather some necessary information.",
 		Icon: ChefHat,
 		index: 1,
 	},
 	{
-		title: "Approve spending cap...",
+		title: "Approve spending cap",
 		description:
 			"Please approve the spending cap for the transaction. This doesn't cost you anything.",
 		Icon: FileSignature,
 		index: 2,
 	},
 	{
-		title: "Sign the transaction",
-		description: "Waiting for you to sign the transaction...",
-		Icon: BadgeDollarSign,
+		title: "Waiting for approval",
+		description: "Please wait while the approval is confirmed...",
+		Icon: Hourglass,
 		index: 3,
 	},
 	{
-		title: "Waiting for confirmation",
-		description: "Please wait while the transaction is confirmed...",
-		Icon: Hourglass,
+		title: "Sign the transaction",
+		description: "Waiting for you to sign the transaction.",
+		Icon: BadgeDollarSign,
 		index: 4,
+	},
+	{
+		title: "Waiting for confirmation",
+		description: "Please wait while the transaction is confirmed.",
+		Icon: Hourglass,
+		index: 5,
 	},
 	{
 		title: "Pay the platform fee",
 		description: `Please sign the platform fee transaction worth ${formatEther(
 			GAINFOREST_TIP_AMOUNT,
-		)} CELO...`,
+		)} CELO.`,
 		Icon: FileSignature,
-		index: 5,
+		index: 6,
 	},
 	{
-		title: "Order completed...",
-		description: "Your order has been completed successfully...",
+		title: "Order completed",
+		description: "Your order has been completed successfully.",
 		Icon: CheckCircle,
-		index: 6,
+		index: 7,
 	},
 ];
 
@@ -132,19 +138,20 @@ const usePaymentProgressStore = create<
 				console.error("Error fetching orders:", ordersFetchError);
 				return;
 			}
+			console.log("Hypercert Exchange Client for debugging:", hcExchangeClient);
 
 			// =========== STEP 2
 			set({ currentStepIndex: 2 });
 			errorTitle = "Approval not confirmed";
 			errorDescription = "The spending cap could not be approved.";
-			const tokensToPayInWei = unitsToBuy * BigInt(order.price);
-			const [, approveTxError] = await tryCatch(() =>
+			// We approve more than we need to avoid issues with some arithmetics while executing the order
+			const tokensToApproveInWei = unitsToBuy * BigInt(order.price);
+			const [approveTx, approveTxError] = await tryCatch(() =>
 				hcExchangeClient.approveErc20(
 					order.currency as `0x${string}`,
-					tokensToPayInWei,
+					tokensToApproveInWei,
 				),
 			);
-			console.log(unitsToBuy, order.price);
 			if (approveTxError) {
 				set({
 					status: "error",
@@ -156,6 +163,28 @@ const usePaymentProgressStore = create<
 
 			// =========== STEP 3
 			set({ currentStepIndex: 3 });
+			const [approveTxReceipt, approveTxReceiptError] = await tryCatch(() =>
+				approveTx.wait(),
+			);
+			if (approveTxReceiptError) {
+				set({
+					status: "error",
+					errorState: { title: errorTitle, description: errorDescription },
+				});
+				console.error("Error getting approval receipt:", approveTxReceiptError);
+				return;
+			}
+			if (approveTxReceipt?.status !== 1) {
+				set({
+					status: "error",
+					errorState: { title: errorTitle, description: errorDescription },
+				});
+				console.error("Error approving spending cap:", approveTxReceipt);
+				return;
+			}
+
+			// =========== STEP 4
+			set({ currentStepIndex: 4 });
 			errorTitle = "Transaction rejected";
 			errorDescription = "The transaction was rejected.";
 			const takerOrder = hcExchangeClient.createFractionalSaleTakerBid(
@@ -167,7 +196,7 @@ const usePaymentProgressStore = create<
 			const overrides =
 				order.currency === "0x0000000000000000000000000000000000000000"
 					? {
-							value: tokensToPayInWei,
+							value: tokensToApproveInWei,
 					  }
 					: undefined;
 			const [executeTx, executeTxError] = await tryCatch(() =>
@@ -194,8 +223,8 @@ const usePaymentProgressStore = create<
 				return;
 			}
 
-			// =========== STEP 4
-			set({ currentStepIndex: 4 });
+			// =========== STEP 5
+			set({ currentStepIndex: 5 });
 			errorTitle = "Transaction not confirmed";
 			errorDescription = "The transaction could not be confirmed.";
 			const [receipt, receiptError] = await tryCatch(() => executeTx.wait());
@@ -208,8 +237,8 @@ const usePaymentProgressStore = create<
 				return;
 			}
 
-			// =========== STEP 5
-			set({ currentStepIndex: 5 });
+			// =========== STEP 6
+			set({ currentStepIndex: 6 });
 			const [, tipTxError] = await tryCatch(async () => {
 				const walletClient = createWalletClient({
 					chain: celo,
@@ -236,8 +265,8 @@ const usePaymentProgressStore = create<
 				console.error("Tipping error:", tipTxError);
 			}
 
-			// =========== STEP 6
-			set({ currentStepIndex: 6 });
+			// =========== STEP 7
+			set({ currentStepIndex: 7 });
 			set({ status: "success" });
 		},
 		reset: () => {

@@ -131,18 +131,6 @@ export const fetchHypercertById = async (
     };
   });
 
-  // ADD UNINDEXED SALES:
-  if (
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-33347671958251969419410711528313284722688" ||
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-35389366159777600200190959172903893991424"
-  ) {
-    parsedSales.push({
-      currency: "0x471EcE3750Da237f93B8E339c536989b8978a438", // CELO,
-      currencyAmount: BigInt(2175 * 10 ** 18),
-    });
-  }
   return {
     hypercertId,
     creatorAddress: hypercert.creator_address as string,
@@ -417,24 +405,6 @@ export const fetchFullHypercertById = async (
       };
     })
     .filter((attestation) => attestation !== null);
-
-  // ADD UNINDEXED SALES:
-  if (
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-33347671958251969419410711528313284722688" ||
-    hypercertId ===
-      "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-35389366159777600200190959172903893991424"
-  ) {
-    parsedSales.push({
-      unitsBought: 108750000000000000n,
-      buyer: "0xCe10d577295d34782815919843a3a4ef70Dc33ce",
-      creationBlockTimestamp: 1743699409n,
-      transactionHash:
-        "0xb596d456c3c84beb1d2d80f49b1898fae9511cd0eb7d420ba63a4868924f45c3",
-      currency: "0x471EcE3750Da237f93B8E339c536989b8978a438", // CELO,
-      currencyAmount: BigInt(2175 * 10 ** 18),
-    });
-  }
 
   const fullHypercert = {
     hypercertId,
