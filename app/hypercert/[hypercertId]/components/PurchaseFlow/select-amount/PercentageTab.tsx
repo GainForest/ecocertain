@@ -58,7 +58,11 @@ const PercentageTab = ({
 					type="text"
 					value={percentageInput}
 					onChange={(e) => {
-						const value = e.target.value.replace(/[^0-9.]/g, "");
+						const value = e.target.value;
+						// regex that allows only digits and at most one decimal point
+						if (!/^\d*\.?\d*$/.test(value)) {
+							return;
+						}
 						const parsed = Number.parseFloat(value);
 						if (parsed < 0 || parsed > 100) {
 							return;

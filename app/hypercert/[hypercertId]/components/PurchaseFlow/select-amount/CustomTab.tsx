@@ -148,7 +148,11 @@ const CustomTab = ({
 					value={customInputMode === "currency" ? currencyInput : usdInput}
 					onChange={(e) => {
 						// sometimes based on locale/browser settings the decimal separator is a comma so we have text.
-						const value = e.target.value.replace(/[^0-9.]/g, "");
+						const value = e.target.value;
+						// regex that allows only digits and at most one decimal point
+						if (!/^\d*\.?\d*$/.test(value)) {
+							return;
+						}
 						const parsed = Number.parseFloat(value);
 						let units: bigint | null = null;
 						if (customInputMode === "currency") {
