@@ -55,13 +55,19 @@ const PercentageTab = ({
 			<div className="relative w-full">
 				<Input
 					className="border-transparent border-b-border bg-background"
-					type="number"
-					min={0}
-					max={100}
+					type="text"
 					value={percentageInput}
 					onChange={(e) => {
-						setPercentageInput(e.target.value.replace(",", "."));
-						const parsed = Number.parseFloat(e.target.value);
+						const value = e.target.value;
+						// regex that allows only digits and at most one decimal point
+						if (!/^\d*\.?\d*$/.test(value)) {
+							return;
+						}
+						const parsed = Number.parseFloat(value);
+						if (parsed < 0 || parsed > 100) {
+							return;
+						}
+						setPercentageInput(value);
 						if (Number.isNaN(parsed)) {
 							setAmountSelectedInUnits({
 								...amountSelectedInUnits,

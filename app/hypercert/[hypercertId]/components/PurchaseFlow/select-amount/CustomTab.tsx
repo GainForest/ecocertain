@@ -60,7 +60,9 @@ const CustomTab = ({
 			totalUnitsInOrder,
 		);
 	}, [selectedOrder, amountSelectedInUnits.custom, totalUnitsInOrder]);
-	const [currencyInput, setCurrencyInput] = useState(initialAmounts.token);
+	const [currencyInput, setCurrencyInput] = useState(
+		Number(initialAmounts.token).toFixed(2),
+	);
 	const [usdInput, setUsdInput] = useState(initialAmounts.usd);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(setAmountSelectedInUnits): setAmountSelectedInUnits should not be a trigger for this side effect.
@@ -129,7 +131,7 @@ const CustomTab = ({
 			const parsed = Number.parseFloat(usdInput);
 			if (!Number.isNaN(parsed)) {
 				const token = (parsed / pricePerPercentInUSD) * pricePerPercentInToken;
-				setCurrencyInput(token.toFixed(4));
+				setCurrencyInput(token.toFixed(2));
 			} else {
 				setCurrencyInput("");
 			}
@@ -142,13 +144,15 @@ const CustomTab = ({
 			<div className="relative w-full">
 				<Input
 					className="border-transparent border-b-border bg-background"
-					type="number"
-					lang="en-US"
-					min={0}
+					type="text"
 					value={customInputMode === "currency" ? currencyInput : usdInput}
 					onChange={(e) => {
-						// sometimes based on locale/browser settings the decimal separator is a comma.
-						const value = e.target.value.replace(",", ".");
+						// sometimes based on locale/browser settings the decimal separator is a comma so we have text.
+						const value = e.target.value;
+						// regex that allows only digits and at most one decimal point
+						if (!/^\d*\.?\d*$/.test(value)) {
+							return;
+						}
 						const parsed = Number.parseFloat(value);
 						let units: bigint | null = null;
 						if (customInputMode === "currency") {
