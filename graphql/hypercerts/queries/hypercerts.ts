@@ -80,6 +80,8 @@ export type Hypercert = {
   sales: {
     currency: string;
     currencyAmount: bigint; // in wei
+    buyer?: string;
+    creationBlockTimestamp?: bigint;
   }[];
   unitsForSale?: bigint;
   pricePerPercentInUSD?: number;
@@ -128,6 +130,9 @@ export const fetchHypercertById = async (
     return {
       currency: sale.currency,
       currencyAmount: typeCastApiResponseToBigInt(sale.currency_amount) ?? 0n,
+      buyer: sale.buyer ?? undefined,
+      creationBlockTimestamp:
+        typeCastApiResponseToBigInt(sale.creation_block_timestamp) ?? 0n,
     };
   });
 

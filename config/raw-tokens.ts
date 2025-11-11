@@ -1,4 +1,4 @@
-import { celo, sepolia } from "viem/chains";
+import { celo, optimism, sepolia } from "viem/chains";
 
 export type TokenConfig<Type = "raw" | "normalized"> = {
   symbol: string;
@@ -48,6 +48,26 @@ export const RAW_TOKENS_CONFIG: TokensConfig<"raw"> = {
       symbol: "USDC",
       address: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
       decimals: 6,
+    },
+    {
+      symbol: "USDGLO",
+      address: "0x4F604735c1cF31399C6E711D5962b2B3E0225AD3",
+      decimals: 18,
+      isUSDPegged: true,
+    },
+  ],
+  [optimism.id]: [
+    {
+      symbol: "USDC",
+      address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+      decimals: 6,
+      isUSDPegged: true,
+    },
+    {
+      symbol: "ETH",
+      address: "0x0000000000000000000000000000000000000000",
+      decimals: 18,
+      isUSDPegged: false,
     },
   ],
 };

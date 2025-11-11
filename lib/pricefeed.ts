@@ -1,26 +1,22 @@
+import { BASE_URL } from "@/config/endpoint";
 import { RAW_TOKENS_CONFIG } from "@/config/raw-tokens";
 
-const symbolToCurrencyAddressMap = new Map<string, `0x${string}`>();
-
+const currencyAddressToSymbolMap = new Map<`0x${string}`, string>();
 for (const chainId in RAW_TOKENS_CONFIG) {
   const tokens = RAW_TOKENS_CONFIG[chainId];
   for (const token of tokens) {
-    symbolToCurrencyAddressMap.set(
-      token.symbol,
-      token.address as `0x${string}`
+    currencyAddressToSymbolMap.set(
+      token.address.toLowerCase() as `0x${string}`,
+      token.symbol
     );
   }
 }
 
-const currencyAddressToSymbolMap = new Map<`0x${string}`, string>();
-symbolToCurrencyAddressMap.forEach((value, key) => {
-  currencyAddressToSymbolMap.set(value, key);
-});
-
 export { currencyAddressToSymbolMap };
 
 const currencyAddressToPriceFeedIdMap = new Map<string, number>([
-  [symbolToCurrencyAddressMap.get("CELO") ?? "", 5567],
+  ["0x471ece3750da237f93b8e339c536989b8978a438", 5567], // CELO
+  ["0x0000000000000000000000000000000000000000", 1027], // ETH (Optimism native)
 ]);
 
 type ApiResponse<Symbol extends string> = {
@@ -47,19 +43,21 @@ type ApiResponse<Symbol extends string> = {
 };
 
 const getPriceFeed = async (currencyAddress: `0x${string}`) => {
-  const normalizedCurrencyAddress = currencyAddress as `0x${string}`;
+  const normalizedCurrencyAddress = currencyAddress.toLowerCase();
   const priceFeedId = currencyAddressToPriceFeedIdMap.get(
     normalizedCurrencyAddress
   );
-  const symbol = currencyAddressToSymbolMap.get(normalizedCurrencyAddress);
+  const symbol = currencyAddressToSymbolMap.get(
+    normalizedCurrencyAddress as `0x${string}`
+  );
   if (!priceFeedId || !symbol) {
     return { usdPrice: null };
   }
 
-  let priceFeedApiUrl = `https://api.coinmarketcap.com/data-api/v3/tools/price-conversion?amount=1&convert_id=2781&id=${priceFeedId}`;
+  let priceFeedApiUrl = `/api/price-conversion?id=${priceFeedId}&amount=1&convert_id=2781`;
 
-  if (typeof window !== "undefined") {
-    priceFeedApiUrl = `/api/price-conversion?id=${priceFeedId}&amount=1&convert_id=2781`;
+  if (typeof window === "undefined") {
+    priceFeedApiUrl = `${BASE_URL}${priceFeedApiUrl}`;
   }
 
   const response = await fetch(priceFeedApiUrl);
