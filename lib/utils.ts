@@ -1,4 +1,4 @@
-import { currencyMap } from "@/config/wagmi";
+import { currencyMap } from "@/config/tokens";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Address } from "viem";

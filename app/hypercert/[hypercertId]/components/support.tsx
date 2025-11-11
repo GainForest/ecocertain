@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import EthAvatar from "@/components/ui/eth-avatar";
 import UserChip from "@/components/user-chip";
-import { TOKENS_CONFIG } from "@/config/wagmi";
+import { TOKENS_CONFIG } from "@/config/tokens";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { formatTokens } from "@/lib/format-tokens";
 import { tryCatch } from "@/lib/tryCatch";
