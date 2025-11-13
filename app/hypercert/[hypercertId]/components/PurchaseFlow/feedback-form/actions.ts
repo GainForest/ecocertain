@@ -12,7 +12,7 @@ export async function insertFeedback(feedback: InsertFeedbackPayload) {
 	if (!serviceKey) {
 		throw new Error("Supabase key not set");
 	}
-	const url = `${process.env.SUPABASE_URL}/purchase_feedback`;
+	const url = `${process.env.SUPABASE_URL}/rest/v1/purchase_feedback`;
 	await fetch(url, {
 		method: "POST",
 		headers: {
