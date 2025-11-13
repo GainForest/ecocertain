@@ -268,7 +268,7 @@ const PaymentProgressBody = ({
 					</Button>
 				)}
 				<Button
-					variant={"secondary"}
+					variant={status === "success" ? "default" : "secondary"}
 					onClick={() => {
 						if (status === "pending") {
 							hide();
