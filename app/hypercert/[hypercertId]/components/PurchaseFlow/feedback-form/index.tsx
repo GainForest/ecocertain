@@ -62,11 +62,11 @@ const FeedbackForm = () => {
 	return (
 		<form onSubmit={handleSubmit}>
 			<ModalContent dismissible={false} className="flex flex-col gap-4">
-				<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-2">
 					<ModalHeader>
 						<ModalTitle>We'd love your feedback!</ModalTitle>{" "}
 						<ModalDescription className="text-sm">
-							How would you rate your experience?
+							Rate your experience donating to an ecocert!
 						</ModalDescription>
 					</ModalHeader>
 					<div className="flex gap-2">
@@ -97,7 +97,8 @@ const FeedbackForm = () => {
 						htmlFor="feedback"
 						className="font-medium text-slate-700 text-sm"
 					>
-						Additional comments (optional)
+						Tell us more! Do you have any feedback or suggestions to improve our
+						app?
 					</label>
 					<Textarea
 						id="feedback"
