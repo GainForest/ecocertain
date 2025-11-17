@@ -277,7 +277,7 @@ const PaymentProgressBody = ({
 						if (status === "success") {
 							pushModalByVariant({
 								id: "feedback-form",
-								content: <FeedbackForm />,
+								content: <FeedbackForm subject={"donation"} />,
 							});
 							return;
 						}

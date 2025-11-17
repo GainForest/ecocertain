@@ -14,7 +14,7 @@ import { Star } from "lucide-react";
 import { type FormEventHandler, useState } from "react";
 import { insertFeedback } from "./actions";
 
-const FeedbackForm = () => {
+const FeedbackForm = ({ subject }: { subject: "donation" | null }) => {
 	const [rating, setRating] = useState(0);
 	const [hoverRating, setHoverRating] = useState(0);
 	const [feedback, setFeedback] = useState("");
@@ -66,7 +66,9 @@ const FeedbackForm = () => {
 					<ModalHeader>
 						<ModalTitle>We'd love your feedback!</ModalTitle>{" "}
 						<ModalDescription className="text-sm">
-							Rate your experience donating to an ecocert!
+							{subject === "donation"
+								? "Rate your experience donating to the ecocert."
+								: "Rate your experience using our app."}
 						</ModalDescription>
 					</ModalHeader>
 					<div className="flex gap-2">
@@ -129,7 +131,7 @@ const FeedbackForm = () => {
 					variant={"secondary"}
 					onClick={clearModal}
 				>
-					Skip 😢
+					{subject === "donation" ? "Skip 😢" : "Close"}
 				</Button>
 			</ModalFooter>
 		</form>
