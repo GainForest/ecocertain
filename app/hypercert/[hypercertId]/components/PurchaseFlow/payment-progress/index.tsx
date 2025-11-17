@@ -21,6 +21,7 @@ import { CircleAlert, RefreshCcw } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import FeedbackForm from "../feedback-form";
 import usePurchaseFlowStore from "../store";
 import usePaymentProgressStore, { PAYMENT_PROGRESS_STEPS } from "./store";
 
@@ -116,7 +117,7 @@ const PaymentProgressBody = ({
 	const { status, errorState, currentStepIndex, start, reset } =
 		usePaymentProgressStore();
 
-	const { hide, popModal, clear } = useModal();
+	const { hide, popModal, clear, pushModalByVariant } = useModal();
 
 	const handleStart = useCallback(() => {
 		start(
@@ -146,6 +147,16 @@ const PaymentProgressBody = ({
 		if (currentStepIndex !== 0 || status !== "pending") return;
 		handleStart();
 	}, [currentStepIndex, status, handleStart]);
+
+	const getButtonLabel = () => {
+		if (status === "success") {
+			return "Next";
+		}
+		if (status === "pending") {
+			return "Continue in background";
+		}
+		return "Close";
+	};
 
 	return (
 		<>
@@ -257,15 +268,24 @@ const PaymentProgressBody = ({
 					</Button>
 				)}
 				<Button
-					variant={"secondary"}
+					variant={status === "success" ? "default" : "secondary"}
 					onClick={() => {
-						hide();
-						if (status === "success") {
-							clear();
+						if (status === "pending") {
+							hide();
+							return;
 						}
+						if (status === "success") {
+							pushModalByVariant({
+								id: "feedback-form",
+								content: <FeedbackForm subject={"donation"} />,
+							});
+							return;
+						}
+						hide();
+						clear();
 					}}
 				>
-					{status === "pending" ? "Continue in background" : "Close"}
+					{getButtonLabel()}
 				</Button>
 			</ModalFooter>
 		</>

@@ -1,7 +1,10 @@
+import { Button } from "@/components/ui/button";
 import InfoBox from "@/components/ui/info-box";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
+import FeedbackButton from "./components/FeedbackButton";
 import HeroSection from "./components/hero-section";
 import HeroTitle from "./components/hero-title";
 import { HypercertsGridWrapper } from "./components/hypercerts-grid-view";
@@ -10,26 +13,21 @@ import PageError from "./components/shared/PageError";
 export default async function Home() {
 	return (
 		<main className="flex flex-col gap-4 pb-[64px] md:pb-0">
-			{/* <div className="flex items-center justify-center">
+			<div className="mt-6 flex items-center justify-center">
 				<InfoBox variant="success" className="max-w-4xl">
-					<span className="text-base">⚠️</span>
+					{/* <span className="text-base">⚠️</span>
 					<p className="text-sm">
 						<b>Service notice:</b> Stablecoin purchases on Ecocertain are down.
 						We're working on a fix.
-					</p>
-					<span className="text-base">🎉</span>
+					</p> */}
+					<span className="text-base">💬</span>
 					<p className="text-green-800 text-sm">
-						<b>Announcement:</b> Ecocertain Reward Round 0 has ended! Payouts
-						are currently being calculated.{" "}
-						<a
-							href="https://gainforest.notion.site/Ecocertain-Rewards-Info-Page-21e94a2f76b3801582e9e84057ee16bc"
-							className="underline"
-						>
-							Learn more.
-						</a>
+						<b>We are building Ecocertain with you!</b> Tell us how we can
+						improve your experience.
+						<FeedbackButton />
 					</p>
 				</InfoBox>
-			</div> */}
+			</div>
 			<section className="flex flex-col items-center gap-4 p-8 pt-0">
 				<div className="flex w-full flex-col items-center px-4">
 					<HeroSection />
