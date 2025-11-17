@@ -39,6 +39,7 @@ export async function getFeedback({
 			Authorization: `Bearer ${serviceKey}`,
 			"Content-Type": "application/json",
 		},
+		cache: "no-store",
 	});
 
 	if (!res.ok) {
