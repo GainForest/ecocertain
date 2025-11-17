@@ -21,7 +21,7 @@ const FeedbackButton = () => {
 				show();
 			}}
 		>
-			Give Feedback
+			Send Feedback
 		</Button>
 	);
 };

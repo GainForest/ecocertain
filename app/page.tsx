@@ -20,10 +20,10 @@ export default async function Home() {
 						<b>Service notice:</b> Stablecoin purchases on Ecocertain are down.
 						We're working on a fix.
 					</p> */}
-					<span className="text-base">🎉</span>
+					<span className="text-base">💬</span>
 					<p className="text-green-800 text-sm">
-						<b>We would love to hear from you!</b> Give your feedback and
-						improve our platform.
+						<b>We are building Ecocertain with you!</b> Tell us how we can
+						improve your experience.
 						<FeedbackButton />
 					</p>
 				</InfoBox>
