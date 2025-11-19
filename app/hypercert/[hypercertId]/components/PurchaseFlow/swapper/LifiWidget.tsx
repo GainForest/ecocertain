@@ -139,6 +139,7 @@ export default function Widget({ toToken }: WidgetProps) {
 					</ClientOnly>
 				</div>
 			</ModalContent>
+			{/* Quick fix: should probably use env-safe-area-inset-bottom in order to not have issues with bottom address bar */}
 			<div className="h-12 w-full lg:h-0" />
 		</>
 	);
