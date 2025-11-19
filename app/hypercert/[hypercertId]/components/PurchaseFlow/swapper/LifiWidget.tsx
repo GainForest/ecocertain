@@ -115,28 +115,31 @@ export default function Widget({ toToken }: WidgetProps) {
 	}, [switchAndPop, widgetEvents]);
 
 	return (
-		<ModalContent dismissible={false} className="font-sans">
-			<ModalHeader className="flex items-center gap-4">
-				<Button
-					variant={"secondary"}
-					size={"sm"}
-					className="h-6 w-6 rounded-full p-0.5"
-					onClick={switchAndPop}
-				>
-					<ChevronLeft />
-				</Button>
-				<div>
-					<ModalTitle>Swap Tokens</ModalTitle>
-					<ModalDescription>
-						Swap your tokens into the ecocert currency.
-					</ModalDescription>
+		<>
+			<ModalContent dismissible={false} className="font-sans">
+				<ModalHeader className="flex items-center gap-4">
+					<Button
+						variant={"secondary"}
+						size={"sm"}
+						className="h-6 w-6 rounded-full p-0.5"
+						onClick={switchAndPop}
+					>
+						<ChevronLeft />
+					</Button>
+					<div>
+						<ModalTitle>Swap Tokens</ModalTitle>
+						<ModalDescription>
+							Swap your tokens into the ecocert currency.
+						</ModalDescription>
+					</div>
+				</ModalHeader>
+				<div className="mt-4">
+					<ClientOnly fallback={<WidgetSkeleton config={config} />}>
+						<LiFiWidget config={config} integrator="gainforest" />
+					</ClientOnly>
 				</div>
-			</ModalHeader>
-			<div className="mt-4">
-				<ClientOnly fallback={<WidgetSkeleton config={config} />}>
-					<LiFiWidget config={config} integrator="gainforest" />
-				</ClientOnly>
-			</div>
-		</ModalContent>
+			</ModalContent>
+			<div className="h-12 w-full lg:h-0" />
+		</>
 	);
 }
