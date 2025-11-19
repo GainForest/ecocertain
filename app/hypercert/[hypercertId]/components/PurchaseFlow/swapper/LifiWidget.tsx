@@ -41,6 +41,7 @@ const LifiWidgetConfig: Partial<WidgetConfig> = {
 			borderRadius: "16px",
 			maxWidth: "340px",
 			minWidth: "340px",
+			paddingBottom: "24px",
 		},
 		palette: {
 			primary: {
@@ -144,6 +145,8 @@ export default function Widget({ toToken }: WidgetProps) {
 					</ClientOnly>
 				</div>
 			</ModalContent>
+			{/* added just for safety for now ( refactor most of this ) */}
+			<div className="h-12 w-full lg:h-0" />
 		</div>
 	);
 }
