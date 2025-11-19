@@ -98,7 +98,7 @@ const ModalStack = ({
 				dismissible={dismissible}
 			>
 				<DrawerPlaceholder
-					className="overflow-hidden"
+					className="h-auto"
 					onEscapeKeyDown={(e) => {
 						e.preventDefault();
 						dismissible && onOpenChange(false);
@@ -108,9 +108,11 @@ const ModalStack = ({
 						dismissible && onOpenChange(false);
 					}}
 				>
-					<AnimateChangeInHeight className="relative">
-						{children}
-					</AnimateChangeInHeight>
+					<div className="max-h-[90vh] overflow-y-auto">
+						<AnimateChangeInHeight className="relative">
+							{children}
+						</AnimateChangeInHeight>
+					</div>
 				</DrawerPlaceholder>
 			</Drawer>
 		);
@@ -176,6 +178,7 @@ export const ModalProvider = ({
 	const handleOpenChange = (open: boolean) => {
 		setIsOpen(open);
 	};
+
 	return (
 		<ModalContext.Provider
 			value={{
