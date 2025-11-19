@@ -115,7 +115,11 @@ export default function Widget({ toToken }: WidgetProps) {
 	}, [switchAndPop, widgetEvents]);
 
 	return (
-		<>
+		<div
+			style={{
+				paddingBottom: "env(safe-area-inset-bottom)",
+			}}
+		>
 			{/* pb for the address bar safety. TODO use env safe area inset bottom and test */}
 			<ModalContent dismissible={false} className="pb-10 font-sans lg:pb-0">
 				<ModalHeader className="flex items-center gap-4">
@@ -140,6 +144,6 @@ export default function Widget({ toToken }: WidgetProps) {
 					</ClientOnly>
 				</div>
 			</ModalContent>
-		</>
+		</div>
 	);
 }
