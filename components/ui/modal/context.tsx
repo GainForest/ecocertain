@@ -98,7 +98,7 @@ const ModalStack = ({
 				dismissible={dismissible}
 			>
 				<DrawerPlaceholder
-					className="overflow-hidden"
+					className="max-h-[calc(100vh-2rem)] overflow-y-auto"
 					onEscapeKeyDown={(e) => {
 						e.preventDefault();
 						dismissible && onOpenChange(false);
@@ -217,7 +217,7 @@ export const ModalProvider = ({
 								</DialogDescription>
 							</DialogHeader>
 						) : mode === "drawer" ? (
-							<DrawerHeader className="overflow-y-auto">
+							<DrawerHeader>
 								<DrawerTitle>
 									{typeof modalInfo.title === "string" ? (
 										modalInfo.title
