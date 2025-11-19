@@ -217,7 +217,7 @@ export const ModalProvider = ({
 								</DialogDescription>
 							</DialogHeader>
 						) : mode === "drawer" ? (
-							<DrawerHeader>
+							<DrawerHeader className="overflow-y-auto">
 								<DrawerTitle>
 									{typeof modalInfo.title === "string" ? (
 										modalInfo.title
