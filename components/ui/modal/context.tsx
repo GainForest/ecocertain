@@ -108,7 +108,7 @@ const ModalStack = ({
 						dismissible && onOpenChange(false);
 					}}
 				>
-					<div className="max-h-[75vh] overflow-y-auto">
+					<div className="max-h-[90vh] overflow-y-auto">
 						<AnimateChangeInHeight className="relative">
 							{children}
 						</AnimateChangeInHeight>
