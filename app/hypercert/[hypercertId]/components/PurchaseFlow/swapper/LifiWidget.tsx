@@ -116,7 +116,8 @@ export default function Widget({ toToken }: WidgetProps) {
 
 	return (
 		<>
-			<ModalContent dismissible={false} className="font-sans">
+			{/* pb for the address bar safety. TODO use env safe area inset bottom and test */}
+			<ModalContent dismissible={false} className="pb-10 font-sans lg:pb-0">
 				<ModalHeader className="flex items-center gap-4">
 					<Button
 						variant={"secondary"}
@@ -139,8 +140,6 @@ export default function Widget({ toToken }: WidgetProps) {
 					</ClientOnly>
 				</div>
 			</ModalContent>
-			{/* just for the bottom address bar quick fix. TODO: use env area bottom  inset and test properly after */}
-			<div className="h-12 w-full lg:h-0" />
 		</>
 	);
 }
