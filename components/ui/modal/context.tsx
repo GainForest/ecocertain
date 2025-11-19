@@ -179,9 +179,6 @@ export const ModalProvider = ({
 		setIsOpen(open);
 	};
 
-	useEffect(() => {
-		console.log("MODAL STACK", modalStack);
-	}, [modalStack]);
 	return (
 		<ModalContext.Provider
 			value={{
