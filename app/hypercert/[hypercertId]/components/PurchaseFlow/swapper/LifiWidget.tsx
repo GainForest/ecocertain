@@ -43,6 +43,7 @@ const LifiWidgetConfig: Partial<WidgetConfig> = {
 			borderRadius: "16px",
 			maxWidth: "340px",
 			minWidth: "340px",
+			paddingBottom: "24px",
 		},
 		palette: {
 			primary: {
@@ -175,28 +176,37 @@ export default function Widget({ toToken, hypercertId }: WidgetProps) {
 	}, [hypercertId, logEvent, switchAndPop, widgetEvents]);
 
 	return (
-		<ModalContent dismissible={false} className="font-sans">
-			<ModalHeader className="flex items-center gap-4">
-				<Button
-					variant={"secondary"}
-					size={"sm"}
-					className="h-6 w-6 rounded-full p-0.5"
-					onClick={switchAndPop}
-				>
-					<ChevronLeft />
-				</Button>
-				<div>
-					<ModalTitle>Swap Tokens</ModalTitle>
-					<ModalDescription>
-						Swap your tokens into the ecocert currency.
-					</ModalDescription>
+		<div
+			style={{
+				paddingBottom: "env(safe-area-inset-bottom)",
+			}}
+		>
+			{/* pb for the address bar safety. TODO use env safe area inset bottom and test */}
+			<ModalContent dismissible={false} className="pb-10 font-sans lg:pb-0">
+				<ModalHeader className="flex items-center gap-4">
+					<Button
+						variant={"secondary"}
+						size={"sm"}
+						className="h-6 w-6 rounded-full p-0.5"
+						onClick={switchAndPop}
+					>
+						<ChevronLeft />
+					</Button>
+					<div>
+						<ModalTitle>Swap Tokens</ModalTitle>
+						<ModalDescription>
+							Swap your tokens into the ecocert currency.
+						</ModalDescription>
+					</div>
+				</ModalHeader>
+				<div className="mt-4">
+					<ClientOnly fallback={<WidgetSkeleton config={config} />}>
+						<LiFiWidget config={config} integrator="gainforest" />
+					</ClientOnly>
 				</div>
-			</ModalHeader>
-			<div className="mt-4">
-				<ClientOnly fallback={<WidgetSkeleton config={config} />}>
-					<LiFiWidget config={config} integrator="gainforest" />
-				</ClientOnly>
-			</div>
-		</ModalContent>
+			</ModalContent>
+			{/* added just for safety for now ( refactor most of this ) */}
+			<div className="h-12 w-full lg:h-0" />
+		</div>
 	);
 }

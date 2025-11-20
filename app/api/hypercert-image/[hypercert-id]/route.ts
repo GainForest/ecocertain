@@ -18,7 +18,8 @@ export async function GET(
 
 	try {
 		const { contentType, buffer } = await getHypercertImage(hypercertId);
-		return new Response(new Uint8Array(buffer), {
+		const uint8Array = Uint8Array.from(buffer);
+		return new NextResponse(uint8Array, {
 			status: 200,
 			headers: {
 				"Content-Type": contentType,
