@@ -74,6 +74,7 @@ export type Hypercert = {
   hypercertId: string;
   creatorAddress: string;
   chainId?: string;
+  uri?: string;
   name?: string;
   description?: string;
   totalUnits: bigint;
@@ -140,6 +141,7 @@ export const fetchHypercertById = async (
     hypercertId,
     creatorAddress: hypercert.creator_address as string,
     chainId: (hypercert.contract?.chain_id as string) ?? undefined,
+    uri: hypercert.uri ?? undefined,
     name: hypercert.metadata?.name ?? undefined,
     description: hypercert.metadata?.description ?? undefined,
     totalUnits: typeCastApiResponseToBigInt(hypercert.units) ?? 0n,

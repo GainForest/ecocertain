@@ -2,6 +2,8 @@ import BigNumber from "bignumber.js";
 
 import { TOKENS_CONFIG } from "@/config/tokens";
 import { fetchHypercerts } from "@/graphql/hypercerts/queries/hypercerts";
+import { getGeoMetrics } from "@/lib/metrics/geo";
+import { getTelemetryMetrics } from "@/lib/metrics/telemetry";
 import { fetchAttestationCountByPeriod } from "@/graphql/hypercerts/queries/metrics";
 
 type TokenMeta = {
@@ -111,13 +113,19 @@ export type DashboardMetrics = {
 		volumeProgress: number;
 		transactionProgress: number;
 	};
+	geo: Awaited<ReturnType<typeof getGeoMetrics>>;
+	engagement: Awaited<ReturnType<typeof getTelemetryMetrics>>;
 };
 
 export const getDashboardMetrics = async (): Promise<DashboardMetrics> => {
 	const nowSeconds = toSeconds(new Date());
 	const monthStartSeconds = toSeconds(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
 
-	const hypercerts = await fetchHypercerts();
+	const [hypercerts, geoMetrics, telemetryMetrics] = await Promise.all([
+		fetchHypercerts(),
+		getGeoMetrics(),
+		getTelemetryMetrics(),
+	]);
 	const allSales = flattenSales(hypercerts);
 	const monthlySales = allSales.filter(
 		(sale) => Number(sale.timestamp ?? 0n) >= monthStartSeconds,
@@ -199,5 +207,7 @@ export const getDashboardMetrics = async (): Promise<DashboardMetrics> => {
 			volumeProgress,
 			transactionProgress,
 		},
+		geo: geoMetrics,
+		engagement: telemetryMetrics,
 	};
 };

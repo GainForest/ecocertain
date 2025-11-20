@@ -10,6 +10,7 @@ export const hypercert = `
           name
           description
         }
+        uri
         orders {
           totalUnitsForSale
           cheapestOrder {

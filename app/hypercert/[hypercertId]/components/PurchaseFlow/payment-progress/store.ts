@@ -89,6 +89,11 @@ type PaymentProgressState = {
 		title: string;
 		description: string;
 	} | null;
+	transactionHashes: {
+		approve?: string;
+		purchase?: string;
+		tip?: string;
+	};
 };
 
 type PaymentProgressActions = {
@@ -109,6 +114,7 @@ const usePaymentProgressStore = create<
 		currentStepIndex: 0,
 		status: "pending",
 		errorState: null,
+		transactionHashes: {},
 		start: async (
 			hcExchangeClient,
 			hypercertId,
@@ -160,6 +166,13 @@ const usePaymentProgressStore = create<
 				console.error("Error approving spending cap:", approveTxError);
 				return;
 			}
+
+			set((state) => ({
+				transactionHashes: {
+					...state.transactionHashes,
+					approve: approveTx.hash,
+				},
+			}));
 
 			// =========== STEP 3
 			set({ currentStepIndex: 3 });
@@ -223,6 +236,13 @@ const usePaymentProgressStore = create<
 				return;
 			}
 
+			set((state) => ({
+				transactionHashes: {
+					...state.transactionHashes,
+					purchase: executeTx.hash,
+				},
+			}));
+
 			// =========== STEP 5
 			set({ currentStepIndex: 5 });
 			errorTitle = "Transaction not confirmed";
@@ -239,7 +259,7 @@ const usePaymentProgressStore = create<
 
 			// =========== STEP 6
 			set({ currentStepIndex: 6 });
-			const [, tipTxError] = await tryCatch(async () => {
+			const [tipTxHash, tipTxError] = await tryCatch(async () => {
 				const walletClient = createWalletClient({
 					chain: celo,
 					transport: custom(
@@ -259,10 +279,17 @@ const usePaymentProgressStore = create<
 					txHash: txhash as `0x${string}`,
 					chainId: celo.id,
 				});
-				return new Promise<boolean>((res) => res(true));
+				return txhash;
 			});
 			if (tipTxError) {
 				console.error("Tipping error:", tipTxError);
+			} else if (tipTxHash) {
+				set((state) => ({
+					transactionHashes: {
+						...state.transactionHashes,
+						tip: tipTxHash,
+					},
+				}));
 			}
 
 			// =========== STEP 7
@@ -274,6 +301,7 @@ const usePaymentProgressStore = create<
 				currentStepIndex: 0,
 				status: "pending",
 				errorState: null,
+				transactionHashes: {},
 			} satisfies PaymentProgressState);
 		},
 	};

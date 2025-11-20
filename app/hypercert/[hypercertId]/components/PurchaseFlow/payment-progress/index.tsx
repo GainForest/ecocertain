@@ -1,3 +1,5 @@
+"use client";
+
 import ErrorModalBody from "@/components/modals/error-body";
 import { useHypercertExchangeClient } from "@/components/providers/HypercertExchangeClientProvider";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,7 @@ import {
 	ModalHeader,
 	ModalTitle,
 } from "@/components/ui/modal/modal";
+import { useTelemetry } from "@/contexts/telemetry";
 import type { FullHypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import { cn } from "@/lib/utils";
 import type {
@@ -19,7 +22,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { motion } from "framer-motion";
 import { CircleAlert, RefreshCcw } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import usePurchaseFlowStore from "../store";
 import usePaymentProgressStore, { PAYMENT_PROGRESS_STEPS } from "./store";
@@ -113,10 +116,127 @@ const PaymentProgressBody = ({
 	unitsToPurchase: bigint;
 	hypercertExchangeClient: HypercertExchangeClient;
 }) => {
-	const { status, errorState, currentStepIndex, start, reset } =
-		usePaymentProgressStore();
+	const {
+		status,
+		errorState,
+		currentStepIndex,
+		transactionHashes,
+		start,
+		reset,
+	} = usePaymentProgressStore();
 
 	const { hide, popModal, clear } = useModal();
+	const { logEvent } = useTelemetry();
+	const flowIdRef = useRef<string>();
+	const previousStepRef = useRef<number | null>(null);
+
+	if (!flowIdRef.current) {
+		flowIdRef.current =
+			typeof crypto !== "undefined" && "randomUUID" in crypto
+				? crypto.randomUUID()
+				: `${Date.now()}-${Math.random()}`;
+	}
+
+	const emitPaymentEvent = useCallback(
+		(
+			statusOverride?: "in_progress" | "completed" | "error",
+			txHash?: string,
+		) => {
+			const step = PAYMENT_PROGRESS_STEPS[currentStepIndex];
+			void logEvent({
+				type: "payment_flow",
+				hypercertId: hypercert.hypercertId,
+				orderId: selectedOrder.id,
+				stepIndex: currentStepIndex,
+				stepName: step?.title ?? `step-${currentStepIndex}`,
+				status:
+					statusOverride ??
+					(status === "success"
+						? "completed"
+						: status === "error"
+						  ? "error"
+						  : "in_progress"),
+				txHash,
+				context: {
+					flowId: flowIdRef.current,
+					error: errorState,
+					units: unitsToPurchase.toString(),
+				},
+			});
+		},
+		[
+			currentStepIndex,
+			errorState,
+			hypercert.hypercertId,
+			logEvent,
+			selectedOrder.id,
+			status,
+			unitsToPurchase,
+		],
+	);
+
+	useEffect(() => {
+		if (previousStepRef.current === currentStepIndex) return;
+
+		if (
+			previousStepRef.current !== null &&
+			previousStepRef.current < currentStepIndex
+		) {
+			const prevStep = PAYMENT_PROGRESS_STEPS[previousStepRef.current];
+			let txHash: string | undefined;
+			if (previousStepRef.current === 2 || previousStepRef.current === 3) {
+				txHash = transactionHashes.approve;
+			} else if (
+				previousStepRef.current === 4 ||
+				previousStepRef.current === 5
+			) {
+				txHash = transactionHashes.purchase;
+			} else if (previousStepRef.current === 6) {
+				txHash = transactionHashes.tip;
+			}
+
+			void logEvent({
+				type: "payment_flow",
+				hypercertId: hypercert.hypercertId,
+				orderId: selectedOrder.id,
+				stepIndex: previousStepRef.current,
+				stepName: prevStep?.title ?? `step-${previousStepRef.current}`,
+				status: "completed",
+				txHash,
+				context: {
+					flowId: flowIdRef.current,
+					error: null,
+					units: unitsToPurchase.toString(),
+				},
+			});
+		}
+
+		previousStepRef.current = currentStepIndex;
+
+		const isFinalStep = currentStepIndex === PAYMENT_PROGRESS_STEPS.length - 1;
+		if (!isFinalStep) {
+			void emitPaymentEvent("in_progress");
+		}
+	}, [
+		currentStepIndex,
+		emitPaymentEvent,
+		hypercert.hypercertId,
+		logEvent,
+		selectedOrder.id,
+		transactionHashes.approve,
+		transactionHashes.purchase,
+		transactionHashes.tip,
+		unitsToPurchase,
+	]);
+
+	useEffect(() => {
+		if (status === "success") {
+			void emitPaymentEvent("completed");
+		}
+		if (status === "error") {
+			void emitPaymentEvent("error");
+		}
+	}, [emitPaymentEvent, status]);
 
 	const handleStart = useCallback(() => {
 		start(

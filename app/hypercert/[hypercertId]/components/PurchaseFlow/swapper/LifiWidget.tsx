@@ -8,6 +8,7 @@ import {
 	ModalHeader,
 	ModalTitle,
 } from "@/components/ui/modal/modal";
+import { useTelemetry } from "@/contexts/telemetry";
 import type { Route, WidgetConfig } from "@lifi/widget";
 import {
 	LiFiWidget,
@@ -16,7 +17,7 @@ import {
 	useWidgetEvents,
 } from "@lifi/widget";
 import { ChevronLeft } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import {
 	arbitrum,
@@ -31,6 +32,7 @@ import { ClientOnly } from "./ClientOnly";
 
 export interface WidgetProps {
 	toToken: string;
+	hypercertId: string;
 }
 
 const LifiWidgetConfig: Partial<WidgetConfig> = {
@@ -87,11 +89,13 @@ const LifiWidgetConfig: Partial<WidgetConfig> = {
 	disabledUI: ["toAddress"],
 };
 
-export default function Widget({ toToken }: WidgetProps) {
+export default function Widget({ toToken, hypercertId }: WidgetProps) {
 	const widgetEvents = useWidgetEvents();
 	const { switchChainAsync } = useSwitchChain();
 	const config = { ...LifiWidgetConfig, toToken } as Partial<WidgetConfig>;
 	const { popModal } = useModal();
+	const { logEvent } = useTelemetry();
+	const swapStartRef = useRef<number | null>(null);
 
 	const switchAndPop = useCallback(async () => {
 		await switchChainAsync(
@@ -105,14 +109,70 @@ export default function Widget({ toToken }: WidgetProps) {
 	}, [switchChainAsync, popModal]);
 
 	useEffect(() => {
-		const onCompleted = async (route: Route) => {
-			toast.success("Swap completed successfully");
-			switchAndPop();
+		const parseUsd = (value?: string | number | null) => {
+			if (value === undefined || value === null) return undefined;
+			const numericValue = typeof value === "number" ? value : Number(value);
+			return Number.isFinite(numericValue) ? numericValue : undefined;
 		};
 
+		const buildPayload = (route?: Route) => ({
+			routeId: route?.id,
+			fromChainId: route?.fromChainId,
+			toChainId: route?.toChainId,
+			fromToken: route?.fromToken?.address ?? route?.fromToken?.symbol,
+			toToken: route?.toToken?.address ?? route?.toToken?.symbol,
+			amountIn: parseUsd(route?.fromAmountUSD),
+			amountOut: parseUsd(route?.toAmountUSD),
+		});
+
+		const onStarted = (route: Route) => {
+			swapStartRef.current = performance.now();
+			void logEvent({
+				type: "lifi_swap",
+				event: "route_started",
+				hypercertId,
+				...buildPayload(route),
+			});
+		};
+
+		const onCompleted = async (route: Route) => {
+			const durationMs = swapStartRef.current
+				? Math.round(performance.now() - swapStartRef.current)
+				: undefined;
+			swapStartRef.current = null;
+			toast.success("Swap completed successfully");
+			void logEvent({
+				type: "lifi_swap",
+				event: "route_completed",
+				hypercertId,
+				durationMs,
+				...buildPayload(route),
+			});
+			await switchAndPop();
+		};
+
+		const onFailed = (payload: { route: Route; process?: unknown }) => {
+			const durationMs = swapStartRef.current
+				? Math.round(performance.now() - swapStartRef.current)
+				: undefined;
+			swapStartRef.current = null;
+			toast.error("Swap failed, please try again.");
+			void logEvent({
+				type: "lifi_swap",
+				event: "route_failed",
+				hypercertId,
+				durationMs,
+				errorLabel: undefined,
+				...buildPayload(payload.route),
+			});
+		};
+
+		widgetEvents.on(WidgetEvent.RouteExecutionStarted, onStarted);
 		widgetEvents.on(WidgetEvent.RouteExecutionCompleted, onCompleted);
+		widgetEvents.on(WidgetEvent.RouteExecutionFailed, onFailed);
+
 		return () => widgetEvents.all.clear();
-	}, [switchAndPop, widgetEvents]);
+	}, [hypercertId, logEvent, switchAndPop, widgetEvents]);
 
 	return (
 		<ModalContent dismissible={false} className="font-sans">

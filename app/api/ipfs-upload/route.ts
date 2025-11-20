@@ -1,6 +1,8 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 
+import { getServiceSupabaseClient } from "@/lib/supabase/server";
+
 export async function POST(request: Request) {
 	console.log("==================================");
 	const { PINATA_API_KEY, PINATA_API_SECRET } = process.env;
@@ -22,12 +24,11 @@ export async function POST(request: Request) {
 			);
 		}
 
+		const payload = new Blob([JSON.stringify(jsonFile)], {
+			type: "application/json",
+		});
 		const formData = new FormData();
-		formData.append(
-			"file",
-			new Blob([JSON.stringify(jsonFile)], { type: "application/json" }),
-			"data.json",
-		);
+		formData.append("file", payload, "data.json");
 
 		const pinataResponse = await axios.post(
 			"https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -48,9 +49,35 @@ export async function POST(request: Request) {
 		const cid = pinataResponse.data.IpfsHash;
 		const link = `ipfs://${cid}`;
 
+		const supabase = getServiceSupabaseClient();
+		await supabase.from("ipfs_upload_logs").insert({
+			session_id: request.headers.get("x-telemetry-session"),
+			wallet_address:
+				request.headers.get("x-wallet-address")?.toLowerCase() ?? null,
+			status: "success",
+			cid,
+			size_bytes: payload.size,
+			mime_type: "application/json",
+			occurred_at: new Date().toISOString(),
+		});
+
 		return NextResponse.json({ cid, link }, { status: 200 });
 	} catch (error) {
 		console.error("Error uploading file to Pinata:", error);
+		try {
+			const supabase = getServiceSupabaseClient();
+			await supabase.from("ipfs_upload_logs").insert({
+				session_id: request.headers.get("x-telemetry-session"),
+				wallet_address:
+					request.headers.get("x-wallet-address")?.toLowerCase() ?? null,
+				status: "error",
+				message:
+					error instanceof Error ? error.message : "Unknown upload failure",
+				occurred_at: new Date().toISOString(),
+			});
+		} catch (loggingError) {
+			console.warn("Failed to log IPFS upload failure", loggingError);
+		}
 		return NextResponse.json(
 			{ error: "Failed to upload file to Pinata" },
 			{ status: 500 },

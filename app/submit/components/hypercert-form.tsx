@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import MarkdownEditor from "@/components/ui/mdx-editor";
 import { BASE_URL } from "@/config/endpoint";
+import { useTelemetry } from "@/contexts/telemetry";
 import useMintHypercert from "@/hooks/use-mint-hypercert";
 import {
 	MDXEditor,
@@ -219,6 +220,17 @@ const HypercertForm = () => {
 	const [mintingFormValues, setMintingFormValues] =
 		useState<MintingFormValues>();
 	const [isMobileInfoExpanded, setIsMobileInfoExpanded] = useState(false);
+	const { logEvent } = useTelemetry();
+	const submissionIdRef = useRef<string>();
+	const loggedStartRef = useRef(false);
+	const validationErrorsRef = useRef<Set<string>>(new Set());
+
+	if (!submissionIdRef.current) {
+		submissionIdRef.current =
+			typeof crypto !== "undefined" && "randomUUID" in crypto
+				? crypto.randomUUID()
+				: `${Date.now()}-${Math.random()}`;
+	}
 
 	// Add refs for file inputs
 	const logoFileInputRef = useRef<HTMLInputElement>(null);
@@ -250,6 +262,43 @@ const HypercertForm = () => {
 	const tags = form.watch("tags") || "";
 	const geojsonValue = form.watch("geojson");
 	const areaActivity = form.getValues("areaActivity");
+
+	useEffect(() => {
+		if (loggedStartRef.current) return;
+		loggedStartRef.current = true;
+		void logEvent({
+			type: "form",
+			submissionId: submissionIdRef.current,
+			step: "hypercert_form",
+			status: "started",
+		});
+	}, [logEvent]);
+
+	useEffect(() => {
+		const errorEntries = Object.entries(form.formState.errors);
+		if (errorEntries.length === 0) {
+			validationErrorsRef.current = new Set();
+			return;
+		}
+		const seen = new Set(validationErrorsRef.current);
+		for (const [field, fieldError] of errorEntries) {
+			if (seen.has(field)) continue;
+			seen.add(field);
+			const errorMessage =
+				typeof fieldError === "object" && fieldError !== null
+					? // biome-ignore lint/suspicious/noExplicitAny: react-hook-form error typing
+					  (fieldError as any).message
+					: undefined;
+			void logEvent({
+				type: "form",
+				submissionId: submissionIdRef.current,
+				step: field,
+				status: "error",
+				context: errorMessage ? { message: errorMessage } : undefined,
+			});
+		}
+		validationErrorsRef.current = seen;
+	}, [form.formState.errors, logEvent]);
 
 	// Memoize the initialization function
 	const initializeFormFromUrl = useCallback(() => {
@@ -609,12 +658,19 @@ const HypercertForm = () => {
 					badges,
 					visible: isMintingProgressDialogVisible,
 					setVisible: setIsMintingProgressDialogVisible,
+					submissionId: submissionIdRef.current ?? "",
 				}}
 			/>
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit((values) => {
 						setMintingFormValues(values);
+						void logEvent({
+							type: "form",
+							submissionId: submissionIdRef.current,
+							step: "hypercert_form",
+							status: "completed",
+						});
 						setIsMintingProgressDialogVisible(true);
 					})}
 				>
