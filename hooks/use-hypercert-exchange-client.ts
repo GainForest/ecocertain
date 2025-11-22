@@ -39,6 +39,7 @@ export const useHypercertExchangeClient = () => {
 		} catch (e) {
 			console.error("Failed to create an exchange client", e);
 		}
+    return null
 	}, [walletClient, chainId, provider, signer]);
 
 	return { client };
