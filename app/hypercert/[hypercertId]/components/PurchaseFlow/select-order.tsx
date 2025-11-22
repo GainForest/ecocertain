@@ -107,6 +107,8 @@ const SelectOrder = ({ hypercert }: { hypercert: FullHypercert }) => {
 					(validOrdersOnCurrentChain.length === 0 ? (
 						<div className="flex flex-col items-center rounded-xl bg-muted p-4 py-8 text-muted-foreground text-sm">
 							No orders found on this chain :{"("}
+							<br />
+							Try switching to Celo or another chain
 						</div>
 					) : (
 						<div className="flex flex-col gap-3">

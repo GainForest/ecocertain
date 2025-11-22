@@ -1,11 +1,14 @@
 "use client";
 import { restEndpoint } from "@/config/hypercerts";
-import { SUPPORTED_CHAINS } from "@/config/wagmi";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
 import { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { useMemo } from "react";
+import { celo } from "viem/chains";
 import { useChainId, useWalletClient } from "wagmi";
+
+// different from wagmi config since wagmi config needs to consider for swaps
+const EXCHANGE_SUPPORTED_CHAINS = [celo]
 
 export const useHypercertExchangeClient = () => {
   const { data: walletClient } = useWalletClient();
@@ -15,7 +18,7 @@ export const useHypercertExchangeClient = () => {
 
   const client = useMemo(() => {
     if (
-      !SUPPORTED_CHAINS.find((chain) => chain.id === walletClient?.chain.id)
+      !EXCHANGE_SUPPORTED_CHAINS.find((chain) => chain.id === walletClient?.chain.id)
     ) {
       return null;
     }
