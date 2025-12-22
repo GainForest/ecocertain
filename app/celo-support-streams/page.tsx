@@ -6,8 +6,9 @@ import Link from "next/link";
 import RoundData from "./RoundData";
 
 const ROUND_0_START = 1742169600; // 17 March
-const TOTAL_ROUNDS = 12;
 const ROUND_DURATION = 2 * 7 * 24 * 60 * 60; // Two weeks
+const TOTAL_ROUNDS =
+	Math.floor(Date.now() / 1000 - ROUND_0_START) / ROUND_DURATION;
 
 const ROUNDS = Array.from({ length: TOTAL_ROUNDS }, (_, i) => ({
 	id: i,
