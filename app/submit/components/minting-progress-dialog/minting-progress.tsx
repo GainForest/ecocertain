@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { DIVVI_DATA_SUFFIX } from "@/config/divvi";
 import { GAINFOREST_TIP_ADDRESS, GAINFOREST_TIP_AMOUNT } from "@/config/tip";
+import { useTelemetry } from "@/contexts/telemetry";
 import { useHypercertClient } from "@/hooks/use-hypercerts-client";
 import { sendEmailAndUpdateGoogle } from "@/lib/sendEmailAndUpdateGoogle";
 import { cn } from "@/lib/utils";
@@ -149,6 +150,7 @@ const MintingProgress = ({
 	badges,
 	visible = false,
 	setVisible,
+	submissionId,
 }: {
 	mintingFormValues: MintingFormValues;
 	generateImage: () => Promise<string | undefined>;
@@ -156,6 +158,7 @@ const MintingProgress = ({
 	badges: string[];
 	visible?: boolean;
 	setVisible: (visible: boolean) => void;
+	submissionId: string;
 }) => {
 	const [configKey, setConfigKey] =
 		useState<MintingProgressConfigKey>("INITIALIZING");
@@ -166,6 +169,52 @@ const MintingProgress = ({
 	const { isConnected, address } = useAccount();
 	const { client } = useHypercertClient();
 	const publicClient = usePublicClient();
+	const { logEvent, sessionId } = useTelemetry();
+	const stageRef = useRef<MintingProgressConfigKey | null>(null);
+	const errorLoggedRef = useRef(false);
+
+	useEffect(() => {
+		if (!visible) return;
+		if (stageRef.current === configKey) return;
+		stageRef.current = configKey;
+		void logEvent({
+			type: "form",
+			submissionId,
+			step: `mint_${configKey.toLowerCase()}`,
+			status:
+				configKey === "COMPLETED"
+					? "completed"
+					: error
+					  ? "error"
+					  : "in_progress",
+			hypercertId: configKey === "COMPLETED" ? mintedHypercertId : undefined,
+			context: { userDidTip },
+		});
+	}, [
+		configKey,
+		error,
+		logEvent,
+		mintedHypercertId,
+		submissionId,
+		userDidTip,
+		visible,
+	]);
+
+	useEffect(() => {
+		if (!visible) return;
+		if (error && !errorLoggedRef.current) {
+			errorLoggedRef.current = true;
+			void logEvent({
+				type: "form",
+				submissionId,
+				step: `mint_${configKey.toLowerCase()}`,
+				status: "error",
+			});
+		}
+		if (!error) {
+			errorLoggedRef.current = false;
+		}
+	}, [configKey, error, logEvent, submissionId, visible]);
 
 	const startTransaction = async () => {
 		setError(false);
@@ -207,10 +256,20 @@ const MintingProgress = ({
 			return;
 		}
 
+		setConfigKey("UPLOADING_GEOJSON");
 		const [geoJSONipfsLink, geoJSONUploadError] = await catchError(async () => {
+			const headers: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			if (sessionId) {
+				headers["x-telemetry-session"] = sessionId;
+			}
+			if (address) {
+				headers["x-wallet-address"] = address;
+			}
 			const ipfsUploadResponse = await fetch("/api/ipfs-upload", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers,
 				body: JSON.stringify(geoJSONData),
 			});
 			const data = await ipfsUploadResponse.json();
@@ -222,6 +281,7 @@ const MintingProgress = ({
 		}
 
 		setConfigKey("GENERATING_METADATA");
+		await new Promise((resolve) => setTimeout(resolve, 50));
 
 		const metadata: HypercertMetadata = {
 			name: values.title,

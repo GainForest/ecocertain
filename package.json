@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint:ci": "biome ci ./app",
     "prepare": "node .husky/install.mjs",
-    "test": "bun jest"
+    "test": "bun jest",
+    "geo:enrich": "bunx tsx scripts/enrich-geo.ts"
   },
   "dependencies": {
     "@divvi/referral-sdk": "^1.0.0",

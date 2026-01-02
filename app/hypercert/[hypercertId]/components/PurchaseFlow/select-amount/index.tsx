@@ -19,13 +19,14 @@ import {
 } from "../../../../../../components/ui/modal/modal";
 import Paymentprogress from "../payment-progress";
 import usePurchaseFlowStore from "../store";
+import type { WidgetProps } from "../swapper/LifiWidget";
 import WidgetSkeleton from "../swapper/LifiWidgetSkeleton";
 import { calcUnitsFromTokens } from "../utils/calcUnitsFromTokens";
 import BasicTab from "./BasicTab";
 import CustomTab from "./CustomTab";
 import PercentageTab from "./PercentageTab";
 
-const Widget = dynamic(() => import("../swapper/LifiWidget"), {
+const Widget = dynamic<WidgetProps>(() => import("../swapper/LifiWidget"), {
 	loading: () => <WidgetSkeleton />,
 });
 
@@ -144,7 +145,12 @@ const SelectAmountBody = ({
 	const handleShowSwap = () => {
 		pushModalByVariant({
 			id: "swap-flow",
-			content: <Widget toToken={currency?.address || ""} />,
+			content: (
+				<Widget
+					toToken={currency?.address || ""}
+					hypercertId={hypercert.hypercertId}
+				/>
+			),
 		});
 	};
 

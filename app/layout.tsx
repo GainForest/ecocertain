@@ -1,19 +1,21 @@
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/react";
-import { cookieToInitialState } from "wagmi";
 
+import GdprBanner from "@/components/GdprBanner";
 import HypercertExchangeClientProvider from "@/components/providers/HypercertExchangeClientProvider";
+import TelemetryConsentGate from "@/components/telemetry/TelemetryConsentGate";
 import { ModalProvider } from "@/components/ui/modal/context";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import { config } from "@/config/wagmi";
+import { ConsentProvider } from "@/contexts/consent";
 import { WagmiContextProvider } from "@/contexts/wagmi";
 import { Libre_Baskerville } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { PriceFeedProvider } from "./PriceFeedProvider";
 import FarcasterProvider from "./components/FarcasterProvider";
 import Footer from "./components/Footer";
@@ -100,12 +102,13 @@ export const metadata: Metadata = {
 		description: siteConfig.description,
 		images: [{ url: "/opengraph-image.png", alt: siteConfig.name }],
 	},
-	viewport: {
-		width: "device-width",
-		initialScale: 1,
-		maximumScale: 1,
-		userScalable: false,
-	},
+};
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: false,
 };
 
 const frame = {
@@ -121,11 +124,13 @@ const frame = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const cookieStore = await cookies();
+	const consentCookie = cookieStore.get("gdpr_consent")?.value === "true";
 	return (
 		<html lang="en">
 			<head>
@@ -138,21 +143,26 @@ export default function RootLayout({
 					archia.variable,
 				)}
 			>
-				<FarcasterProvider>
-					<Analytics />
-					<WagmiContextProvider>
-						<HypercertExchangeClientProvider>
-							<PriceFeedProvider>
-								<ModalProvider modalVariants={[]}>
-									<Header />
-									<div className="flex-1">{children}</div>
-									<Footer />
-									<Toaster />
-								</ModalProvider>
-							</PriceFeedProvider>
-						</HypercertExchangeClientProvider>
-					</WagmiContextProvider>
-				</FarcasterProvider>
+				<ConsentProvider initialConsent={consentCookie}>
+					<FarcasterProvider>
+						<Analytics />
+						<WagmiContextProvider>
+							<TelemetryConsentGate>
+								<HypercertExchangeClientProvider>
+									<PriceFeedProvider>
+										<ModalProvider modalVariants={[]}>
+											<Header />
+											<div className="flex-1">{children}</div>
+											<Footer />
+											<Toaster />
+										</ModalProvider>
+									</PriceFeedProvider>
+								</HypercertExchangeClientProvider>
+							</TelemetryConsentGate>
+						</WagmiContextProvider>
+					</FarcasterProvider>
+					<GdprBanner />
+				</ConsentProvider>
 			</body>
 		</html>
 	);

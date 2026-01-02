@@ -10,6 +10,7 @@ export const hypercert = `
           name
           description
         }
+        uri
         orders {
           totalUnitsForSale
           cheapestOrder {
@@ -25,6 +26,7 @@ export const hypercert = `
             buyer
             currency
             currency_amount
+            creation_block_timestamp
           }
         }
         hypercert_id

@@ -18,6 +18,7 @@ const MintingProgressDialog = ({
 	badges,
 	visible,
 	setVisible,
+	submissionId,
 }: {
 	mintingFormValues: MintingFormValues | undefined;
 	generateImage: () => Promise<string | undefined>;
@@ -25,6 +26,7 @@ const MintingProgressDialog = ({
 	badges: string[];
 	visible?: boolean;
 	setVisible: (visible: boolean) => void;
+	submissionId: string;
 }) => {
 	return (
 		<Dialog open={visible} onOpenChange={(value) => setVisible(value)}>
@@ -130,6 +132,7 @@ const MintingProgressDialog = ({
 							badges,
 							visible,
 							setVisible,
+							submissionId,
 						}}
 					/>
 				)}

@@ -1,7 +1,6 @@
 "use client";
 
-import { RAW_TOKENS_CONFIG } from "@/config/raw-tokens";
-import { TOKENS_CONFIG } from "@/config/wagmi";
+import { TOKENS_CONFIG } from "@/config/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useState } from "react";
 
