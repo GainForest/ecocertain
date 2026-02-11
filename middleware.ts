@@ -28,7 +28,16 @@ const VALID_ETH_ADDRESS = /^0x[a-fA-F0-9]{40}$/;
 export function middleware(request: NextRequest) {
 	const ua = request.headers.get("user-agent") ?? "";
 
-	// Layer 1: Block known AI crawlers on any matched route
+	// Layer 1: Block any user agent containing "bot" (case-insensitive)
+	const uaLower = ua.toLowerCase();
+	if (uaLower.includes("bot")) {
+		return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+			status: 403,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	// Layer 2: Block known AI crawlers on any matched route
 	const isBlockedBot = BLOCKED_BOTS.some((bot) => ua.includes(bot));
 	if (isBlockedBot) {
 		return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
