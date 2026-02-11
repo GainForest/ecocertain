@@ -5,6 +5,7 @@ import PageError from "@/app/components/shared/PageError";
 import { catchError } from "@/app/utils";
 import { MotionWrapper } from "@/components/ui/motion-wrapper";
 import { fetchHypercertsByUserId } from "@/graphql/hypercerts/queries/user-hypercerts";
+import { notFound } from "next/navigation";
 
 import {
 	type SaleByUser,
@@ -89,7 +90,20 @@ export default async function ProfilePage({
 	searchParams: Promise<{ view: string | string[] | undefined }>;
 }) {
 	const { address } = await params;
-	const formattedAddress = getAddress(address) as `0x${string}`;
+
+	// Early validation: reject non-hex-address paths before any heavy lifting.
+	// This turns bot-crawled garbage URLs (e.g. "/profile/god") into instant 404s
+	// instead of burning serverless compute on viem parsing + GraphQL queries.
+	if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+		notFound();
+	}
+
+	let formattedAddress: `0x${string}`;
+	try {
+		formattedAddress = getAddress(address) as `0x${string}`;
+	} catch {
+		notFound();
+	}
 	const view = getValueFromSearchParams(
 		await searchParams,
 		"view",
