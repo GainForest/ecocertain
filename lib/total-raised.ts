@@ -1,5 +1,3 @@
-import "server-only";
-
 import { currencyDetailsMap } from "@/config/tokens";
 import { unstable_cache } from "next/cache";
 import { getHistoricalUSDPrice } from "./historical-price";

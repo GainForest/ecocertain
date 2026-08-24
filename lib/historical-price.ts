@@ -1,5 +1,3 @@
-import "server-only";
-
 // DeFiLlama chain slugs for the chains we accept donations on. Stablecoins are
 // valued at $1 and never reach this map, so we only need chains with volatile
 // tokens (CELO, native ETH).
