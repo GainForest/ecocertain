@@ -2,6 +2,7 @@ import { hyperboardId } from "@/config/hypercerts";
 import { typeCastApiResponseToBigInt } from "@/lib/utils";
 import { type ResultOf } from "gql.tada";
 import { tryCatch } from "@/lib/tryCatch";
+import { getTotalRaisedInUSD } from "@/lib/total-raised";
 import { fetchHypercertsGraphQL as fetchGraphQL, graphql } from "../";
 import { hypercert } from "./templates";
 
@@ -90,6 +91,8 @@ export type Hypercert = {
   creationBlockTimestamp: bigint;
   orderNonce?: number;
   orderId?: string;
+  // Total USD raised, valued at each donation's price at the time it was made.
+  totalRaisedInUSD?: number;
 };
 
 export const fetchHypercertById = async (
@@ -137,6 +140,10 @@ export const fetchHypercertById = async (
     };
   });
 
+  const [totalRaisedInUSD] = await tryCatch(() =>
+    getTotalRaisedInUSD(hypercertId, parsedSales)
+  );
+
   return {
     hypercertId,
     creatorAddress: hypercert.creator_address as string,
@@ -155,6 +162,7 @@ export const fetchHypercertById = async (
       typeCastApiResponseToBigInt(hypercert.creation_block_timestamp) ?? 0n,
     orderNonce: orderNonce ? Number(orderNonce) : undefined,
     orderId: hypercert.orders?.data?.[0]?.id ?? undefined,
+    totalRaisedInUSD: totalRaisedInUSD ?? undefined,
   };
 };
 

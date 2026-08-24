@@ -61,3 +61,28 @@ for (const chainId in TOKENS_CONFIG) {
 		};
 	}
 }
+
+// Address (lowercased) -> details needed to value a sale, including at a past
+// point in time. Keyed lowercase because on-chain sale currency addresses may
+// come back in a different case than the checksummed config addresses.
+export const currencyDetailsMap: Record<
+	string,
+	{
+		symbol: string;
+		chainId: number;
+		decimals: number;
+		isUSDPegged: boolean;
+	}
+> = {};
+
+for (const chainId in TOKENS_CONFIG) {
+	const tokens = TOKENS_CONFIG[chainId];
+	for (const token of tokens) {
+		currencyDetailsMap[token.address.toLowerCase()] = {
+			symbol: token.symbol,
+			chainId: Number(chainId),
+			decimals: token.decimals,
+			isUSDPegged: token.isUSDPegged,
+		};
+	}
+}

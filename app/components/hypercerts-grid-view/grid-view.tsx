@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 
-import usePriceFeed, { type PriceFeedContext } from "@/app/PriceFeedProvider";
 import { ShowingDisplay, VDPaginator } from "@/components/global/vd-paginator";
 import type { Hypercert } from "@/graphql/hypercerts/queries/hypercerts";
 import autoAnimate from "@formkit/auto-animate";
@@ -12,26 +11,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Card from "./card";
 import Search, { type SortOption, type SortKey } from "./search";
 
-const calculateHypercertTotalSalesInUSD = (
-	hypercert: Hypercert,
-	priceFeed: PriceFeedContext,
-) => {
-	const { sales } = hypercert;
-	const totalSalesInUSD =
-		priceFeed.status === "ready"
-			? sales.reduce((acc, sale) => {
-					return (
-						acc +
-						(priceFeed.toUSD(
-							sale.currency as `0x${string}`,
-							BigInt(sale.currencyAmount),
-						) ?? 0)
-					);
-			  }, 0)
-			: null;
-	return totalSalesInUSD;
-};
-
 export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 	const searchInputState = useState("");
 	const [searchInput, setSearchInput] = searchInputState;
@@ -40,7 +19,6 @@ export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 		order: "asc",
 	});
 	const [sortOptions, setSortOptions] = sortOptionsState;
-	const priceFeed = usePriceFeed();
 	const filteredHypercerts = useMemo(() => {
 		if (searchInput === "") {
 			return hypercerts;
@@ -84,13 +62,13 @@ export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 			});
 		} else if (key === "totalSales") {
 			arr.sort((a, b) => {
-				const aSales = calculateHypercertTotalSalesInUSD(a, priceFeed) ?? 0;
-				const bSales = calculateHypercertTotalSalesInUSD(b, priceFeed) ?? 0;
+				const aSales = a.totalRaisedInUSD ?? 0;
+				const bSales = b.totalRaisedInUSD ?? 0;
 				return order === "asc" ? aSales - bSales : bSales - aSales;
 			});
 		}
 		return arr;
-	}, [filteredHypercerts, sortOptions, priceFeed]);
+	}, [filteredHypercerts, sortOptions]);
 
 	return (
 		<section
@@ -114,10 +92,7 @@ export function GridView({ hypercerts }: { hypercerts: Hypercert[] }) {
 							<Card
 								hypercert={hypercert}
 								key={hypercert.hypercertId}
-								totalSalesInUSD={calculateHypercertTotalSalesInUSD(
-									hypercert,
-									priceFeed,
-								)}
+								totalSalesInUSD={hypercert.totalRaisedInUSD ?? null}
 							/>
 						))}
 					</div>
