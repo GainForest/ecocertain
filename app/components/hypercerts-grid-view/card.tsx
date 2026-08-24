@@ -77,14 +77,28 @@ const Card = ({
 					<p
 						className={cn(
 							"text-ellipsis text-muted-foreground text-sm",
-							pricePerPercentInUSD === undefined
+							pricePerPercentInUSD === undefined && totalSalesInUSD === null
 								? "mb-2.5 line-clamp-5 h-auto min-h-[100px]"
 								: "line-clamp-2 h-10",
 						)}
 					>
 						{description ?? "..."}
 					</p>
-					{pricePerPercentInUSD === undefined ? null : unitsForSale === 0n ? ( // </div> // 	</span> // 		Not listed for sale // 	<span className="inline-block rounded-full bg-beige-muted px-2 text-beige-muted-foreground"> // <div className="flex w-full items-center justify-start text-muted-foreground text-sm">
+					{pricePerPercentInUSD === undefined ? (
+						totalSalesInUSD !== null && (
+							<div className="flex items-center justify-between">
+								<div className="space-y-1">
+									<div className="font-semibold text-sm">
+										${totalSalesInUSD.toFixed(0)} raised
+									</div>
+									<div className="text-muted-foreground text-sm">
+										Not for sale · {buyerCount} buyer
+										{buyerCount !== 1 ? "s" : ""}
+									</div>
+								</div>
+							</div>
+						)
+					) : unitsForSale === 0n ? (
 						<div className="flex w-full items-center justify-start text-muted-foreground text-sm">
 							<span className="inline-block rounded-full bg-destructive/20 px-2 text-destructive">
 								Sold
