@@ -9,7 +9,12 @@ import SiteBoundaries from "./site-boundaries";
 const RightContent = ({ hypercert }: { hypercert: FullHypercert }) => {
 	return (
 		<div className="flex w-full flex-initial flex-col gap-6 lg:w-auto lg:flex-[2]">
-			{hypercert.uri && <SiteBoundaries hypercertCID={hypercert.uri} />}
+			{hypercert.metadata.geoJSON && (
+				<SiteBoundaries
+					geoJSON={hypercert.metadata.geoJSON}
+					name={hypercert.metadata.name}
+				/>
+			)}
 			<Attestations />
 			<Contributors hypercert={hypercert} />
 			<SectionWrapper title={"Verification"}>

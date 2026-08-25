@@ -6,6 +6,42 @@ import { getTotalRaisedInUSD } from "@/lib/total-raised";
 import { fetchHypercertsGraphQL as fetchGraphQL, graphql } from "../";
 import { hypercert } from "./templates";
 
+/**
+ * Pulls the geoJSON site-boundary pointer out of a hypercert's metadata
+ * `properties` (as served by the hypercerts indexer). The indexer returns
+ * `properties` either as a JSON string or an already-parsed array, so we
+ * handle both. Returns undefined when there is no geoJSON property.
+ */
+const extractGeoJSONFromMetadataProperties = (
+  properties: unknown
+): { uri: string; name?: string } | undefined => {
+  if (!properties) return undefined;
+  let parsed: unknown = properties;
+  if (typeof properties === "string") {
+    try {
+      parsed = JSON.parse(properties);
+    } catch {
+      return undefined;
+    }
+  }
+  if (!Array.isArray(parsed)) return undefined;
+  const geoJSONProperty = parsed.find(
+    (property): property is { src: string; name?: string } =>
+      typeof property === "object" &&
+      property !== null &&
+      (property as { trait_type?: unknown }).trait_type === "geoJSON" &&
+      typeof (property as { src?: unknown }).src === "string"
+  );
+  if (!geoJSONProperty) return undefined;
+  return {
+    uri: geoJSONProperty.src,
+    name:
+      typeof geoJSONProperty.name === "string"
+        ? geoJSONProperty.name
+        : undefined,
+  };
+};
+
 const hypercertIdsByHyperboardIdQuery = graphql(`
   query GetHypercertIdsByHyperboardId($hyperboard_id: String!) {
     hyperboards(where: { id: { eq: $hyperboard_id } }) {
@@ -202,6 +238,7 @@ const fullHypercertByHypercertIdQuery = graphql(`
           work_timeframe_from
           work_timeframe_to
           contributors
+          properties
         }
         orders {
           totalUnitsForSale
@@ -299,6 +336,10 @@ export type FullHypercert = {
       to?: bigint;
     };
     contributors: string[];
+    geoJSON?: {
+      uri: string;
+      name?: string;
+    };
   };
 
   cheapestOrder: {
@@ -360,6 +401,7 @@ export const fetchFullHypercertById = async (
   }
 
   const metadata = hypercert.metadata;
+  const geoJSON = extractGeoJSONFromMetadataProperties(metadata?.properties);
   const pricePerPercentInUSD = cheapestOrder?.pricePerPercentInUSD
     ? Number(cheapestOrder?.pricePerPercentInUSD)
     : undefined;
@@ -443,6 +485,7 @@ export const fetchFullHypercertById = async (
       contributors: (metadata?.contributors ?? []).map((contributor) =>
         contributor.toLowerCase()
       ),
+      geoJSON,
     },
     cheapestOrder: {
       pricePerPercentInUSD,

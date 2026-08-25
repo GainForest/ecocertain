@@ -5,7 +5,10 @@ export const generateHypercertIPFSUrl = (cid: string) => {
 };
 
 export const generateEcocertainIPFSUrl = (cid: string) => {
-  return `https://ipfs.io/ipfs/${cid}`;
+  // GainForest pins its metadata + geoJSON to Pinata, so resolve through the
+  // Pinata gateway rather than ipfs.io, which frequently times out for these
+  // CIDs. gateway.pinata.cloud reliably serves Pinata-pinned content.
+  return `https://gateway.pinata.cloud/ipfs/${cid}`;
 };
 
 export const getMetadata = async (cid: string) => {
