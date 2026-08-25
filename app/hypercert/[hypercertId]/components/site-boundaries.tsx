@@ -8,6 +8,7 @@ import { CircleAlert, FileJson2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import SectionWrapper from "./SectionWrapper";
+import SiteBoundaryMap from "./site-boundary-map";
 
 /**
  * Resolves the geoJSON pointer stored on the hypercert metadata into a
@@ -26,15 +27,10 @@ const resolveGeoJSONUrl = (uri: string): string | null => {
 
 const SiteBoundaries = ({
 	geoJSON,
-	name,
 }: {
 	geoJSON: FullHypercert["metadata"]["geoJSON"];
-	name?: string;
 }) => {
 	const geojsonURL = geoJSON ? resolveGeoJSONUrl(geoJSON.uri) : null;
-	const mapPreviewURL = geojsonURL
-		? `https://legacy.gainforest.app/?shapefile=${geojsonURL}&showUI=false`
-		: null;
 
 	return (
 		<SectionWrapper
@@ -53,7 +49,7 @@ const SiteBoundaries = ({
 		>
 			<div className="flex w-full items-center justify-center">
 				<div className="flex aspect-square h-auto min-h-[300px] w-full max-w-[400px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl">
-					{!mapPreviewURL ? (
+					{!geojsonURL ? (
 						<>
 							<CircleAlert
 								className="mb-4 text-muted-foreground/75"
@@ -64,13 +60,7 @@ const SiteBoundaries = ({
 							</p>
 						</>
 					) : (
-						<iframe
-							height="500"
-							width="500"
-							src={mapPreviewURL}
-							title={`GeoJSON for ${name ?? "hypercert"}`}
-							className="h-full w-full"
-						/>
+						<SiteBoundaryMap geojsonURL={geojsonURL} />
 					)}
 				</div>
 			</div>

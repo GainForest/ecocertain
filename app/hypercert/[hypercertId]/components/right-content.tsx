@@ -10,10 +10,7 @@ const RightContent = ({ hypercert }: { hypercert: FullHypercert }) => {
 	return (
 		<div className="flex w-full flex-initial flex-col gap-6 lg:w-auto lg:flex-[2]">
 			{hypercert.metadata.geoJSON && (
-				<SiteBoundaries
-					geoJSON={hypercert.metadata.geoJSON}
-					name={hypercert.metadata.name}
-				/>
+				<SiteBoundaries geoJSON={hypercert.metadata.geoJSON} />
 			)}
 			<Attestations />
 			<Contributors hypercert={hypercert} />
